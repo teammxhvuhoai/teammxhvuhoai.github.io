@@ -1,318 +1,360 @@
+```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shopee Link Copy Tool</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopee Quick Copy</title>
 
-    body {
-      background: linear-gradient(180deg, #ff6a00, #ff8c42);
-      min-height: 100vh;
-      padding: 12px;
-      color: white;
-    }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
 
-    .container {
-      width: 100%;
-      max-width: 500px;
-      margin: auto;
-      background: rgba(255,255,255,0.12);
-      border-radius: 24px;
-      padding: 16px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
+body{
+    background:linear-gradient(180deg,#ff6a00,#ff8c42);
+    min-height:100vh;
+    padding:12px;
+    color:white;
+}
 
-    h1 {
-      text-align: center;
-      font-size: 26px;
-      margin-bottom: 8px;
-      color: white;
-    }
+.container{
+    max-width:500px;
+    margin:auto;
+    background:rgba(255,255,255,0.12);
+    border-radius:24px;
+    padding:16px;
+    backdrop-filter:blur(10px);
+}
 
-    .desc {
-      text-align: center;
-      font-size: 13px;
-      opacity: 0.95;
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
+h1{
+    text-align:center;
+    margin-bottom:10px;
+}
 
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
+.desc{
+    text-align:center;
+    font-size:13px;
+    margin-bottom:15px;
+}
 
-    .toolbar button {
-      flex: 1;
-      border: none;
-      background: white;
-      color: #ff6a00;
-      padding: 12px 10px;
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+.toolbar{
+    display:flex;
+    gap:8px;
+    margin-bottom:15px;
+}
 
-    .toolbar button:active {
-      transform: scale(0.96);
-    }
+.toolbar button{
+    flex:1;
+    border:none;
+    background:white;
+    color:#ff6a00;
+    padding:12px;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
 
-    .copy-btn {
-      border: none;
-      background: white;
-      border-radius: 18px;
-      padding: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      text-align: left;
-      min-height: 88px;
-      overflow: hidden;
-      position: relative;
-    }
+.copy-btn{
+    border:none;
+    background:white;
+    border-radius:18px;
+    padding:12px;
+    text-align:left;
+    min-height:95px;
+    position:relative;
+    cursor:pointer;
+}
 
-    .copy-btn:active {
-      transform: scale(0.96);
-    }
+.copy-title{
+    color:#ff6a00;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
 
-    .copy-title {
-      color: #ff6a00;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
+.copy-link{
+    color:#666;
+    font-size:10px;
+    word-break:break-all;
+}
 
-    .copy-link {
-      color: #555;
-      font-size: 10px;
-      word-break: break-all;
-      line-height: 1.4;
-      max-height: 42px;
-      overflow: hidden;
-    }
+.copied-tag{
+    position:absolute;
+    top:8px;
+    right:8px;
+    background:#2ecc71;
+    color:white;
+    font-size:10px;
+    padding:3px 6px;
+    border-radius:999px;
+    display:none;
+}
 
-    .copied-tag {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #2ecc71;
-      color: white;
-      font-size: 10px;
-      padding: 4px 6px;
-      border-radius: 999px;
-      display: none;
-    }
+.copy-btn.copied .copied-tag{
+    display:block;
+}
 
-    .copy-btn.copied .copied-tag {
-      display: block;
-    }
+.status{
+    text-align:center;
+    margin:16px 0;
+    font-weight:bold;
+}
 
-    .status {
-      text-align: center;
-      font-size: 14px;
-      margin: 16px 0;
-      font-weight: bold;
-    }
+textarea{
+    width:100%;
+    height:130px;
+    border:none;
+    border-radius:16px;
+    padding:12px;
+    font-size:13px;
+    resize:none;
+    margin-bottom:12px;
+    outline:none;
+    color:#333;
+}
 
-    textarea {
-      width: 100%;
-      height: 130px;
-      border: none;
-      border-radius: 16px;
-      padding: 12px;
-      font-size: 13px;
-      resize: none;
-      margin-bottom: 12px;
-      outline: none;
-      color: #333;
-      font-weight: 500;
-    }
+textarea::placeholder{
+    color:rgba(0,0,0,0.35);
+}
 
-    textarea::placeholder {
-      color: rgba(0,0,0,0.35);
-      font-weight: 400;
-    }
-      outline: none;
-    }
-
-    .footer {
-      text-align: center;
-      font-size: 11px;
-      opacity: 0.8;
-      margin-top: 10px;
-    }
-  </style>
+.footer{
+    text-align:center;
+    font-size:11px;
+    margin-top:10px;
+}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>🚀 Shopee Link Quick Copy</h1>
-    <p class="desc">
-      Nhấn button để copy link cực nhanh — phù hợp spam share / đăng bài / marketing.
-    </p>
 
-    <div class="toolbar">
-      <button onclick="shuffleLinks()">🔀 Trộn Link</button>
-      <button onclick="copyRandom()">🎲 Copy Random</button>
-      <button onclick="generateButtons()">🔄 Reload Button</button>
-    </div>
+<div class="container">
 
-    <div class="grid" id="buttonGrid"></div>
+<h1>🚀 Shopee Quick Copy</h1>
 
-    <div class="status" id="statusText">Sẵn sàng copy...</div>
+<p class="desc">
+Copy cực nhanh link Shopee cho mobile
+</p>
 
-    <textarea id="linkInput" placeholder="Tên sản phẩm | https://shopee.vn/abc"></textarea>
+<div class="toolbar">
+<button onclick="shuffleLinks()">🔀 Trộn</button>
+<button onclick="copyRandom()">🎲 Random</button>
+<button onclick="generateButtons()">🔄 Reload</button>
+</div>
 
-    <div class="toolbar">
-      <button onclick="loadCustomLinks()">➕ Load Link Mới</button>
-    </div>
+<div class="grid" id="buttonGrid"></div>
 
-    <div class="footer">
-      HTML Tool - Copy Link Shopee Siêu Nhanh
-    </div>
-  </div>
+<div class="status" id="statusText">
+Sẵn sàng copy...
+</div>
 
-  <script>
-    let links = [
-      {
-        title: 'Mỗi lượt click là một lượt ủng hộ để page phát triển - Deal Quạt Mini tích hợp sò lạnh mát sâu ',
-        url: 'https://s.shopee.vn/1gFZahEg1a'
-      },
-      {
-        title: 'Mỗi lượt click là một lượt ủng hộ để page phát triển- Deal Quạt Mini tích hợp sò lạnh mát sâu ',
-        url: 'https://s.shopee.vn/AUqy7Af2tm'
-      },
-      {
-        title: 'Voucher Thời Trang đi biển Nữ',
-        url: 'https://s.shopee.vn/BQloEhujt'
-      },
-      {
-        title: 'Voucher Thời Trang đi biển Nam ',
-        url: 'https://s.shopee.vn/6pxfkVdZyq'
-      },
-      {
-        title: 'Phụ Kiện Điện Thoại Hot',
-        url: 'https://s.shopee.vn/qgSbXdUgf'
-      },
-      {
-        title: 'Giảm Giá Máy đánh bọt Cafe',
-        url: 'https://s.shopee.vn/4AwuZiQpVj'
-      }
-    ];
+<textarea
+id="linkInput"
+placeholder="Tên sản phẩm | https://shopee.vn/abc"
+></textarea>
 
-    const buttonGrid = document.getElementById('buttonGrid');
-    const statusText = document.getElementById('statusText');
+<div class="toolbar">
+<button onclick="loadCustomLinks()">
+➕ Load Link Mới
+</button>
+</div>
 
-    function generateButtons() {
-      buttonGrid.innerHTML = '';
+<div class="footer">
+Shopee Link Tool
+</div>
 
-      links.forEach((item, index) => {
-        const btn = document.createElement('button');
-        btn.className = 'copy-btn';
+</div>
 
-        btn.innerHTML = `
-          <div class="copied-tag">COPIED</div>
-          <div class="copy-title">${item.title}</div>
-          <div class="copy-link">${item.url}</div>
-        `;
+<script>
 
-        btn.onclick = () => copyLink(item, btn, index + 1);
+let links = [
+{
+title:'Deal Quạt Mini tích hợp sò lạnh',
+url:'https://s.shopee.vn/1gFZahEg1a'
+},
+{
+title:'Deal Mỹ Phẩm Hot',
+url:'https://s.shopee.vn/AUqy7Af2tm'
+},
+{
+title:'Voucher Thời Trang Nữ',
+url:'https://s.shopee.vn/BQloEhujt'
+},
+{
+title:'Voucher Thời Trang Nam',
+url:'https://s.shopee.vn/6pxfkVdZyq'
+}
+];
 
-        buttonGrid.appendChild(btn);
-      });
-    }`;
+const buttonGrid=document.getElementById('buttonGrid');
+const statusText=document.getElementById('statusText');
 
-        btn.onclick = () => copyLink(link, btn, index + 1);
+function generateButtons(){
 
-        buttonGrid.appendChild(btn);
-      });
-    }
+buttonGrid.innerHTML='';
 
-    function copyLink(item, button, number) {
-      const fullText = `${item.title}
+links.forEach((item,index)=>{
+
+const btn=document.createElement('button');
+
+btn.className='copy-btn';
+
+btn.innerHTML=`
+<div class="copied-tag">COPIED</div>
+<div class="copy-title">${item.title}</div>
+<div class="copy-link">${item.url}</div>
+`;
+
+btn.onclick=()=>{
+copyLink(item,btn,index+1);
+};
+
+buttonGrid.appendChild(btn);
+
+});
+
+}
+
+function fallbackCopy(text){
+
+const textarea=document.createElement('textarea');
+
+textarea.value=text;
+
+document.body.appendChild(textarea);
+
+textarea.select();
+
+document.execCommand('copy');
+
+document.body.removeChild(textarea);
+
+}
+
+function copyLink(item,button){
+
+const fullText=
+`${item.title}
 ${item.url}`;
 
-      navigator.clipboard.writeText(fullText)
-        .then(() => {
-          statusText.innerHTML = `✅ Đã copy: ${item.title}`;
+if(navigator.clipboard){
 
-          button.classList.add('copied');
+navigator.clipboard.writeText(fullText)
+.then(()=>{
 
-          setTimeout(() => {
-            button.classList.remove('copied');
-          }, 1200);
-        })
-        .catch(() => {
-          statusText.innerHTML = '❌ Copy thất bại';
-        });
-    }
+showCopied(button,item.title);
 
-    function shuffleLinks() {
-      for (let i = links.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [links[i], links[j]] = [links[j], links[i]];
-      }
+})
+.catch(()=>{
 
-      generateButtons();
-      statusText.innerHTML = '🔀 Đã trộn danh sách link';
-    }
+fallbackCopy(fullText);
 
-    function copyRandom() {
-      const randomIndex = Math.floor(Math.random() * links.length);
-      const item = links[randomIndex];
+showCopied(button,item.title);
 
-      const fullText = `${item.title}
-${item.url}`;
+});
 
-      navigator.clipboard.writeText(fullText)
-        .then(() => {
-          statusText.innerHTML = `🎲 Đã copy random: ${item.title}`;
-        });
-    }
+}else{
 
-    function loadCustomLinks() {
-      const input = document.getElementById('linkInput').value.trim();
+fallbackCopy(fullText);
 
-      if (!input) {
-        alert('Vui lòng nhập dữ liệu');
-        return;
-      }
+showCopied(button,item.title);
 
-      const rows = input.split('
-');
+}
 
-      links = rows.map((row, index) => {
-        const parts = row.split('|');
+}
 
-        return {
-          title: parts[0] || `Link ${index + 1}`,
-          url: parts[1] || parts[0]
-        };
-      });
+function showCopied(button,title){
 
-      generateButtons();
+statusText.innerHTML=`✅ Đã copy: ${title}`;
 
-      statusText.innerHTML = `🚀 Đã load ${links.length} link mới`;
-    }
+button.classList.add('copied');
 
-    generateButtons();
-  </script>
+setTimeout(()=>{
+
+button.classList.remove('copied');
+
+},1200);
+
+}
+
+function shuffleLinks(){
+
+for(let i=links.length-1;i>0;i--){
+
+const j=Math.floor(Math.random()*(i+1));
+
+[links[i],links[j]]=[links[j],links[i]];
+
+}
+
+generateButtons();
+
+statusText.innerHTML='🔀 Đã trộn danh sách';
+
+}
+
+function copyRandom(){
+
+const randomIndex=Math.floor(Math.random()*links.length);
+
+const item=links[randomIndex];
+
+copyLink(item,document.createElement('button'));
+
+}
+
+function loadCustomLinks(){
+
+const input=document
+.getElementById('linkInput')
+.value
+.trim();
+
+if(!input){
+
+alert('Vui lòng nhập dữ liệu');
+
+return;
+
+}
+
+const rows=input.split('\n');
+
+links=rows.map((row,index)=>{
+
+const parts=row.split('|');
+
+return{
+
+title:parts[0]?.trim() || `Link ${index+1}`,
+
+url:parts[1]?.trim() || parts[0]?.trim()
+
+};
+
+});
+
+generateButtons();
+
+statusText.innerHTML=
+`🚀 Đã load ${links.length} link mới`;
+
+}
+
+generateButtons();
+
+</script>
+
 </body>
 </html>
+```
