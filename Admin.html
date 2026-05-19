@@ -142,6 +142,15 @@
       resize: none;
       margin-bottom: 12px;
       outline: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    textarea::placeholder {
+      color: rgba(0,0,0,0.35);
+      font-weight: 400;
+    }
+      outline: none;
     }
 
     .footer {
@@ -169,7 +178,7 @@
 
     <div class="status" id="statusText">Sẵn sàng copy...</div>
 
-    <textarea id="linkInput" placeholder="Dán danh sách link Shopee tại đây, mỗi dòng 1 link..."></textarea>
+    <textarea id="linkInput" placeholder="Tên sản phẩm | https://shopee.vn/abc"></textarea>
 
     <div class="toolbar">
       <button onclick="loadCustomLinks()">➕ Load Link Mới</button>
