@@ -329,11 +329,47 @@ statusText.innerHTML='🔀 Đã trộn danh sách';
 
 function copyRandom(){
 
-const randomIndex=Math.floor(Math.random()*links.length);
+```javascript
+let lastRandomIndex = -1;
 
-const item=links[randomIndex];
+function copyRandom() {
 
-copyLink(item,document.createElement('button'));
+    if (links.length === 0) return;
+
+    let randomIndex;
+
+    do {
+
+        randomIndex = Math.floor(
+            Math.random() * links.length
+        );
+
+    } while (
+        links.length > 1 &&
+        randomIndex === lastRandomIndex
+    );
+
+    lastRandomIndex = randomIndex;
+
+    const item = links[randomIndex];
+
+    // copy
+    copyLink(
+        item,
+        document.createElement('button')
+    );
+
+    // tự trộn danh sách sau khi copy
+    shuffleLinks();
+
+    // highlight trạng thái
+    statusText.innerHTML =
+    `🎲 Random không trùng:
+    ${item.title}`;
+
+}
+```
+
 
 }
 
