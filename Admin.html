@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Quản Trị Viên - Tin Tức MXH</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      padding: 20px;
+      color: #1e3a8a;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(30, 64, 175, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h2 { text-align: center; color: #1e40af; margin-bottom: 20px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+    /* Tab Control */
+    .tabs-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e3f2fd;
+    }
+    .tab-btn {
+      padding: 12px 20px;
+      cursor: pointer;
+      border: none;
+      background: #f1f5f9;
+      color: #64748b;
+      font-weight: 600;
+      border-radius: 10px 10px 0 0;
+      transition: all 0.3s;
+      flex: 1;
+    }
+    .tab-btn.active {
+      background: #1e88e5;
+      color: white;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+    /* Group Box (Fieldset) Style */
+    .group-box {
+      border: 1.5px solid #90caf9;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: #fcfdfe;
+    }
+    .group-box legend {
+      padding: 0 10px;
+      font-weight: bold;
+      color: #1e88e5;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Form Styles */
+    label { font-weight: 600; color: #1e40af; display: flex; align-items: center; gap: 6px; font-size: 14px; margin-top: 10px; margin-bottom: 5px; }
+    input[type="text"], textarea {
+      width: 100%; padding: 11px; border: 1.5px solid #90caf9;
+      border-radius: 10px; font-size: 14px; transition: 0.3s;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #42a5f5; box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2); }
+    textarea { min-height: 80px; resize: vertical; }
+
+    .input-group { display: flex; gap: 8px; align-items: center; margin-bottom: 5px; }
+    .btn-small { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; transition: 0.2s; }
+    .btn-add { background: #42a5f5; }
+    .btn-remove { background: #ef5350; }
+
+    .media-list {
+      max-height: 150px; overflow-y: auto; padding: 8px; margin-top: 5px;
+      background: #f8fbff; border-radius: 10px; border: 1px dashed #90caf9;
+    }
+.media-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px; background: #e3f2fd; border-radius: 8px; margin-bottom: 5px; font-size: 13px;
+    }
+
+    /* Assistant Buttons */
+    .assistant-grid { display: flex; flex-direction: column; gap: 15px; padding: 10px 0; }
+    .btn-assistant {
+      padding: 18px; border: 2px solid #1e88e5; border-radius: 12px;
+      background: #fff; color: #1e88e5; font-weight: bold; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; transition: 0.3s;
+    }
+    .btn-assistant:hover { background: #1e88e5; color: #fff; transform: translateY(-3px); }
+
+    /* Action Buttons */
+    .btn { width: 100%; padding: 13px; background: #1e88e5; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-secondary { background: #42a5f5; }
+    #output, #outputtt { background: #f8fbff; font-family: monospace; font-size: 12px; margin-top: 5px; }
+
+    /* Tooltip & Popup */
+    .tooltip-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; touch-action: none; }
+    .tooltip-btn { width: 56px; height: 56px; background: #1e88e5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .tooltip-menu { position: absolute; bottom: 70px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 10px; display: none; flex-direction: column; min-width: 200px; }
+    .tooltip-menu.active { display: flex; }
+    .tooltip-item { padding: 10px; text-decoration: none; color: #1e3a8a; display: flex; align-items: center; gap: 10px; font-size: 14px; border-radius: 8px; }
+    .tooltip-item:hover { background: #e3f2fd; }
+
+    .popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+    .popup-content { background: #fff; padding: 24px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2><i class="fas fa-tasks"></i> Admin Hoài Panel</h2>
+
+    <div class="tabs-header">
+      <div class="tab-btn active" onclick="openTab(event, 'tab-ui')">Tạo giao diện trang</div>
+      <div class="tab-btn" onclick="openTab(event, 'tab-ai')">Trợ lý ảo</div>
+      <div class="tab-btn" onclick="openTab(event, 'tab-affiliate')">TikTok Affiliate</div>
+    </div>
+    <div id="tab-ui" class="tab-content active">
+      <fieldset class="group-box">
+        <legend><i class="fas fa-edit"></i> Nội dung hiển thị</legend>
+<label>Tiêu đề bài viết</label>
+        <input type="text" id="a" placeholder="Nhập tiêu đề...">
+
+        <label>Nội dung chi tiết</label>
+        <textarea id="ab" placeholder="Mô tả sự kiện..."></textarea>
+
+        <label>Video Google Drive (nhiều)</label>
+        <div class="input-group">
+          <input type="text" id="videoInput" placeholder="Dán link drive...">
+          <button class="btn-small btn-add" onclick="themVideo()"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="media-list" id="videoList"></div>
+
+        <label>Ảnh chi tiết (nhiều)</label>
+        <div class="input-group">
+          <input type="text" id="imageInput" placeholder="Dán link ảnh...">
+          <button class="btn-small btn-add" onclick="themAnh()"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="media-list" id="imageList"></div>
+
+        <label>Quảng cáo (Link ảnh & Đích)</label>
+        <input list="videoAds" type="text" id="c" placeholder="Link ảnh quảng cáo..." style="margin-bottom:8px">
+        <datalist id="videoAds">
+          <option value="https://tintucmxh.github.io/TinTucMXH/vn-11134258-820l4-mgug0poszr4b79.webp">Shopee Banner</option>
+          <option value="https://tintucmxh.github.io/TinTucMXH/mbhtrungquyen.webp">Mũ Bảo Hiểm</option>
+        </datalist>
+        <input list="Ads" type="text" id="d" placeholder="Link Shopee, Tiki...">
+        <datalist id="Ads">
+            <option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F642872908%2F26564042129%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkUm9yWVZMbGw0Q214S0d1TzNEZmUwNE9UTHo2Tmlza0JVKzdncFhxMXphcGxLOUkzNmJTODV4Q0JJajV2ZlM3VEQxR3RUU01TUEZwc1lyZCtlZkhXQ011RmVRTHBYZHlIanB5OFBvYXN2dXZKbW95Tmt5bHFLNkNLcks5Vk5iTW53PT0&sm=fb_partner&affiliate_id=17335420220">Link 1</option>
+          <option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F1597381587%2F42120625683%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkZmdTUmpMeSszRElEdm91eXFrOVhzNUp2MkZYam1qS3k3K3JBMzBkWUdkT3NMS0daZGtXc3VwZG5HOEthM3JRT3ZiTFdUN3BXVmxvMVpEZEpJZ05aZytzcEtWR0ZVbE9NeE1VK2Y3VVM2UmxiOWFTaHc0NmpzcFE0NmtValZSTjFnPT0&sm=fb_partner&affiliate_id=17335420220">Link 2</option>
+  <option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F60321356%2F24186455622%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkUzJYdkg4SUFId3huV3BOemxRSlQvQ0FTRWFTMUw4TExrd1hYRGlPUlVlRFlTak9NYXBzZEJ1VTFCZkx4UlFUT3k5NEx1SEJ3bTZoMkZrcEhzaFRWTmtqRUxoeFN3emk4cm8zaTY1RjlTWlc&sm=fb_partner&affiliate_id=17335420220">Link 3</option>
+<option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F134371556%2F42423910759%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkUm9yWVZMbGw0Q214S0d1TzNEZmUwNVVDbzlwcVRBVDZ3dDl1dlZ5dlpHVU9rTkFDY2RVZ0UvMkgxNHRJRktEa2xqVER6SDRwT3FQUGFXQ3YrTDhCNWFoNHZSN3BWL3c4K21FUkdUckd6a2x6d2V1MlJaUSt2UjV3WnR4UGRRT3hBPT0&sm=fb_partner&affiliate_id=17335420220">Link 4</option>
+  <option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F1362679168%2F42725093098%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkZmdTUmpMeSszRElEdm91eXFrOVhzNU5xQVdFa0NHWU9WRTU1RHdLSWo0ZXhIWHJ4M0lsYmpSdSs5WmdlMGwxYjBNQnd6ZXc0RUR1UGpqWVJXbDhPb04yam9MNVpueWpFa3pJUUE5ditLdTJ0TkU4U1BmUmUzSW9ncC9kTnA3UXpBPT0&sm=fb_partner&affiliate_id=17335420220">Link 5</option>
+  <option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F1116012986%2F28111763195%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkZmdTUmpMeSszRElEdm91eXFrOVhzNDFUcWFjSXJ2THR4K3RtYnBENjR2Qk1BdVY0b3M2WnN0VTEvcjhUaXp0YmROU2o1ZmxIWkFGVG9LSFMwd2FCelRhbVpIL3lTZkd3Z3g5Z2tnWFFrNkVtV3VYUTBoSDhuT1JsZHBJSVpKOGJ3PT0&sm=fb_partner&affiliate_id=17335420220">Link 6</option>
+  <option value="https://s.shopee.vn/an_redir?origin_link=https%3A%2F%2Fshopee.vn%2Fproduct%2F457209160%2F23750569400%3Fgads_t_sig%3DVTJGc2RHVmtYMTlxTFVSVVRrdENkUm9yWVZMbGw0Q214S0d1TzNEZmUwNEx3RU1NWVR6VVpZaFBSSTVaV20wVk9HWVJ3QVM2SzhIT1lqYWhwZlRUWVVrWGU3d2l6RlhkTFl5UlluT0h2
