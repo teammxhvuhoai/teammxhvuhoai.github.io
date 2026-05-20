@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <title>Shopee Quick Copy</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -143,9 +141,7 @@ textarea::placeholder{
     margin-top:10px;
     opacity:0.8;
 }
-
 </style>
-
 </head>
 
 <body>
@@ -159,19 +155,9 @@ Copy cực nhanh link Shopee cho mobile
 </p>
 
 <div class="toolbar">
-
-<button onclick="shuffleLinks()">
-🔀 Trộn
-</button>
-
-<button onclick="copyRandom()">
-🎲 Random
-</button>
-
-<button onclick="generateButtons()">
-🔄 Reload
-</button>
-
+<button onclick="shuffleLinks()">🔀 Trộn</button>
+<button onclick="copyRandom()">🎲 Random</button>
+<button onclick="generateButtons()">🔄 Reload</button>
 </div>
 
 <div class="grid" id="buttonGrid"></div>
@@ -186,11 +172,9 @@ placeholder="Tên sản phẩm | https://shopee.vn/abc"
 ></textarea>
 
 <div class="toolbar">
-
 <button onclick="loadCustomLinks()">
 ➕ Load Link Mới
 </button>
-
 </div>
 
 <div class="footer">
@@ -202,236 +186,206 @@ Shopee Link Tool
 <script>
 
 let links = [
-{ title:'Deal Quạt Mini tích hợp sò lạnh', url:'https://s.shopee.vn/1gFZahEg1a' }, { title:'Deal Quạt Hot', url:'https://s.shopee.vn/AUqy7Af2tm' }, { title:'Voucher Thời Trang Nữ', url:'https://s.shopee.vn/BQloEhujt' }, { title:'Voucher Son bóng lifter Gloss', url:'https://s.shopee.vn/6VKpMYpN8l' }, { title:'Voucher Camera giám sát', url:'https://s.shopee.vn/8V5tkKBdX3' }, { title:'Voucher Thẻ nhớ', url:'https://s.shopee.vn/5L8ryXGhGf' }, { title:'Voucher Thẻ nhớ 32g/64g', url:'https://s.shopee.vn/3B4NOaFoqW' }, { title:'Voucher Thiết bị định vị thông minh', url:'https://s.shopee.vn/7AaWA0h2eG' }, { title:'Voucher Quạt tốc độ gió cao, url:'https://s.shopee.vn/8pik98naPI' }, { title:'Voucher Máy sấy tóc', url:'https://s.shopee.vn/30kxCSdqv5' }
+{ title:'Deal Quạt Mini tích hợp sò lạnh', url:'https://s.shopee.vn/1gFZahEg1a' },
+{ title:'Deal Quạt Hot', url:'https://s.shopee.vn/AUqy7Af2tm' },
+{ title:'Voucher Thời Trang Nữ', url:'https://s.shopee.vn/BQloEhujt' },
+{ title:'Voucher Son bóng lifter Gloss', url:'https://s.shopee.vn/6VKpMYpN8l' },
+{ title:'Voucher Camera giám sát', url:'https://s.shopee.vn/8V5tkKBdX3' },
+{ title:'Voucher Thẻ nhớ', url:'https://s.shopee.vn/5L8ryXGhGf' },
+{ title:'Voucher Thẻ nhớ 32g/64g', url:'https://s.shopee.vn/3B4NOaFoqW' },
+{ title:'Voucher Thiết bị định vị thông minh', url:'https://s.shopee.vn/7AaWA0h2eG' },
+{ title:'Voucher Quạt tốc độ gió cao', url:'https://s.shopee.vn/8pik98naPI' },
+{ title:'Voucher Máy sấy tóc', url:'https://s.shopee.vn/30kxCSdqv5' }
 ];
 
-const buttonGrid =
-document.getElementById('buttonGrid');
-
-const statusText =
-document.getElementById('statusText');
+const buttonGrid = document.getElementById('buttonGrid');
+const statusText = document.getElementById('statusText');
 
 let lastRandomIndex = -1;
 
 function generateButtons(){
 
-buttonGrid.innerHTML='';
+    buttonGrid.innerHTML = '';
 
-links.forEach((item,index)=>{
+    links.forEach((item,index)=>{
 
-const btn=document.createElement('button');
+        const btn = document.createElement('button');
 
-btn.className='copy-btn';
+        btn.className = 'copy-btn';
 
-btn.innerHTML=`
+        btn.innerHTML = `
+            <div class="copied-tag">
+                COPIED
+            </div>
 
-<div class="copied-tag">
-COPIED
-</div>
+            <div class="copy-title">
+                ${item.title}
+            </div>
 
-<div class="copy-title">
-${item.title}
-</div>
+            <div class="copy-link">
+                ${item.url}
+            </div>
+        `;
 
-<div class="copy-link">
-${item.url}
-</div>
+        btn.onclick = () => {
+            copyLink(item,btn,index);
+        };
 
-`;
+        buttonGrid.appendChild(btn);
 
-btn.onclick=()=>{
-
-copyLink(item,btn,index);
-
-};
-
-buttonGrid.appendChild(btn);
-
-});
+    });
 
 }
 
 function fallbackCopy(text){
 
-const textarea =
-document.createElement('textarea');
+    const textarea = document.createElement('textarea');
 
-textarea.value = text;
+    textarea.value = text;
 
-document.body.appendChild(textarea);
+    document.body.appendChild(textarea);
 
-textarea.select();
+    textarea.select();
 
-document.execCommand('copy');
+    document.execCommand('copy');
 
-document.body.removeChild(textarea);
-
-}
-
-function copyLink(item,button,index){
-
-const fullText =
-`${item.title}
-${item.url}`;
-
-if(navigator.clipboard){
-
-navigator.clipboard.writeText(fullText)
-
-.then(()=>{
-
-showCopied(button,item.title);
-
-})
-
-.catch(()=>{
-
-fallbackCopy(fullText);
-
-showCopied(button,item.title);
-
-});
-
-}else{
-
-fallbackCopy(fullText);
-
-showCopied(button,item.title);
+    document.body.removeChild(textarea);
 
 }
+
+async function copyLink(item,button){
+
+    const fullText = `${item.title}\n${item.url}`;
+
+    try{
+
+        if(navigator.clipboard){
+            await navigator.clipboard.writeText(fullText);
+        }else{
+            fallbackCopy(fullText);
+        }
+
+        showCopied(button,item.title);
+
+    }catch(error){
+
+        fallbackCopy(fullText);
+
+        showCopied(button,item.title);
+
+    }
 
 }
 
 function showCopied(button,title){
 
-statusText.innerHTML =
-`✅ Đã copy: ${title}`;
+    statusText.textContent = `✅ Đã copy: ${title}`;
 
-if(button){
+    if(button){
 
-button.classList.add('copied');
+        button.classList.add('copied');
 
-setTimeout(()=>{
+        setTimeout(()=>{
+            button.classList.remove('copied');
+        },1200);
 
-button.classList.remove('copied');
-
-},1200);
-
-}
+    }
 
 }
 
 function shuffleLinks(){
 
-for(
-let i=links.length-1;
-i>0;
-i--
-){
+    for(let i = links.length - 1; i > 0; i--){
 
-const j =
-Math.floor(
-Math.random()*(i+1)
-);
+        const j = Math.floor(Math.random() * (i + 1));
 
-[links[i],links[j]] =
-[links[j],links[i]];
+        [links[i],links[j]] = [links[j],links[i]];
 
-}
+    }
 
-generateButtons();
+    generateButtons();
 
-statusText.innerHTML =
-'🔀 Đã trộn danh sách';
+    statusText.textContent = '🔀 Đã trộn danh sách';
 
 }
 
 function copyRandom(){
 
-if(links.length===0) return;
+    if(links.length === 0) return;
 
-let randomIndex;
+    let randomIndex;
 
-do{
+    do{
 
-randomIndex =
-Math.floor(
-Math.random()*links.length
-);
+        randomIndex = Math.floor(
+            Math.random() * links.length
+        );
 
-}
-while(
-links.length>1 &&
-randomIndex===lastRandomIndex
-);
+    }while(
+        links.length > 1 &&
+        randomIndex === lastRandomIndex
+    );
 
-lastRandomIndex=randomIndex;
+    lastRandomIndex = randomIndex;
 
-const item=links[randomIndex];
+    const item = links[randomIndex];
 
-copyLink(
-item,
-null,
-randomIndex
-);
+    copyLink(item,null);
 
-shuffleLinks();
+    shuffleLinks();
 
-statusText.innerHTML =
-`🎲 Random không trùng:
-${item.title}`;
+    statusText.textContent =
+    `🎲 Random không trùng: ${item.title}`;
 
 }
 
 function loadCustomLinks(){
 
-const input =
-document
-.getElementById('linkInput')
-.value
-.trim();
+    const input = document
+        .getElementById('linkInput')
+        .value
+        .trim();
 
-if(!input){
+    if(!input){
 
-alert('Vui lòng nhập dữ liệu');
+        alert('Vui lòng nhập dữ liệu');
 
-return;
+        return;
+
+    }
+
+    const rows = input
+        .split('\n')
+        .filter(row => row.trim() !== '');
+
+    links = rows.map((row,index)=>{
+
+        const parts = row.split('|');
+
+        return {
+
+            title:
+                parts[0]?.trim() ||
+                `Link ${index + 1}`,
+
+            url:
+                parts[1]?.trim() ||
+                parts[0]?.trim()
+
+        };
+
+    });
+
+    generateButtons();
+
+    statusText.textContent =
+    `🚀 Đã load ${links.length} link mới`;
 
 }
 
-const rows =
-input.split('\n');
-
-links =
-rows.map((row,index)=>{
-
-const parts =
-row.split('|');
-
-return{
-
-title:
-parts[0]?.trim()
-||
-`Link ${index+1}`,
-
-url:
-parts[1]?.trim()
-||
-parts[0]?.trim()
-
-};
-
-});
-
 generateButtons();
 
-statusText.innerHTML =
-`🚀 Đã load
-${links.length}
-link mới`;
-}
-generateButtons();
 </script>
+
 </body>
 </html>
