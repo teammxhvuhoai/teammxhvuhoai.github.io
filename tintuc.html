@@ -73,6 +73,32 @@ color:#0a6fd6;
 font-weight:bold;
 margin-bottom:3px;
 }
+  /* COPY BADGE */
+button{
+position:relative;
+overflow:hidden;
+}
+
+.copied-badge{
+position:absolute;
+top:5px;
+right:5px;
+background:#16a34a;
+color:#fff;
+font-size:10px;
+padding:2px 6px;
+border-radius:20px;
+font-weight:bold;
+opacity:0;
+transform:translateY(-5px);
+transition:0.25s;
+pointer-events:none;
+}
+
+button.show-copied .copied-badge{
+opacity:1;
+transform:translateY(0);
+}
 </style>
 </head>
 
@@ -264,34 +290,42 @@ result.push(match[2].trim());
 
 return result;
 }
-
+  
+// SHOW COPIED
+function showCopied(button){
+if(!button) return;
+let badge = button.querySelector(".copied-badge");
+if(!badge){
+badge = document.createElement("span");
+badge.className = "copied-badge";
+badge.innerText = "Copied";
+button.appendChild(badge);
+}
 // COPY DATA (SMART)
-function copyData(id,tag,index){
+function copyData(id,tag,index,button){
 let mode = getMode();
-
 // giữ nguyên
 if(mode === "single"){
 let text=document.getElementById(id).value;
-navigator.clipboard.writeText(text+"\n\nNgày đăng: "+today()+"\n"+tag);
+navigator.clipboard.writeText(
+text+"\n\nNgày đăng: "+today()+"\n"+tag
+);
 notify("Đã copy");
+showCopied(button);
 return;
 }
-
 // tách chuỗi
 let arr = splitText();
-
 if(arr.length < index){
 notify("Thiếu dòng "+index);
 return;
 }
-
 let text = arr[index-1];
-
 navigator.clipboard.writeText(
 text+"\n\nNgày đăng: "+today()+"\n"+tag
 );
-
 notify("Đã copy dòng "+index);
+showCopied(button);
 }
 
 // TIN NÓNG
