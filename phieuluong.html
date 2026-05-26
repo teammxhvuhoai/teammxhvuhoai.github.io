@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tính Thu Nhập Tháng</title>
+<title>Tính Thu Nhập Nhiều Tháng</title>
 
 <style>
 
@@ -16,15 +16,15 @@ font-family:Arial,sans-serif;
 }
 
 body{
-background:#eef5ff;
+background:#eef4ff;
 padding:15px;
 color:#1e293b;
 }
 
 .container{
-max-width:600px;
+max-width:700px;
 margin:auto;
-background:#ffffff;
+background:#fff;
 padding:18px;
 border-radius:18px;
 box-shadow:0 5px 20px rgba(0,0,0,0.08);
@@ -32,17 +32,24 @@ box-shadow:0 5px 20px rgba(0,0,0,0.08);
 
 h1{
 text-align:center;
-font-size:24px;
-margin-bottom:18px;
 color:#2563eb;
+margin-bottom:18px;
+font-size:24px;
 }
 
 .card{
 background:#f8fbff;
-padding:15px;
-border-radius:14px;
-margin-bottom:15px;
 border:1px solid #dbeafe;
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:12px;
 }
 
 label{
@@ -63,71 +70,82 @@ font-size:15px;
 outline:none;
 }
 
-input:focus,
-select:focus,
-textarea:focus{
-border-color:#3b82f6;
-}
-
 textarea{
-height:240px;
+height:260px;
 resize:none;
 margin-top:10px;
 background:#f8fafc;
 }
 
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
 button{
 width:100%;
-padding:14px;
+padding:13px;
 border:none;
 border-radius:12px;
 font-size:15px;
 font-weight:bold;
 cursor:pointer;
-margin-top:12px;
 transition:0.2s;
+}
+
+.add-btn{
+background:#0ea5e9;
+color:white;
+margin-top:10px;
 }
 
 .calc-btn{
 background:#2563eb;
 color:white;
+margin-top:10px;
 }
 
 .copy-btn{
 background:#16a34a;
 color:white;
+margin-top:10px;
 }
 
 button:hover{
 transform:scale(0.98);
 }
 
-.result-box{
-background:#f8fbff;
+.month-item{
+background:white;
+padding:12px;
+border-radius:12px;
 border:1px solid #dbeafe;
-padding:15px;
-border-radius:14px;
-margin-top:15px;
+margin-top:10px;
+position:relative;
+}
+
+.remove-btn{
+position:absolute;
+top:10px;
+right:10px;
+background:#ef4444;
+color:white;
+border:none;
+border-radius:8px;
+padding:5px 10px;
+font-size:12px;
+cursor:pointer;
 }
 
 .money{
 font-size:22px;
 font-weight:bold;
 color:#16a34a;
-margin-top:10px;
+margin-top:12px;
+text-align:center;
 }
 
-.note{
-margin-top:10px;
-font-size:13px;
-color:#64748b;
-text-align:center;
+.summary{
+background:#f8fbff;
+padding:15px;
+border-radius:14px;
+border:1px solid #dbeafe;
+margin-top:15px;
 }
 
 @media(max-width:600px){
@@ -137,7 +155,7 @@ grid-template-columns:1fr;
 }
 
 h1{
-font-size:21px;
+font-size:20px;
 }
 
 }
@@ -149,29 +167,15 @@ font-size:21px;
 
 <div class="container">
 
-<h1>Tính Thu Nhập Tháng</h1>
+<h1>Tính Thu Nhập Nhiều Tháng</h1>
 
 <div class="card">
 
 <div class="row">
 
 <div>
-<label>Chọn tháng</label>
-<input type="month" id="month">
-</div>
-
-<div>
-<label>Giá đô la (VNĐ)</label>
+<label>Giá đô la hiện tại (VNĐ)</label>
 <input type="number" id="rate" value="26000">
-</div>
-
-</div>
-
-<div class="row" style="margin-top:12px;">
-
-<div>
-<label>Tổng đô la kiếm được ($)</label>
-<input type="number" id="usd" placeholder="Ví dụ: 2500">
 </div>
 
 <div>
@@ -187,15 +191,21 @@ font-size:21px;
 
 </div>
 
+<button class="add-btn" onclick="addMonth()">
++ Thêm tháng thu nhập
+</button>
+
+<div id="monthList"></div>
+
 <button class="calc-btn" onclick="calculateSalary()">
 Tính bảng lương
 </button>
 
 </div>
 
-<div class="result-box">
+<div class="summary">
 
-<label>Phiếu lương chi tiết</label>
+<label>Phiếu lương</label>
 
 <textarea id="salaryText" readonly></textarea>
 
@@ -209,111 +219,188 @@ Copy bảng lương
 
 </div>
 
-<div class="note">
-Thiết kế tối ưu cho điện thoại • Hỗ trợ copy nhanh bảng lương
-</div>
-
 </div>
 
 <script>
 
-// FORMAT TIỀN
+let monthCount = 0;
+
+// FORMAT
 
 function formatMoney(num){
 
-return Number(num).toLocaleString('vi-VN');
+return Number(num).toLocaleString("vi-VN");
 
 }
 
-// TÍNH LƯƠNG
+// THÊM THÁNG
 
-function calculateSalary(){
+function addMonth(){
 
-let monthValue = document.getElementById("month").value;
+monthCount++;
 
-let usd = parseFloat(document.getElementById("usd").value) || 0;
+let div = document.createElement("div");
 
-let rate = parseFloat(document.getElementById("rate").value) || 0;
+div.className = "month-item";
 
-let percent = parseFloat(document.getElementById("percent").value);
+div.id = "monthItem"+monthCount;
 
-// CHECK
+div.innerHTML = `
 
-if(!monthValue){
+<button class="remove-btn"
+onclick="removeMonth(${monthCount})">
+Xóa
+</button>
 
-alert("Vui lòng chọn tháng");
+<div class="row">
 
-return;
+<div>
+<label>Tháng</label>
+<input type="month" class="month-input">
+</div>
 
-}
+<div>
+<label>Thu nhập đô la ($)</label>
+<input type="number"
+class="usd-input"
+step="0.01"
+placeholder="Ví dụ: 1250.75">
+</div>
 
-if(usd <= 0){
+</div>
 
-alert("Vui lòng nhập thu nhập đô la");
+`;
 
-return;
-
-}
-
-// XỬ LÝ THÁNG
-
-let parts = monthValue.split("-");
-
-let year = parts[0];
-
-let month = parts[1];
-
-let nextMonth = parseInt(month) + 1;
-
-let nextYear = year;
-
-if(nextMonth > 12){
-
-nextMonth = 1;
-
-nextYear++;
+document.getElementById("monthList")
+.appendChild(div);
 
 }
 
-nextMonth = String(nextMonth).padStart(2,"0");
+// XÓA THÁNG
+
+function removeMonth(id){
+
+let el = document.getElementById("monthItem"+id);
+
+if(el){
+el.remove();
+}
+
+}
 
 // TÍNH
 
-let deductUsd = usd * (percent / 100);
+function calculateSalary(){
 
-let receiveUsd = usd - deductUsd;
+let rate = parseFloat(
+document.getElementById("rate").value
+) || 0;
+
+let percent = parseFloat(
+document.getElementById("percent").value
+);
+
+let monthInputs = document.querySelectorAll(".month-input");
+
+let usdInputs = document.querySelectorAll(".usd-input");
+
+if(monthInputs.length === 0){
+
+alert("Vui lòng thêm tháng thu nhập");
+
+return;
+
+}
+
+let totalUsd = 0;
+
+let details = "";
+
+for(let i=0;i<monthInputs.length;i++){
+
+let month = monthInputs[i].value;
+
+let usd = parseFloat(usdInputs[i].value) || 0;
+
+if(month && usd > 0){
+
+let parts = month.split("-");
+
+let year = parts[0];
+
+let m = parts[1];
+
+details +=
+"- Tháng "+m+"/"+year+
+": $"+formatMoney(usd.toFixed(2))+"\n";
+
+totalUsd += usd;
+
+}
+
+}
+
+if(totalUsd <= 0){
+
+alert("Chưa có dữ liệu thu nhập");
+
+return;
+
+}
+
+// KHẤU TRỪ
+
+let deductUsd = totalUsd * (percent/100);
+
+let receiveUsd = totalUsd - deductUsd;
 
 let receiveVnd = receiveUsd * rate;
 
 // TEXT
 
 let text =
-"========== PHIẾU LƯƠNG ==========\n\n"+
 
-"Tổng đô la kiếm được từ ngày 01/"+month+"/"+year+
-" tới ngày 01/"+nextMonth+"/"+nextYear+
-" là: $"+formatMoney(usd)+"\n\n"+
+"=========== PHIẾU LƯƠNG ===========\n\n"+
 
-"Giá đô la hiện tại: "+formatMoney(rate)+" VNĐ\n\n"+
+"DANH SÁCH THU NHẬP:\n\n"+
 
-"Khấu trừ: "+percent+"%\n"+
+details+
 
-"Thu nhập nhận được: "+(100-percent)+"%\n\n"+
+"\n-----------------------------------\n\n"+
 
-"Tổng khấu trừ: $"+formatMoney(deductUsd.toFixed(2))+"\n\n"+
+"Tổng đô la kiếm được: $"+
+formatMoney(totalUsd.toFixed(2))+"\n\n"+
 
-"Thực lĩnh USD: $"+formatMoney(receiveUsd.toFixed(2))+"\n\n"+
+"Giá đô la hiện tại: "+
+formatMoney(rate)+" VNĐ\n\n"+
 
-"Thực lĩnh VNĐ: "+formatMoney(receiveVnd.toFixed(0))+" VNĐ\n\n"+
+"Khấu trừ: "+percent+"%\n\n"+
 
-"Ngày tạo phiếu: "+new Date().toLocaleDateString("vi-VN");
+"Thu nhập nhận được: "+
+(100-percent)+"%\n\n"+
+
+"Tổng khấu trừ: $"+
+formatMoney(deductUsd.toFixed(2))+"\n\n"+
+
+"Thực lĩnh USD: $"+
+formatMoney(receiveUsd.toFixed(2))+"\n\n"+
+
+"Thực lĩnh VNĐ: "+
+formatMoney(receiveVnd.toFixed(0))+
+" VNĐ\n\n"+
+
+"Ngày tạo phiếu: "+
+new Date().toLocaleDateString("vi-VN");
 
 // HIỂN THỊ
 
-document.getElementById("salaryText").value = text;
+document.getElementById("salaryText")
+.value = text;
 
-document.getElementById("finalMoney").innerText =
-formatMoney(receiveVnd.toFixed(0))+" VNĐ";
+document.getElementById("finalMoney")
+.innerText =
+formatMoney(receiveVnd.toFixed(0))+
+" VNĐ";
 
 }
 
@@ -321,7 +408,9 @@ formatMoney(receiveVnd.toFixed(0))+" VNĐ";
 
 function copySalary(){
 
-let text = document.getElementById("salaryText").value;
+let text = document
+.getElementById("salaryText")
+.value;
 
 if(!text){
 
@@ -336,6 +425,10 @@ navigator.clipboard.writeText(text);
 alert("Đã copy bảng lương");
 
 }
+
+// AUTO ADD 1 THÁNG
+
+addMonth();
 
 </script>
 
