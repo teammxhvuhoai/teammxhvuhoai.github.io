@@ -8,76 +8,185 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 <title>Tool Copy Nội Dung</title>
 
 <style>
-body{font-family:Arial;margin:0;padding:15px;background:#f0f7ff;}
-.container{max-width:650px;margin:auto;}
-h2{text-align:center;color:#0a6fd6;}
 
-.tabs{display:flex;gap:5px;margin-bottom:10px;}
-.tabbtn{flex:1;padding:12px;border:none;border-radius:8px;background:#cfd9e6;font-weight:bold;}
-.tabbtn.active{background:#2ecc71;color:white;}
+body{
+font-family:Arial;
+margin:0;
+padding:15px;
+background:#f0f7ff;
+}
 
-.tabcontent{display:none;}
-.tabcontent.active{display:block;}
+.container{
+max-width:650px;
+margin:auto;
+}
 
-.textbox-wrap{position:relative;}
+h2{
+text-align:center;
+color:#0a6fd6;
+}
+
+.tabs{
+display:flex;
+gap:5px;
+margin-bottom:10px;
+}
+
+.tabbtn{
+flex:1;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#cfd9e6;
+font-weight:bold;
+cursor:pointer;
+}
+
+.tabbtn.active{
+background:#2ecc71;
+color:white;
+}
+
+.tabcontent{
+display:none;
+}
+
+.tabcontent.active{
+display:block;
+}
+
+.textbox-wrap{
+position:relative;
+}
+
 textarea{
-width:100%;height:140px;padding:12px;margin-top:8px;
-border-radius:10px;border:1px solid #cfd9e6;
-resize:none;font-size:16px;box-sizing:border-box;
+width:100%;
+height:140px;
+padding:12px;
+margin-top:8px;
+border-radius:10px;
+border:1px solid #cfd9e6;
+resize:none;
+font-size:16px;
+box-sizing:border-box;
 }
 
-.iconbox{position:absolute;top:10px;right:10px;display:flex;gap:5px;}
+.iconbox{
+position:absolute;
+top:10px;
+right:10px;
+display:flex;
+gap:5px;
+}
+
 .iconbtn{
-width:28px;height:28px;border:none;border-radius:6px;
-background:#2ecc71;color:white;font-size:16px;
+width:28px;
+height:28px;
+border:none;
+border-radius:6px;
+background:#2ecc71;
+color:white;
+font-size:16px;
+cursor:pointer;
 }
 
-.dark{background:#1a1a1a;color:white;border:1px solid #333;}
+.dark{
+background:#1a1a1a;
+color:white;
+border:1px solid #333;
+}
 
-.grid{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid{
+margin-top:12px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
 
 button{
-padding:14px;border:none;border-radius:10px;
-font-size:14px;font-weight:bold;background:#4da3ff;color:white;
+padding:14px;
+border:none;
+border-radius:10px;
+font-size:14px;
+font-weight:bold;
+background:#4da3ff;
+color:white;
+cursor:pointer;
+position:relative;
+overflow:hidden;
 }
 
-.bluebtn{background:linear-gradient(135deg,#0d3b66,#5fa8ff);}
+.bluebtn{
+background:linear-gradient(135deg,#0d3b66,#5fa8ff);
+}
 
-.mail-row{margin-top:8px;padding:6px;background:#fff;border-radius:8px;}
+.mail-row{
+margin-top:8px;
+padding:6px;
+background:#fff;
+border-radius:8px;
+}
+
 .mail-row input{
-width:100%;padding:8px;margin-top:4px;
-border-radius:6px;border:1px solid #ccc;font-size:13px;
+width:100%;
+padding:8px;
+margin-top:4px;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:13px;
 }
 
-.go{width:100%;margin-top:5px;background:#2ecc71;}
+.go{
+width:100%;
+margin-top:5px;
+background:#2ecc71;
+}
 
-.groupbox{background:white;padding:10px;border-radius:10px;}
+.groupbox{
+background:white;
+padding:10px;
+border-radius:10px;
+}
 
 .salary-box{
-margin-top:15px;padding:12px;background:#ffffff;border-radius:10px;
+margin-top:15px;
+padding:12px;
+background:#ffffff;
+border-radius:10px;
 }
 
 .salary-box input,
 .salary-box select{
-width:100%;padding:10px;border-radius:8px;
-border:1px solid #ccc;margin-top:6px;
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
+margin-top:6px;
+box-sizing:border-box;
 }
 
-.salary-box textarea{height:120px;}
-.history{height:120px;}
+.salary-box textarea{
+height:120px;
+}
 
-#notify{margin-top:12px;text-align:center;color:green;font-weight:bold;}
+.history{
+height:120px;
+}
+
+#notify{
+margin-top:12px;
+text-align:center;
+color:green;
+font-weight:bold;
+}
 
 .page-name{
 color:#0a6fd6;
 font-weight:bold;
 margin-bottom:3px;
 }
-  /* COPY BADGE */
-button{
-position:relative;
-overflow:hidden;
-}
+
+/* BADGE COPIED */
 
 .copied-badge{
 position:absolute;
@@ -99,10 +208,12 @@ button.show-copied .copied-badge{
 opacity:1;
 transform:translateY(0);
 }
+
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
 <h2>Tool Copy Nội Dung</h2>
@@ -115,14 +226,23 @@ transform:translateY(0);
 </div>
 
 <!-- TAB 1 -->
+
 <div id="tab1" class="tabcontent active">
 
 <div style="margin-bottom:8px;">
-<label><input type="radio" name="mode" value="single" checked> 1 chuỗi</label>
-<label style="margin-left:15px;"><input type="radio" name="mode" value="split"> Tách chuỗi</label>
+<label>
+<input type="radio" name="mode" value="single" checked>
+1 chuỗi
+</label>
+
+<label style="margin-left:15px;">
+<input type="radio" name="mode" value="split">
+Tách chuỗi
+</label>
 </div>
 
 <div class="textbox-wrap">
+
 <textarea id="content1" placeholder="Dán:
 1. Nội dung 1
 2. Nội dung 2
@@ -133,36 +253,95 @@ transform:translateY(0);
 <button class="iconbtn" onclick="pasteText()">📋</button>
 <button class="iconbtn" onclick="clearText()">❌</button>
 </div>
+
 </div>
 
 <div class="grid">
-<button onclick="copyData('content1','#tintucmxh #mxh #tintuc',1)">1. Tin tức MXH</button>
-<button onclick="copyData('content1','#tinmoimxh #mxh #tintuc',2)">2. Tin Mới</button>
-<button onclick="copyData('content1','#todaynews #mxh #tintuc',3)">3. Today News</button>
-<button onclick="copyData('content1','#cxcn #camxucconnguoi #mxh #tintuc',4)">4. Cảm xúc</button>
-<button onclick="copyData('content1','#tintuc #mxh',5)">5. Kiên trổi </button>
-<button onclick="tinNong(6)">6. Tin Nóng</button>
-<button class="bluebtn" onclick="copyData('content1','#tinmoi24h #tinmoinhat24h #tinmoinhat #tintuc #mxh',7)">7. TinMoi24h</button>
-<button class="bluebtn" onclick="copyData('content1','#tinnhanh #tinnhanh60s #tinnhanh60smxh #tintuc #mxh',8)">8. Tin Nhanh 60s</button>
-<button class="bluebtn" onclick="copyData('content1','#tinmoimangxahoi #tinmoimxh #tintuc #mxh',9)">9. Tin mới MXH</button>
-<button class="bluebtn" onclick="copyData('content1','#tinviet #tintuc',10)">10. Tin Việt</button>
+
+<button onclick="copyData('content1','#tintucmxh #mxh #tintuc',1,this)">
+1. Tin tức MXH
+</button>
+
+<button onclick="copyData('content1','#tinmoimxh #mxh #tintuc',2,this)">
+2. Tin Mới
+</button>
+
+<button onclick="copyData('content1','#todaynews #mxh #tintuc',3,this)">
+3. Today News
+</button>
+
+<button onclick="copyData('content1','#cxcn #camxucconnguoi #mxh #tintuc',4,this)">
+4. Cảm xúc
+</button>
+
+<button onclick="copyData('content1','#tintuc #mxh',5,this)">
+5. Kiên Chổi
+</button>
+
+<button onclick="tinNong(6,this)">
+6. Tin Nóng
+</button>
+
+<button class="bluebtn"
+onclick="copyData('content1','#tinmoi24h #tinmoinhat24h #tinmoinhat #tintuc #mxh',7,this)">
+7. TinMoi24h
+</button>
+
+<button class="bluebtn"
+onclick="copyData('content1','#tinnhanh #tinnhanh60s #tinnhanh60smxh #tintuc #mxh',8,this)">
+8. Tin Nhanh 60s
+</button>
+
+<button class="bluebtn"
+onclick="copyData('content1','#tinmoimangxahoi #tinmoimxh #tintuc #mxh',9,this)">
+9. Tin mới MXH
+</button>
+
+<button class="bluebtn"
+onclick="copyData('content1','#tinviet #tintuc',10,this)">
+10. Tin Việt
+</button>
+
 </div>
 </div>
 
 <!-- TAB 2 -->
+
 <div id="tab2" class="tabcontent">
+
 <textarea id="content2" class="dark"></textarea>
+
 <div class="grid">
-<button onclick="copyProduct('🚀 Mũ Fullface Royal M266 giá tốt hôm nay #royalm266 #muabaohiem')">Royal M266</button>
-<button onclick="copyProduct('Mũ lật hàm Royal M179 tiện lợi an toàn #royalm179 #muabaohiem')">Royal M179</button>
-<button onclick="copyData('content2','#review #sanpham')">Review</button>
-<button onclick="copyData('content2','#giamgia #uudai')">Giảm Giá</button>
-<button onclick="copyData('content2','#tiktokshop #sanphamhot')">TikTok Shop</button>
-<button onclick="copyData('content2','#muasam #dealhot')">Mua Sắm</button>
+
+<button onclick="copyProduct('🚀 Mũ Fullface Royal M266 giá tốt hôm nay #royalm266 #muabaohiem',this)">
+Royal M266
+</button>
+
+<button onclick="copyProduct('Mũ lật hàm Royal M179 tiện lợi an toàn #royalm179 #muabaohiem',this)">
+Royal M179
+</button>
+
+<button onclick="copyData('content2','#review #sanpham',1,this)">
+Review
+</button>
+
+<button onclick="copyData('content2','#giamgia #uudai',2,this)">
+Giảm Giá
+</button>
+
+<button onclick="copyData('content2','#tiktokshop #sanphamhot',3,this)">
+TikTok Shop
+</button>
+
+<button onclick="copyData('content2','#muasam #dealhot',4,this)">
+Mua Sắm
+</button>
+
 </div>
 </div>
 
-<!-- TAB MAIL (ĐÃ KHÔI PHỤC FULL) -->
+<!-- TAB 3 -->
+
 <div id="tab3" class="tabcontent">
 
 <div class="mail-row">
@@ -171,160 +350,176 @@ transform:translateY(0);
 </div>
 
 <div class="mail-row">
-<input value="https://yahoo.com.vn" readonly>
-<button onclick="window.open('https://yahoo.com.vn')">Mở</button>
-</div>
-
-<div class="mail-row">
 <input value="https://gmail.com" readonly>
 <button onclick="window.open('https://gmail.com')">Mở</button>
 </div>
 
-<div class="salary-box">
-<h3>Tính Thu Nhập</h3>
-
-<label>Thu nhập $</label>
-<input type="number" id="income">
-
-<label>Tỷ giá VNĐ</label>
-<input type="number" id="rate" value="25000">
-
-<label>Phần trăm nhận</label>
-<select id="percent">
-<option>50</option><option>55</option><option>60</option>
-<option>65</option><option>70</option><option>75</option>
-<option>80</option><option>85</option><option>90</option>
-<option>95</option><option selected>100</option>
-</select>
-
-<button onclick="tinhTien()">Tính Tiền</button>
-<button onclick="copyLuong()">Copy bảng lương</button>
-<button onclick="clearHistory()">Xóa lịch sử</button>
-
-<textarea id="salaryResult" readonly></textarea>
-<textarea id="history" class="history" readonly></textarea>
 </div>
 
-</div>
+<!-- TAB 4 -->
 
-<!-- TAB PAGE -->
 <div id="tab4" class="tabcontent">
 <div class="groupbox" id="pageList"></div>
 </div>
 
 <div id="notify"></div>
+
 </div>
 
 <script>
 
-// DATA PAGE (ĐẦY ĐỦ)
+// PAGE DATA
+
 let pages = [
-{ name:"Tin Mới-Mạng Xã Hội", link:"https://facebook.com/tinmoi.mxh", id:"10001"},
-{ name:"Tin Tức MXH", link:"https://facebook.com/TinTucMXH.Page", id:"10002"},
-{ name:"Tin Mới 24h", link:"https://facebook.com/TinMoi24h.Page", id:"10003"},
-{ name:"Cảm Xúc Con Người", link:"https://facebook.com/camxucconnguoii", id:"10004"},
-{ name:"Today News", link:"https://facebook.com/todaynews8entertainment", id:"10005"},
-{ name:"Bac Giang Hiện Tại", link:"https://www.facebook.com/100057402221572", id:"100057402221572"},
-{ name:"Kiên Chổi", link:"https://www.facebook.com/100089319363865", id:"100089319363865"},
-{ name:"Review Film", link:"https://www.facebook.com/mephimhaychannel", id:"10008"},
-{ name:"Page Video", link:"https://facebook.com/page9", id:"10009"},
-{ name:"Page Review", link:"https://facebook.com/page10", id:"10010"}
+{
+name:"Tin Mới-Mạng Xã Hội",
+link:"https://facebook.com/tinmoi.mxh",
+id:"10001"
+},
+{
+name:"Tin Tức MXH",
+link:"https://facebook.com/TinTucMXH.Page",
+id:"10002"
+}
 ];
 
-// render page
+// RENDER PAGE
+
 let container = document.getElementById("pageList");
 
-// clear trước (tránh bị lặp khi reload script)
-container.innerHTML = "";
+pages.forEach(p=>{
 
-pages.forEach(p => {
-  let div = document.createElement("div");
-  div.className = "mail-row";
+let div = document.createElement("div");
 
-  div.innerHTML = `
-    <div class="page-name">${p.name}</div>
-    <input value="${p.link}" readonly onclick="copyThis(this)">
-    <input value="ID:${p.id}" readonly onclick="copyThis(this)">
-    <button class="go" onclick="window.open('${p.link}')">GO</button>
-  `;
+div.className = "mail-row";
 
-  container.appendChild(div);
+div.innerHTML = `
+<div class="page-name">${p.name}</div>
+
+<input value="${p.link}" readonly onclick="copyThis(this)">
+
+<input value="ID:${p.id}" readonly onclick="copyThis(this)">
+
+<button class="go" onclick="window.open('${p.link}')">
+GO
+</button>
+`;
+
+container.appendChild(div);
+
 });
 
-// FUNCTIONS
+// OPEN TAB
+
 function openTab(id,btn){
-document.querySelectorAll(".tabcontent").forEach(t=>t.classList.remove("active"));
-document.querySelectorAll(".tabbtn").forEach(t=>t.classList.remove("active"));
-document.getElementById(id).classList.add("active");
+
+document.querySelectorAll(".tabcontent")
+.forEach(t=>t.classList.remove("active"));
+
+document.querySelectorAll(".tabbtn")
+.forEach(t=>t.classList.remove("active"));
+
+document.getElementById(id)
+.classList.add("active");
+
 btn.classList.add("active");
+
 }
 
 // DATE
+
 function today(){
-const d=new Date();
-return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+
+const d = new Date();
+
+return d.getDate()+"/"+
+(d.getMonth()+1)+"/"+
+d.getFullYear();
+
 }
 
 // MODE
+
 function getMode(){
-return document.querySelector('input[name="mode"]:checked').value;
+
+return document.querySelector(
+'input[name="mode"]:checked'
+).value;
+
 }
 
 // SPLIT TEXT
-function splitText(){
-let raw = document.getElementById("content1").value.trim();
 
-// chuẩn hóa xuống dòng + loại bỏ dòng rỗng
-let lines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l !== "");
+function splitText(){
+
+let raw = document
+.getElementById("content1")
+.value
+.trim();
+
+let lines = raw
+.split(/\r?\n/)
+.map(l=>l.trim())
+.filter(l=>l!=='');
 
 let result = [];
 
 lines.forEach(line=>{
-// regex mới: chịu được khoảng trắng lung tung
-let match = line.match(/^\s*(\d+)\s*\.\s*(.+)$/);
+
+let match = line.match(
+/^\s*(\d+)\s*\.\s*(.+)$/
+);
 
 if(match){
 result.push(match[2].trim());
 }
+
 });
 
 return result;
+
 }
-  
+
 // SHOW COPIED
+
 function showCopied(button){
+
 if(!button) return;
-// tìm badge
+
 let badge = button.querySelector(".copied-badge");
-// nếu chưa có thì tạo mới
+
 if(!badge){
+
 badge = document.createElement("span");
+
 badge.className = "copied-badge";
+
 badge.innerText = "Copied";
 button.appendChild(badge);
 }
-// hiện badge
 button.classList.add("show-copied");
-// tự ẩn
 setTimeout(()=>{
 button.classList.remove("show-copied");
 },1200);
 }
-  
-// COPY DATA (SMART)
+// COPY DATA
 function copyData(id,tag,index,button){
 let mode = getMode();
-// giữ nguyên
+// SINGLE
 if(mode === "single"){
-let text=document.getElementById(id).value;
+let text = document.getElementById(id).value;
 navigator.clipboard.writeText(
-text+"\n\nNgày đăng: "+today()+"\n"+tag
+text+
+"\n\nNgày đăng: "+
+today()+
+"\n"+
+tag
 );
 notify("Đã copy");
 showCopied(button);
 return;
 }
-// tách chuỗi
+// SPLIT
 let arr = splitText();
 if(arr.length < index){
 notify("Thiếu dòng "+index);
@@ -332,23 +527,29 @@ return;
 }
 let text = arr[index-1];
 navigator.clipboard.writeText(
-text+"\n\nNgày đăng: "+today()+"\n"+tag
+text+
+"\n\nNgày đăng: "+
+today()+
+"\n"+
+tag
 );
 notify("Đã copy dòng "+index);
 showCopied(button);
 }
-
 // TIN NÓNG
-function tinNong(index){
+function tinNong(index,button){
 let mode = getMode();
-
 if(mode === "single"){
-let text=document.getElementById("content1").value;
-navigator.clipboard.writeText("🚨 TIN NÓNG\n\n"+text+"\n\n#tinnong #mxh");
+let text = document.getElementById("content1").value;
+navigator.clipboard.writeText(
+"🚨 TIN NÓNG\n\n"+
+text+
+"\n\n#tinnong #mxh"
+);
 notify("Đã copy Tin Nóng");
+showCopied(button);
 return;
 }
-
 let arr = splitText();
 if(arr.length < index){
 notify("Thiếu dòng "+index);
@@ -356,60 +557,43 @@ return;
 }
 let text = arr[index-1];
 navigator.clipboard.writeText(
-"🚨 TIN NÓNG\n\n"+text+"\n\n#tinnong #mxh"
+"🚨 TIN NÓNG\n\n"+
+text+
+"\n\n#tinnong #mxh"
 );
-notify("Đã copy Tin Nóng dòng "+index);
+notify("Đã copy Tin Nóng");
+showCopied(button);
 }
-// BASIC
-function copyProduct(t){
+// COPY PRODUCT
+function copyProduct(t,button){
 navigator.clipboard.writeText(t);
 notify("Đã copy");
+showCopied(button);
 }
-
+// PASTE
 function pasteText(){
-navigator.clipboard.readText().then(t=>{document.getElementById("content1").value=t;});
+navigator.clipboard.readText()
+.then(t=>{
+document.getElementById("content1").value = t;
+});
 }
-function clearText(){document.getElementById("content1").value="";}
-function copyThis(el){navigator.clipboard.writeText(el.value);notify("Đã copy");}
-
-// TÍNH TIỀN (ĐÃ FIX)
-function tinhTien(){
-let income=parseFloat(document.getElementById("income").value)||0;
-let rate=parseFloat(document.getElementById("rate").value)||0;
-let percent=parseFloat(document.getElementById("percent").value)||0;
-
-let receiveUsd=income*percent/100;
-let vnd=receiveUsd*rate;
-
-let result=
-"===== BẢNG LƯƠNG =====\n"+
-"Ngày: "+today()+"\n\n"+
-"Thu nhập: $"+income+"\n"+
-"Nhận: "+percent+"%\n"+
-"Thực nhận: $"+receiveUsd.toFixed(2)+"\n"+
-"VNĐ: "+vnd.toLocaleString()+"\n";
-
-document.getElementById("salaryResult").value=result;
-
-document.getElementById("history").value=
-result+"\n----------------\n"+
-document.getElementById("history").value;
+// CLEAR
+function clearText(){
+document.getElementById("content1").value = "";
 }
 
-function copyLuong(){
-navigator.clipboard.writeText(document.getElementById("salaryResult").value);
-notify("Đã copy bảng lương");
+// COPY INPUT
+function copyThis(el){
+navigator.clipboard.writeText(el.value);
+notify("Đã copy");
 }
-
-function clearHistory(){
-document.getElementById("history").value="";
-}
-
+// NOTIFY
 function notify(msg){
-document.getElementById("notify").innerText=msg;
-setTimeout(()=>{document.getElementById("notify").innerText="";},2000);
+document.getElementById("notify").innerText = msg;
+setTimeout(()=>{
+document.getElementById("notify").innerText = "";
+},2000);
 }
-
 </script>
 </body>
 </html>
