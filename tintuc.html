@@ -294,13 +294,23 @@ return result;
 // SHOW COPIED
 function showCopied(button){
 if(!button) return;
+// tìm badge
 let badge = button.querySelector(".copied-badge");
+// nếu chưa có thì tạo mới
 if(!badge){
 badge = document.createElement("span");
 badge.className = "copied-badge";
 badge.innerText = "Copied";
 button.appendChild(badge);
 }
+// hiện badge
+button.classList.add("show-copied");
+// tự ẩn
+setTimeout(()=>{
+button.classList.remove("show-copied");
+},1200);
+}
+  
 // COPY DATA (SMART)
 function copyData(id,tag,index,button){
 let mode = getMode();
