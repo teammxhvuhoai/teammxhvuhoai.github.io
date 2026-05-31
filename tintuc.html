@@ -279,7 +279,7 @@ Tách chuỗi
 </button>
 
 <button onclick="tinNong(6,this)">
-6. Tin Nóng
+6. Dòng Tin Tức
 </button>
 
 <button class="bluebtn"
@@ -542,11 +542,11 @@ let mode = getMode();
 if(mode === "single"){
 let text = document.getElementById("content1").value;
 navigator.clipboard.writeText(
-"🚨 TIN NÓNG\n\n"+
+"🚨 "+
 text+
-"\n\n#tinnong #mxh"
+"#dongtintuc #tintucmxh #tinhomnay #tinnong #mxh"
 );
-notify("Đã copy Tin Nóng");
+notify("Đã copy Dòng Tin Tức");
 showCopied(button);
 return;
 }
