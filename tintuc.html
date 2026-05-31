@@ -367,46 +367,37 @@ Mua Sắm
 </div>
 
 <script>
-
-// PAGE DATA
-
+// DATA PAGE (ĐẦY ĐỦ)
 let pages = [
-{
-name:"Tin Mới-Mạng Xã Hội",
-link:"https://facebook.com/tinmoi.mxh",
-id:"10001"
-},
-{
-name:"Tin Tức MXH",
-link:"https://facebook.com/TinTucMXH.Page",
-id:"10002"
-}
+{ name:"Tin Mới-Mạng Xã Hội", link:"https://facebook.com/tinmoi.mxh", id:"10001"},
+{ name:"Tin Tức MXH", link:"https://facebook.com/TinTucMXH.Page", id:"10002"},
+{ name:"Tin Mới 24h", link:"https://facebook.com/TinMoi24h.Page", id:"10003"},
+{ name:"Cảm Xúc Con Người", link:"https://facebook.com/camxucconnguoii", id:"10004"},
+{ name:"Today News", link:"https://facebook.com/todaynews8entertainment", id:"10005"},
+{ name:"Bac Giang Hiện Tại", link:"https://www.facebook.com/100057402221572", id:"100057402221572"},
+{ name:"Tin Ngắn Mỗi Ngày", link:"https://www.facebook.com/100089319363865", id:"100089319363865"},
+{ name:"Dòng Tin Tức", link:"https://www.facebook.com/cuonglay.page/", id:"10008"},
+{ name:"Tin Nhanh 60S", link:"https://www.facebook.com/Tintucnhanh60s/", id:"10008"},
+{ name:"Beat Diễn Châu", link:"https://www.facebook.com/profile.php?id=61557917230628", id:"10008"},
+{ name:"Review Film", link:"https://www.facebook.com/mephimhaychannel", id:"10008"},
+{ name:"Page Video", link:"https://facebook.com/page9", id:"10009"},
+{ name:"Page Review", link:"https://facebook.com/page10", id:"10010"}
 ];
 
-// RENDER PAGE
-
+// render page
 let container = document.getElementById("pageList");
-
-pages.forEach(p=>{
-
-let div = document.createElement("div");
-
-div.className = "mail-row";
-
-div.innerHTML = `
-<div class="page-name">${p.name}</div>
-
-<input value="${p.link}" readonly onclick="copyThis(this)">
-
-<input value="ID:${p.id}" readonly onclick="copyThis(this)">
-
-<button class="go" onclick="window.open('${p.link}')">
-GO
-</button>
-`;
-
-container.appendChild(div);
-
+// clear trước (tránh bị lặp khi reload script)
+container.innerHTML = "";
+pages.forEach(p => {
+  let div = document.createElement("div");
+  div.className = "mail-row";
+  div.innerHTML = `
+    <div class="page-name">${p.name}</div>
+    <input value="${p.link}" readonly onclick="copyThis(this)">
+    <input value="ID:${p.id}" readonly onclick="copyThis(this)">
+    <button class="go" onclick="window.open('${p.link}')">GO</button>
+  `;
+  container.appendChild(div);
 });
 
 // OPEN TAB
