@@ -260,7 +260,129 @@ button.show-copied .copied-badge{
 opacity:1;
 transform:translateY(0);
 }
+/* ===== TAB 2 THU NHẬP ===== */
 
+.salary-container{
+padding:5px;
+}
+
+.salary-title{
+text-align:center;
+color:#2563eb;
+font-size:22px;
+margin-bottom:15px;
+}
+
+.salary-card,
+.salary-summary{
+background:#fff;
+padding:16px;
+border-radius:18px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+margin-bottom:15px;
+}
+
+.salary-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:12px;
+}
+
+.salary-container label{
+display:block;
+font-weight:bold;
+font-size:14px;
+margin-bottom:6px;
+}
+
+.salary-container input,
+.salary-container select,
+.salary-container textarea{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #dbeafe;
+font-size:15px;
+box-sizing:border-box;
+}
+
+.salary-container textarea{
+height:260px;
+resize:none;
+background:#f8fafc;
+}
+
+.salary-add-btn,
+.salary-calc-btn,
+.salary-copy-btn{
+width:100%;
+padding:13px;
+border:none;
+border-radius:12px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+.salary-add-btn{
+background:#0ea5e9;
+color:white;
+}
+
+.salary-calc-btn{
+background:#2563eb;
+color:white;
+}
+
+.salary-copy-btn{
+background:#16a34a;
+color:white;
+}
+
+.salary-money{
+font-size:24px;
+font-weight:bold;
+color:#16a34a;
+text-align:center;
+margin-top:15px;
+}
+
+.month-item{
+background:#f8fbff;
+border:1px solid #dbeafe;
+padding:12px;
+border-radius:12px;
+margin-top:10px;
+position:relative;
+}
+
+.remove-btn{
+position:absolute;
+top:10px;
+right:10px;
+background:#ef4444;
+color:#fff;
+border:none;
+border-radius:8px;
+padding:5px 10px;
+font-size:12px;
+cursor:pointer;
+width:auto;
+}
+
+@media(max-width:600px){
+
+.salary-row{
+grid-template-columns:1fr;
+}
+
+.salary-title{
+font-size:20px;
+}
+
+}
 </style>
 </head>
 
@@ -361,37 +483,73 @@ onclick="copyData('content1','#tinviet #tintuc',10,this)">
 
 <div id="tab2" class="tabcontent">
 
-<textarea id="content2" class="dark"></textarea>
+<div class="salary-container">
 
-<div class="grid">
+<h3 class="salary-title">
+💰 Tính Thu Nhập Nhiều Tháng
+</h3>
 
-<button onclick="copyProduct('🚀 Mũ Fullface Royal M266 giá tốt hôm nay #royalm266 #muabaohiem',this)">
-Royal M266
+<div class="salary-card">
+
+<div class="salary-row">
+
+<div>
+<label>Giá đô hiện tại (VNĐ)</label>
+<input type="number" id="rate" value="26000">
+</div>
+
+<div>
+<label>Khấu trừ (%)</label>
+<select id="percent">
+<option value="35">35%</option>
+<option value="40">40%</option>
+<option value="45">45%</option>
+<option value="50">50%</option>
+<option value="55">55%</option>
+</select>
+</div>
+
+</div>
+
+<button class="salary-add-btn"
+onclick="addMonth()">
+➕ Thêm tháng thu nhập
 </button>
 
-<button onclick="copyProduct('Mũ lật hàm Royal M179 tiện lợi an toàn #royalm179 #muabaohiem',this)">
-Royal M179
-</button>
+<div id="monthList"></div>
 
-<button onclick="copyData('content2','#review #sanpham',1,this)">
-Review
-</button>
-
-<button onclick="copyData('content2','#giamgia #uudai',2,this)">
-Giảm Giá
-</button>
-
-<button onclick="copyData('content2','#tiktokshop #sanphamhot',3,this)">
-TikTok Shop
-</button>
-
-<button onclick="copyData('content2','#muasam #dealhot',4,this)">
-Mua Sắm
+<button class="salary-calc-btn"
+onclick="calculateSalary()">
+📊 Tính bảng lương
 </button>
 
 </div>
+
+<div class="salary-summary">
+
+<label>Phiếu lương</label>
+
+<textarea
+id="salaryText"
+readonly
+placeholder="Kết quả sẽ hiển thị tại đây..."
+></textarea>
+
+<div class="salary-money"
+id="finalMoney">
+0 VNĐ
 </div>
 
+<button class="salary-copy-btn"
+onclick="copySalary()">
+📋 Copy bảng lương
+</button>
+
+</div>
+
+</div>
+
+</div>
 <!-- TAB 3 -->
 
 <div id="tab3" class="tabcontent">
@@ -446,7 +604,6 @@ let pages = [
 { name:"Page Review", link:"https://facebook.com/page10", id:"10010"}
 ];
 
-// render page
 // render page
 let container = document.getElementById("pageList");
 
@@ -674,6 +831,182 @@ setTimeout(()=>{
 document.getElementById("notify").innerText = "";
 },2000);
 }
+  // ===== TAB THU NHẬP =====
+
+let monthCount = 0;
+
+function formatMoney(num){
+return Number(num).toLocaleString("vi-VN");
+}
+
+function addMonth(){
+
+monthCount++;
+
+let div = document.createElement("div");
+
+div.className = "month-item";
+
+div.id = "monthItem"+monthCount;
+
+div.innerHTML = `
+<button class="remove-btn"
+onclick="removeMonth(${monthCount})">
+Xóa
+</button>
+
+<div class="salary-row">
+
+<div>
+<label>Tháng</label>
+<input type="month" class="month-input">
+</div>
+
+<div>
+<label>Thu nhập ($)</label>
+<input
+type="number"
+step="0.01"
+class="usd-input"
+placeholder="1250.75">
+</div>
+
+</div>
+`;
+
+document
+.getElementById("monthList")
+.appendChild(div);
+
+}
+
+function removeMonth(id){
+
+let el =
+document.getElementById(
+"monthItem"+id
+);
+
+if(el) el.remove();
+
+}
+
+function calculateSalary(){
+
+let rate =
+parseFloat(
+document.getElementById("rate").value
+) || 0;
+
+let percent =
+parseFloat(
+document.getElementById("percent").value
+);
+
+let monthInputs =
+document.querySelectorAll(".month-input");
+
+let usdInputs =
+document.querySelectorAll(".usd-input");
+
+let totalUsd = 0;
+
+let details = "";
+
+for(let i=0;i<monthInputs.length;i++){
+
+let month = monthInputs[i].value;
+
+let usd =
+parseFloat(
+usdInputs[i].value
+) || 0;
+
+if(month && usd > 0){
+
+let parts = month.split("-");
+
+details +=
+"- Tháng "+
+parts[1]+"/"+
+parts[0]+
+": $"+
+usd.toFixed(2)+
+"\n";
+
+totalUsd += usd;
+
+}
+
+}
+
+if(totalUsd<=0){
+
+notify("Chưa có dữ liệu");
+
+return;
+
+}
+
+let deductUsd =
+totalUsd * percent / 100;
+
+let receiveUsd =
+totalUsd - deductUsd;
+
+let receiveVnd =
+receiveUsd * rate;
+
+let text =
+
+"=========== PHIẾU LƯƠNG ===========\n\n"+
+
+details+
+
+"\nTổng USD: $"+
+totalUsd.toFixed(2)+
+
+"\nKhấu trừ: "+
+percent+"%"+
+
+"\nThực lĩnh USD: $"+
+receiveUsd.toFixed(2)+
+
+"\nThực lĩnh VNĐ: "+
+formatMoney(receiveVnd.toFixed(0))+
+" VNĐ";
+
+document
+.getElementById("salaryText")
+.value = text;
+
+document
+.getElementById("finalMoney")
+.innerText =
+formatMoney(receiveVnd.toFixed(0))
++" VNĐ";
+
+}
+
+function copySalary(){
+
+let text =
+document.getElementById(
+"salaryText"
+).value;
+
+if(!text){
+notify("Chưa có bảng lương");
+return;
+}
+
+navigator.clipboard.writeText(text);
+
+notify("Đã copy bảng lương");
+
+}
+
+addMonth();
 </script>
 </body>
 </html>
