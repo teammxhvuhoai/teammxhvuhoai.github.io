@@ -121,7 +121,6 @@ background:linear-gradient(135deg,#0d3b66,#5fa8ff);
 }
 
 /* ===== TAB 4 PAGE LIST ===== */
-
 #pageList{
 display:flex;
 flex-direction:column;
@@ -129,12 +128,10 @@ gap:12px;
 background:none;
 padding:0;
 }
-
 .groupbox{
 background:none;
 padding:0;
 }
-
 .mail-row{
 background:#fff;
 border-radius:16px;
@@ -143,12 +140,10 @@ border:1px solid #e8eef7;
 box-shadow:0 4px 15px rgba(0,0,0,.06);
 transition:.25s;
 }
-
 .mail-row:hover{
 transform:translateY(-2px);
 box-shadow:0 8px 25px rgba(0,0,0,.10);
 }
-
 .page-name{
 background:linear-gradient(135deg,#1877f2,#00b7ff);
 color:#fff;
@@ -452,19 +447,45 @@ let pages = [
 ];
 
 // render page
+// render page
 let container = document.getElementById("pageList");
-// clear trước (tránh bị lặp khi reload script)
+
 container.innerHTML = "";
+
 pages.forEach(p => {
-  let div = document.createElement("div");
-  div.className = "mail-row";
-  div.innerHTML = `
-    <div class="page-name">${p.name}</div>
-    <input value="${p.link}" readonly onclick="copyThis(this)">
-    <input value="ID:${p.id}" readonly onclick="copyThis(this)">
-    <button class="go" onclick="window.open('${p.link}')">GO</button>
-  `;
-  container.appendChild(div);
+
+let div = document.createElement("div");
+
+div.className = "mail-row";
+
+div.innerHTML = `
+
+<div class="page-name">
+📘 ${p.name}
+</div>
+
+<input
+value="🔗 ${p.link}"
+readonly
+onclick="copyText('${p.link}')">
+
+<input
+value="🆔 ${p.id}"
+readonly
+onclick="copyText('${p.id}')">
+
+<button
+class="go"
+onclick="window.open('${p.link}','_blank')">
+GO
+</button>
+
+<div style="clear:both"></div>
+
+`;
+
+container.appendChild(div);
+
 });
 
 // OPEN TAB
@@ -641,9 +662,10 @@ document.getElementById("content1").value = "";
 }
 
 // COPY INPUT
-function copyThis(el){
-navigator.clipboard.writeText(el.value);
-notify("Đã copy");
+function copyText(text){
+navigator.clipboard.writeText(text);
+notify("✅ Đã copy thành công");
+
 }
 // NOTIFY
 function notify(msg){
