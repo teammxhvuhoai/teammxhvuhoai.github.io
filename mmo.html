@@ -441,7 +441,39 @@ Thật sự thì hiện tại Shopee tiếp thị liên kết và Facebook đã 
 <button class="btn" onclick="renameFiles()">Đổi tên MP4</button>
 </div>
 </div>
+<script>
+/* ========================= TAB SWITCH ========================== */
+function openTab(tabId) {
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+  event.target.classList.add("active");
+document.getElementById(tabId).classList.add("active");
+}
 
+/* ========================= CONVERT (XHS / DOUYIN / ANY LINK) ========================== */
+function convertDouyin() {
+    let text = document.getElementById("douyinLink").value.trim();
+    let url = text.match(/https?:\/\/[^\s"'<>]+/i);
+    if (!url) {
+  document.getElementById("convertResult").value = "⚠️Không tìm thấy link!";
+        return;
+    }
+    let link = url[0];
+document.getElementById("convertResult").value = link;
+  document.getElementById("douyinLink").value = "";
+    window.open(link, "_blank");
+}
+/* ========================= TIẾN HÀNH TẢI ========================== */
+function copyResult() {
+  let link = document.getElementById("convertResult").value;
+  if (!link.startsWith("http")) {
+    alert("Link không hợp lệ!");
+    return;
+  }
+  // Mở tab mới truy cập link đã tách
+  window.open(link, "_blank");
+}
+</script>
 <script>
 function openTab(id,btn){
 document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
