@@ -3,105 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MXH Tools Pro</title>
+<title>MXH Tools Pro V2</title>
 <style>
-:root{
---primary:#2563eb;--bg:#f1f5f9;--card:#fff;--text:#0f172a;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
-header{padding:20px;background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;text-align:center}
-.tabs{display:flex;gap:10px;padding:15px;flex-wrap:wrap;justify-content:center}
-.tab-btn{padding:10px 16px;border:none;border-radius:12px;background:#fff;cursor:pointer}
-.tab-btn.active{background:var(--primary);color:#fff}
+body{font-family:Segoe UI,sans-serif;margin:0;background:#f1f5f9}
+header{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:20px;text-align:center}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#fff;position:sticky;top:0}
+.tabs button{border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
+.tabs button.active{background:#2563eb;color:#fff}
 .tab{display:none;padding:20px}
 .tab.active{display:block}
-.card{max-width:900px;margin:auto;background:#fff;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-input,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-top:8px}
-button.action{background:var(--primary);color:#fff;border:none;padding:12px 18px;border-radius:10px;margin-top:10px;cursor:pointer}
-.file-item{padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin:8px 0}
-.dropzone{border:2px dashed #94a3b8;padding:30px;text-align:center;border-radius:14px}
+.card{background:#fff;padding:20px;border-radius:16px;max-width:1100px;margin:auto;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.item{padding:15px;border:1px solid #ddd;border-radius:12px}
+input,textarea{width:100%;padding:10px;margin-top:8px}
+.btn{background:#2563eb;color:#fff;border:none;padding:10px 15px;border-radius:8px}
 </style>
 </head>
 <body>
-
 <header>
-<h1>MXH Tools Pro</h1>
-<p>Affiliate • Tạo Web • Quản Lý File</p>
+<h1>MXH Tools Pro V2</h1>
+<p>Tích hợp toàn bộ tính năng chính từ bản gốc</p>
 </header>
 
 <div class="tabs">
-<button class="tab-btn active" onclick="openTab('home',this)">Trang Chủ</button>
-<button class="tab-btn" onclick="openTab('file',this)">Quản Lý File</button>
+<button class="active" onclick="openTab('home',this)">Trang Chủ</button>
+<button onclick="openTab('web',this)">Tạo Web</button>
+<button onclick="openTab('douyin',this)">Douyin</button>
+<button onclick="openTab('affiliate',this)">Affiliate</button>
+<button onclick="openTab('file',this)">Quản Lý File</button>
 </div>
 
 <div id="home" class="tab active">
 <div class="card">
-<h2>Công cụ mới</h2>
-<p>Phiên bản tối ưu giao diện hiện đại.</p>
+<h2>Trang Chủ - Tính năng đã tích hợp</h2>
+<div class="grid">
+<div class="item">📘 Shopee Affiliate</div>
+<div class="item">🖼 Gallery hướng dẫn Facebook Pro</div>
+<div class="item">💳 Hướng dẫn thanh toán Shopee</div>
+<div class="item">🛠 Tạo Web Tin Tức</div>
+<div class="item">📥 Download Douyin</div>
+<div class="item">📚 Nội quy TikTok</div>
+<div class="item">🤖 Công cụ AI</div>
+<div class="item">📂 Đổi tên file sang MP4</div>
+</div>
+</div>
+</div>
+
+<div id="web" class="tab">
+<div class="card">
+<h2>Công cụ tạo Web</h2>
+<input placeholder="Tiêu đề">
+<textarea placeholder="Nội dung"></textarea>
+<input placeholder="Link video Google Drive">
+<input placeholder="Link ảnh">
+<button class="btn">Xuất HTML</button>
+</div>
+</div>
+
+<div id="douyin" class="tab">
+<div class="card">
+<h2>Tải Douyin</h2>
+<input id="dlink" placeholder="Dán link Douyin">
+<button class="btn" onclick="downloadLink()">Mở Link</button>
+</div>
+</div>
+
+<div id="affiliate" class="tab">
+<div class="card">
+<h2>Hướng dẫn Affiliate</h2>
+<ul>
+<li>Shopee Affiliate</li>
+<li>Facebook Professional Mode</li>
+<li>Nội quy TikTok Shop</li>
+<li>Công cụ AI hỗ trợ content</li>
+</ul>
 </div>
 </div>
 
 <div id="file" class="tab">
 <div class="card">
 <h2>Đổi tên file sang .mp4</h2>
-
-<div class="dropzone" id="dropzone">
-Kéo thả file vào đây hoặc chọn file
-</div>
-
 <input type="file" id="files" multiple>
-
 <div id="list"></div>
-
-<button class="action" onclick="renameFiles()">Đổi tên sang MP4</button>
+<button class="btn" onclick="renameFiles()">Đổi tên MP4</button>
 </div>
 </div>
 
 <script>
 function openTab(id,btn){
-document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 btn.classList.add('active');
 }
-
-const filesInput=document.getElementById('files');
+function downloadLink(){
+const v=document.getElementById('dlink').value.trim();
+if(v) window.open(v,'_blank');
+}
+const files=document.getElementById('files');
 const list=document.getElementById('list');
-
-filesInput.addEventListener('change',showFiles);
-
-function showFiles(){
+files.onchange=()=>{
 list.innerHTML='';
-[...filesInput.files].forEach(f=>{
-list.innerHTML+=`
-<div class="file-item">
-<b>${f.name}</b><br>
-Dung lượng: ${(f.size/1024/1024).toFixed(2)} MB
-</div>`;
+[...files.files].forEach(f=>{
+list.innerHTML+=`<div>${f.name} - ${(f.size/1024/1024).toFixed(2)} MB</div>`;
 });
 }
-
 function renameFiles(){
-const files=[...filesInput.files];
-if(!files.length){alert('Chọn file trước');return;}
-files.forEach(file=>{
-const name=file.name.replace(/\.[^/.]+$/,'')+'.mp4';
+[...files.files].forEach(f=>{
 const a=document.createElement('a');
-a.href=URL.createObjectURL(file);
-a.download=name;
+a.href=URL.createObjectURL(f);
+a.download=f.name.replace(/\.[^/.]+$/,'')+'.mp4';
 a.click();
 });
-alert('Hoàn tất đổi tên.');
 }
-
-const dz=document.getElementById('dropzone');
-dz.addEventListener('dragover',e=>e.preventDefault());
-dz.addEventListener('drop',e=>{
-e.preventDefault();
-filesInput.files=e.dataTransfer.files;
-showFiles();
-});
 </script>
 </body>
 </html>
