@@ -432,94 +432,14 @@ Thật sự thì hiện tại Shopee tiếp thị liên kết và Facebook đã 
     if (e.target === lightboxAff) lightboxAff.style.display = "none";
   });
 </script>
-    
 <div id="file" class="tab">
 <div class="card">
-
-<h2>📂 Quản Lý File</h2>
-
-<input
-type="file"
-id="files"
-multiple
-accept="video/*,*/*">
-
+<h2>Đổi tên file sang .mp4</h2>
+<input type="file" id="files" multiple>
 <div id="list"></div>
-
-<button class="btn" onclick="renameFiles()">
-🎬 Đổi Sang .MP4
-</button>
-
+<button class="btn" onclick="renameFiles()">Đổi tên MP4</button>
 </div>
 </div>
-
-<script>
-const files=document.getElementById('files');
-const list=document.getElementById('list');
-
-files.addEventListener('change',()=>{
-
-list.innerHTML='';
-
-[...files.files].forEach((file,index)=>{
-
-list.innerHTML+=`
-<div style="
-padding:12px;
-margin:8px 0;
-border:1px solid #ddd;
-border-radius:10px;
-background:#f8fafc">
-
-<b>${file.name}</b><br>
-
-Dung lượng:
-${(file.size/1024/1024).toFixed(2)} MB
-
-</div>
-`;
-
-});
-
-});
-
-function renameFiles(){
-
-if(files.files.length===0){
-alert("Vui lòng chọn file đã tải về");
-return;
-}
-
-[...files.files].forEach(file=>{
-
-const fileName=file.name.replace(/\.[^/.]+$/,"");
-
-const blob=new Blob([file],{
-type:"video/mp4"
-});
-
-const url=URL.createObjectURL(blob);
-
-const a=document.createElement("a");
-
-a.href=url;
-
-a.download=fileName + ".mp4";
-
-document.body.appendChild(a);
-
-a.click();
-
-document.body.removeChild(a);
-
-URL.revokeObjectURL(url);
-
-});
-
-alert("Đã tạo file .mp4 để tải xuống");
-
-}
-</script>
 <script>
 /* ========================= TAB SWITCH ========================== */
 function openTab(tabId) {
