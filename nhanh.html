@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chia sẻ nhanh</title>
+<style>
+  :root {
+    --bg-1: #0b0e1a;
+    --bg-2: #131a2e;
+    --card: #171f36;
+    --line: #262f4d;
+    --text: #eef1fb;
+    --muted: #8a91b3;
+    --accent: #6c8cff;
+    --accent-2: #b06cff;
+    --zalo: #0068ff;
+    --tiktok: #ff2c55;
+    --facebook: #1877f2;
+    --youtube: #ff0033;
+    --ok: #3ddc97;
+    --err: #ff5c72;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(circle at 20% -10%, rgba(108,140,255,0.25), transparent 45%),
+      radial-gradient(circle at 100% 0%, rgba(176,108,255,0.18), transparent 40%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px 14px 40px;
+  }
+  .app { width: 100%; max-width: 460px; }
+  .top { padding: 6px 4px 18px; }
+  .top .eyebrow {
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin: 0 0 6px;
+  }
+  .top h1 { font-size: 24px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .top p { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    background-color: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  label.section-label {
+    display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  }
+
+  textarea {
+    width: 100%; min-height: 100px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    color: var(--text);
+    font-size: 15.5px;
+    font-family: inherit;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  textarea::placeholder { color: #5c6488; }
+  textarea:focus { outline: none; border-color: var(--accent); }
+
+  .charcount { text-align: right; font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+
+  .drop {
+    border: 1.5px dashed var(--line);
+    border-radius: 14px;
+    padding: 22px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .drop:active { background: rgba(255,255,255,0.03); }
+  .drop.dragover { border-color: var(--accent); background: rgba(108,140,255,0.08); }
+  .drop .icon {
+    width: 40px; height: 40px; margin: 0 auto 10px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+  }
+  .drop .icon svg { width: 20px; height: 20px; }
+  .drop .main-txt { font-size: 14px; font-weight: 600; }
+  .drop .sub-txt { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  input[type="file"] { display: none; }
+
+  .previews {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px;
+  }
+  .preview-item {
+    position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden;
+    background: #0b0e1a; border: 1px solid var(--line); cursor: pointer;
+  }
+  .preview-item.is-video { border-color: var(--line); }
+  .preview-item.selected-video { border-color: var(--ok); box-shadow: 0 0 0 2px rgba(61,220,151,0.35) inset; }
+  .preview-item img, .preview-item video { width: 100%; height: 100%; object-fit: cover; }
+  .preview-item .remove {
+    position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
+    background: rgba(0,0,0,0.6); border-radius: 50%; border: none; color: #fff;
+    font-size: 13px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+  }
+  .preview-item .tag {
+    position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.55);
+    font-size: 9.5px; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .preview-item .pick-video {
+    position: absolute; bottom: 4px; right: 4px;
+    background: rgba(0,0,0,0.55); color: #fff; font-size: 9.5px;
+    padding: 2px 6px; border-radius: 6px; z-index: 2;
+  }
+  .preview-item.selected-video .pick-video { background: var(--ok); color: #062; font-weight: 700; }
+
+  .platforms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .platform {
+    border: 1.5px solid var(--line); background: rgba(255,255,255,0.02); border-radius: 14px;
+    padding: 12px 4px 10px; text-align: center; cursor: pointer;
+    transition: transform .12s ease, border-color .12s ease, background .12s ease; user-select: none;
+  }
+  .platform:active { transform: scale(0.96); }
+  .platform .badge {
+    width: 34px; height: 34px; margin: 0 auto 6px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff;
+  }
+  .platform[data-p="zalo"] .badge { background: var(--zalo); }
+  .platform[data-p="tiktok"] .badge { background: linear-gradient(135deg, #25f4ee, #ff0050); }
+  .platform[data-p="facebook"] .badge { background: var(--facebook); }
+  .platform[data-p="youtube"] .badge { background: var(--youtube); }
+  .platform .name { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+  .platform.active { border-color: var(--accent); background: rgba(108,140,255,0.09); }
+  .platform.active .name { color: var(--text); }
+
+  .hint { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+  .share-btn {
+    width: 100%; padding: 15px; border: none; border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 0.01em; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 10px 24px rgba(108,140,255,0.25);
+  }
+  .share-btn:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+  .share-btn:active { transform: scale(0.98); }
+
+  #status { margin-top: 12px; font-size: 13.5px; text-align: center; min-height: 18px; line-height: 1.5; }
+  .ok { color: var(--ok); }
+  .err { color: var(--err); }
+
+  .banner {
+    display: none; border: 1px solid rgba(255,92,114,0.35); background: rgba(255,92,114,0.08);
+    color: #ffb4bf; border-radius: 14px; padding: 12px 14px; font-size: 12.5px; line-height: 1.55; margin-bottom: 14px;
+  }
+  .banner.show { display: block; }
+  .banner b { color: #fff; }
+  .banner.info {
+    border-color: rgba(108,140,255,0.35);
+    background: rgba(108,140,255,0.08);
+    color: #cfd8ff;
+  }
+
+  .fallback-row { display: flex; gap: 10px; margin-top: 10px; }
+  .fallback-btn {
+    flex: 1; padding: 11px; border-radius: 12px; border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .fallback-btn:active { transform: scale(0.98); }
+
+  /* --- Facebook / CocCoc tabs section --- */
+  .fb-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .fb-add-row input {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 11px 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .fb-add-row input:focus { outline: none; border-color: var(--accent); }
+  .fb-add-row button {
+    padding: 0 16px;
+    border: none;
+    border-radius: 12px;
+    background: var(--facebook);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+  .fb-add-row button:active { transform: scale(0.97); }
+
+  .fb-tab-list { display: flex; flex-direction: column; gap: 10px; }
+  .fb-tab-item {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(255,255,255,0.02);
+  }
+  .fb-tab-item .row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .fb-tab-item .tab-name {
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fb-tab-item .tab-name .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .fb-tab-item .tab-name .dot.opened { background: var(--ok); }
+  .fb-tab-item .del-tab {
+    border: none; background: transparent; color: var(--muted);
+    font-size: 13px; cursor: pointer; padding: 4px 6px;
+  }
+  .fb-tab-item .row2 { display: flex; gap: 8px; }
+  .fb-tab-item .row2 button {
+    flex: 1;
+    padding: 9px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+  }
+  .fb-tab-item .row2 .post-btn {
+    background: var(--facebook);
+    border-color: var(--facebook);
+    color: #fff;
+  }
+  .fb-tab-item .row2 button:active { transform: scale(0.97); }
+  .empty-note { font-size: 12.5px; color: var(--muted); text-align: center; padding: 10px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="banner" id="envBanner"></div>
+  <div class="banner info show" id="fbLimitBanner">
+    <b>Lưu ý:</b> Trang web không thể tự nhìn thấy các tab đang mở ở hồ sơ khác của CocCoc, và cũng không thể tự gắn video vào ô upload của Facebook (trình duyệt chặn vì lý do an toàn). Mục "Tab Facebook" bên dưới sẽ: đặt tên cho từng tab bạn dùng, mở/focus đúng tab đó, tự copy caption và tự tải sẵn video bạn chọn về máy — bạn chỉ cần dán caption và chọn file vừa tải khi đăng.
+  </div>
+
+  <div class="top">
+    <p class="eyebrow">Đăng · Chia sẻ · Gửi</p>
+    <h1>Chia sẻ nhanh</h1>
+    <p>Viết nội dung, thêm ảnh/video, chọn nơi muốn đăng rồi chia sẻ chỉ trong vài giây.</p>
+  </div>
+
+  <div class="card">
+    <label class="section-label">Nội dung</label>
+    <textarea id="caption" maxlength="2200" placeholder="Viết caption, mô tả video hoặc tin nhắn..."></textarea>
+    <div class="charcount"><span id="charNum">0</span>/2200</div>
+  </div>
+
+  <div class="card">
+    <label class="section-label">Ảnh / Video</label>
+    <div class="drop" id="dropZone">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="main-txt">Chạm để chọn ảnh hoặc video</div>
+      <div class="sub-txt">Có thể chọn nhiều tệp cùng lúc</div>
+      <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+    </div>
+    <div class="previews" id="previews"></div>
+  </div>
+
+  <div class="card">
+    <label class="section-label">Đăng lên</label>
+    <div class="platforms">
+      <div class="platform" data-p="zalo">
+        <div class="badge">Za</div>
+        <div class="name">Zalo</div>
+      </div>
+      <div class="platform" data-p="tiktok">
+        <div class="badge">Tt</div>
+        <div class="name">TikTok</div>
+      </div>
+      <div class="platform" data-p="facebook">
+        <div class="badge">Fb</div>
+        <div class="name">Reels</div>
+      </div>
+      <div class="platform" data-p="youtube">
+        <div class="badge">Yt</div>
+        <div class="name">YouTube</div>
+      </div>
+    </div>
+    <div class="hint">
+      Lưu ý thực tế: Zalo và Facebook thường nhận được ảnh/video qua bảng chia sẻ. <b style="color:#c7cbe6">TikTok không hỗ trợ nhận nội dung qua cơ chế chia sẻ chuẩn</b> — nếu TikTok không tự mở hoặc không có nội dung, hãy dùng nút "Tải tệp" bên dưới rồi đăng thủ công trong app. Facebook cũng không giữ chắc caption khi kèm video — hãy dán lại caption nếu cần.
+    </div>
+  </div>
+
+  <button class="share-btn" id="shareBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/>
+    </svg>
+    Chia sẻ ngay
+  </button>
+
+  <div class="fallback-row">
+    <button class="fallback-btn" id="copyBtn">📋 Copy nội dung</button>
+    <button class="fallback-btn" id="downloadBtn">⬇️ Tải tệp về máy</button>
+  </div>
+
+  <div id="status"></div>
+
+  <!-- === Khu vực mới: chọn video + chọn tab Facebook (CocCoc) === -->
+  <div class="card">
+    <label class="section-label">Video sẽ đăng lên Facebook</label>
+    <div id="videoPickNote" class="empty-note">Chưa có video nào. Thêm video ở mục "Ảnh / Video" phía trên, rồi chạm vào video để chọn.</div>
+  </div>
+
+  <div class="card">
+    <label class="section-label">Tab Facebook (CocCoc)</label>
+    <div class="fb-add-row">
+      <input type="text" id="fbTabNameInput" placeholder="Tên tab, vd: Profile 1 - Fanpage A" maxlength="40">
+      <button id="fbTabAddBtn">+ Thêm tab</button>
+    </div>
+    <div class="fb-tab-list" id="fbTabList"></div>
+    <div class="empty-note" id="fbTabEmptyNote">Chưa có tab nào. Thêm tên các tab CocCoc bạn đang đăng nhập Facebook để bắt đầu.</div>
+    <div class="hint">
+      Bấm "Mở tab" để mở/focus tab đó lần đầu (bạn cần tự đăng nhập đúng hồ sơ Facebook trong tab vừa mở). Bấm "Đăng vào tab này" để: copy caption, tải sẵn video đã chọn về máy, rồi focus lại đúng tab đó để bạn dán caption và chọn file vừa tải.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const caption = document.getElementById('caption');
+  const charNum = document.getElementById('charNum');
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const previews = document.getElementById('previews');
+  const shareBtn = document.getElementById('shareBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statusEl = document.getElementById('status');
+  const envBanner = document.getElementById('envBanner');
+  const platformEls = document.querySelectorAll('.platform');
+
+  const videoPickNote = document.getElementById('videoPickNote');
+  const fbTabNameInput = document.getElementById('fbTabNameInput');
+  const fbTabAddBtn = document.getElementById('fbTabAddBtn');
+  const fbTabList = document.getElementById('fbTabList');
+  const fbTabEmptyNote = document.getElementById('fbTabEmptyNote');
+
+  const FB_COMPOSE_URL = 'https://www.facebook.com/reel/create';
+
+  let selectedFiles = [];       // tất cả ảnh/video đã thêm
+  let selectedVideoIdx = -1;    // index (trong selectedFiles) của video đang chọn để đăng
+  let selectedPlatforms = new Set();
+
+  // fbTabs: [{ id, name, winRef, opened }]
+  let fbTabs = [];
+  let fbTabIdSeq = 1;
+
+  // ---------- Môi trường ----------
+  (function checkEnvironment() {
+    if (location.protocol === 'file:') {
+      envBanner.innerHTML = '<b>Trang đang mở dạng file:// nên tính năng Chia sẻ sẽ KHÔNG hoạt động.</b> Hãy đưa trang này lên hosting HTTPS (hoặc chạy qua localhost) rồi mở bằng trình duyệt, thay vì mở trực tiếp từ trình quản lý file.';
+      envBanner.classList.add('show');
+      return;
+    }
+    if (!window.isSecureContext) {
+      envBanner.innerHTML = '<b>Trang chưa chạy trên kết nối an toàn (HTTPS).</b> Web Share API yêu cầu HTTPS, nếu không nút Chia sẻ sẽ không mở được app nào.';
+      envBanner.classList.add('show');
+      return;
+    }
+    if (!navigator.share) {
+      envBanner.innerHTML = '<b>Trình duyệt này không hỗ trợ chia sẻ trực tiếp.</b> Hãy dùng nút "Copy nội dung" / "Tải tệp về" bên dưới rồi đăng thủ công.';
+      envBanner.classList.add('show');
+    }
+  })();
+
+  caption.addEventListener('input', () => {
+    charNum.textContent = caption.value.length;
+  });
+
+  // ---------- Chọn ảnh / video ----------
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  ['dragover', 'dragenter'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+  });
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+    });
+  });
+  dropZone.addEventListener('drop', (e) => {
+    const dropped = Array.from(e.dataTransfer.files || []);
+    addFiles(dropped);
+  });
+
+  fileInput.addEventListener('change', () => {
+    addFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
+  function addFiles(files) {
+    for (const f of files) {
+      if (f.type.startsWith('image/') || f.type.startsWith('video/')) {
+        selectedFiles.push(f);
+      }
+    }
+    // Nếu chưa chọn video nào và vừa thêm video mới -> tự chọn video đầu tiên
+    if (selectedVideoIdx === -1) {
+      const firstVideoIdx = selectedFiles.findIndex(f => f.type.startsWith('video/'));
+      if (firstVideoIdx !== -1) selectedVideoIdx = firstVideoIdx;
+    }
+    renderPreviews();
+    renderVideoPickNote();
+  }
+
+  function renderPreviews() {
+    previews.innerHTML = '';
+    selectedFiles.forEach((file, idx) => {
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      const isVideo = file.type.startsWith('video/');
+
+      const url = URL.createObjectURL(file);
+      if (isVideo) {
+        item.classList.add('is-video');
+        if (idx === selectedVideoIdx) item.classList.add('selected-video');
+
+        const vid = document.createElement('video');
+        vid.src = url;
+        vid.muted = true;
+        item.appendChild(vid);
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.textContent = 'Video';
+        item.appendChild(tag);
+
+        const pick = document.createElement('div');
+        pick.className = 'pick-video';
+        pick.textContent = (idx === selectedVideoIdx) ? '✓ Sẽ đăng' : 'Chọn';
+        item.appendChild(pick);
+
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.remove')) return;
+          selectedVideoIdx = idx;
+          renderPreviews();
+          renderVideoPickNote();
+        });
+      } else {
+        const img = document.createElement('img');
+        img.src = url;
+        item.appendChild(img);
+      }
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove';
+      removeBtn.textContent = '✕';
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedFiles.splice(idx, 1);
+        if (selectedVideoIdx === idx) {
+          selectedVideoIdx = -1;
+        } else if (selectedVideoIdx > idx) {
+          selectedVideoIdx -= 1;
+        }
+        renderPreviews();
+        renderVideoPickNote();
+      });
+      item.appendChild(removeBtn);
+
+      previews.appendChild(item);
+    });
+  }
+
+  function currentVideoFile() {
+    if (selectedVideoIdx === -1) return null;
+    const f = selectedFiles[selectedVideoIdx];
+    return (f && f.type.startsWith('video/')) ? f : null;
+  }
+
+  function renderVideoPickNote() {
+    const v = currentVideoFile();
+    const videoCount = selectedFiles.filter(f => f.type.startsWith('video/')).length;
+    if (!v) {
+      videoPickNote.textContent = 'Chưa có video nào. Thêm video ở mục "Ảnh / Video" phía trên, rồi chạm vào video để chọn.';
+      videoPickNote.classList.remove('ok');
+    } else {
+      videoPickNote.innerHTML = 'Video sẽ đăng: <b style="color:#fff">' + escapeHtml(v.name) + '</b>' +
+        (videoCount > 1 ? ' (chạm vào video khác ở trên để đổi lựa chọn)' : '');
+    }
+  }
+
+  // ---------- Chọn nền tảng (chia sẻ chung) ----------
+  platformEls.forEach(el => {
+    el.addEventListener('click', () => {
+      const p = el.dataset.p;
+      if (selectedPlatforms.has(p)) {
+        selectedPlatforms.delete(p);
+        el.classList.remove('active');
+      } else {
+        selectedPlatforms.add(p);
+        el.classList.add('active');
+      }
+    });
+  });
+
+  shareBtn.addEventListener('click', async () => {
+    const text = caption.value.trim();
+
+    if (!text && selectedFiles.length === 0) {
+      showStatus('Hãy nhập nội dung hoặc chọn ảnh/video.', 'err');
+      return;
+    }
+
+    const shareData = {};
+    if (text) shareData.text = text;
+    if (selectedFiles.length > 0) shareData.files = selectedFiles;
+
+    const platformNote = selectedPlatforms.size
+      ? ' Trong bảng chia sẻ, hãy chọn: ' + Array.from(selectedPlatforms).map(labelOf).join(', ') + '.'
+      : '';
+
+    if (navigator.share) {
+      const canShareFiles = selectedFiles.length === 0 ||
+        (navigator.canShare && navigator.canShare({ files: selectedFiles }));
+
+      if (!canShareFiles) {
+        showStatus('Trình duyệt này không hỗ trợ chia sẻ tệp trực tiếp.' + platformNote, 'err');
+        return;
+      }
+
+      shareBtn.disabled = true;
+      try {
+        await navigator.share(shareData);
+        showStatus('Đã mở bảng chia sẻ.' + platformNote, 'ok');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showStatus('Không chia sẻ được: ' + err.message, 'err');
+        }
+      } finally {
+        shareBtn.disabled = false;
+      }
+    } else {
+      try {
+        if (text) await navigator.clipboard.writeText(text);
+        showStatus('Trình duyệt không hỗ trợ chia sẻ trực tiếp. Đã copy nội dung — hãy tải ảnh/video và đăng thủ công.' + platformNote, 'ok');
+      } catch (e) {
+        showStatus('Trình duyệt không hỗ trợ chia sẻ. Vui lòng thao tác thủ công.', 'err');
+      }
+    }
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(caption.value.trim());
+      showStatus('Đã copy nội dung.', 'ok');
+    } catch (e) {
+      showStatus('Không copy được nội dung.', 'err');
+    }
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    if (selectedFiles.length === 0) {
+      showStatus('Chưa có tệp nào để tải.', 'err');
+      return;
+    }
+    selectedFiles.forEach(f => downloadFile(f));
+    showStatus('Đã tải ' + selectedFiles.length + ' tệp về máy.', 'ok');
+  });
+
+  function labelOf(p) {
+    return { zalo: 'Zalo', tiktok: 'TikTok', facebook: 'Facebook Reels', youtube: 'YouTube' }[p] || p;
+  }
+
+  function showStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = cls;
+  }
+
+  function downloadFile(file) {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name || 'video';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---------- Quản lý tab Facebook (CocCoc) ----------
+  fbTabAddBtn.addEventListener('click', addFbTab);
+  fbTabNameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addFbTab();
+  });
+
+  function addFbTab() {
+    const name = fbTabNameInput.value.trim();
+    if (!name) {
+      showStatus('Nhập tên cho tab trước khi thêm.', 'err');
+      return;
+    }
+    const winName = 'fbtab_' + (fbTabIdSeq++) + '_' + name.replace(/[^a-zA-Z0-9]/g, '');
+    fbTabs.push({ id: winName, name, winRef: null, opened: false });
+    fbTabNameInput.value = '';
+    renderFbTabs();
+  }
+
+  function renderFbTabs() {
+    fbTabList.innerHTML = '';
+    fbTabEmptyNote.style.display = fbTabs.length ? 'none' : 'block';
+
+    fbTabs.forEach((tab) => {
+      const item = document.createElement('div');
+      item.className = 'fb-tab-item';
+
+      const row1 = document.createElement('div');
+      row1.className = 'row1';
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'tab-name';
+      const dot = document.createElement('span');
+      dot.className = 'dot' + (tab.opened ? ' opened' : '');
+      nameEl.appendChild(dot);
+      nameEl.appendChild(document.createTextNode(tab.name));
+      row1.appendChild(nameEl);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del-tab';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', () => {
+        fbTabs = fbTabs.filter(t => t.id !== tab.id);
+        renderFbTabs();
+      });
+      row1.appendChild(delBtn);
+
+      const row2 = document.createElement('div');
+      row2.className = 'row2';
+
+      const openBtn = document.createElement('button');
+      openBtn.textContent = tab.opened ? 'Focus tab' : 'Mở tab';
+      openBtn.addEventListener('click', () => openFbTab(tab));
+      row2.appendChild(openBtn);
+
+      const postBtn = document.createElement('button');
+      postBtn.className = 'post-btn';
+      postBtn.textContent = 'Đăng vào tab này';
+      postBtn.addEventListener('click', () => postToFbTab(tab));
+      row2.appendChild(postBtn);
+
+      item.appendChild(row1);
+      item.appendChild(row2);
+      fbTabList.appendChild(item);
+    });
+  }
+
+  function openFbTab(tab) {
+    const win = window.open(FB_COMPOSE_URL, tab.id);
+    if (!win) {
+      showStatus('Trình duyệt chặn cửa sổ bật lên. Hãy cho phép popup cho trang này.', 'err');
+      return;
+    }
+    tab.winRef = win;
+    tab.opened = true;
+    try { win.focus(); } catch (e) {}
+    renderFbTabs();
+    showStatus('Đã mở/focus tab "' + tab.name + '". Hãy tự đăng nhập đúng hồ sơ Facebook trong tab đó nếu đây là lần đầu.', 'ok');
+  }
+
+  async function postToFbTab(tab) {
+    const video = currentVideoFile();
+    const text = caption.value.trim();
+
+    if (!video && !text) {
+      showStatus('Hãy nhập caption hoặc chọn một video trước khi đăng.', 'err');
+      return;
+    }
+    if (selectedFiles.filter(f => f.type.startsWith('video/')).length > 0 && !video) {
+      showStatus('Có video đã thêm nhưng chưa chọn video nào để đăng — chạm vào video ở mục "Ảnh / Video" để chọn.', 'err');
+      return;
+    }
+
+    // 1. Copy caption
+    if (text) {
+      try { await navigator.clipboard.writeText(text); } catch (e) {}
+    }
+
+    // 2. Tải sẵn video về máy để dễ chọn trong hộp thoại upload của Facebook
+    if (video) downloadFile(video);
+
+    // 3. Mở/focus đúng tab đã đặt tên
+    const win = window.open(FB_COMPOSE_URL, tab.id);
+    if (win) {
+      tab.winRef = win;
+      tab.opened = true;
+      try { win.focus(); } catch (e) {}
+    }
+    renderFbTabs();
+
+    const parts = [];
+    if (text) parts.push('đã copy caption');
+    if (video) parts.push('đã tải video "' + video.name + '"');
+    showStatus(
+      (parts.length ? 'Đã ' + parts.join(', ') + '. ' : '') +
+      'Đã focus tab "' + tab.name + '" — hãy dán caption và chọn file video vừa tải trong hộp thoại đăng bài của Facebook.',
+      'ok'
+    );
+  }
+
+  renderVideoPickNote();
+  renderFbTabs();
+</script>
+</body>
+</html>
