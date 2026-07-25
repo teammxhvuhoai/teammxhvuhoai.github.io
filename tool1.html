@@ -232,6 +232,8 @@
   .listbox-item.picked{
     background:var(--primary-light); border-left:3px solid var(--primary); font-weight:600;
   }
+  .listbox-item .item-title{ display:block; font-weight:700; color:var(--navy); margin-bottom:2px; }
+  .listbox-item .item-link{ display:block; font-size:12px; color:var(--muted); font-weight:400; }
 
   #toast{
     position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px);
@@ -354,19 +356,19 @@
   <section id="page-shoppe" class="page">
     <div class="card">
       <h2 class="title">Link Shopee</h2>
-      <p class="hint">Danh sách link Shopee của bạn (mỗi dòng 1 link). Bấm "Chia sẻ ngẫu nhiên" để copy random 1 link mỗi lần bấm.</p>
+      <p class="hint">Mỗi dòng nhập theo dạng <strong>Tiêu đề | Link</strong>. Bấm "Chia sẻ ngẫu nhiên" để copy random 1 link kèm tiêu đề mỗi lần bấm.</p>
 
+      <div class="btnrow" style="margin-top:0">
+        <button class="btn btn-primary btn-full" id="btnRandomShoppe">Chia sẻ ngẫu nhiên (Copy)</button>
+      </div>
+
+      <div class="section-label">Danh sách link (mỗi dòng: Tiêu đề | Link)</div>
       <div class="field" style="margin-top:0">
-        <label for="shoppeLinksInput">Danh sách link (mỗi dòng 1 link)</label>
         <textarea id="shoppeLinksInput" style="min-height:100px"></textarea>
       </div>
 
-      <div class="section-label">Danh sách</div>
+      <div class="section-label">Xem trước</div>
       <div id="shoppeListbox" class="listbox"></div>
-
-      <div class="btnrow">
-        <button class="btn btn-primary btn-full" id="btnRandomShoppe">Chia sẻ ngẫu nhiên (Copy)</button>
-      </div>
     </div>
   </section>
 
@@ -665,33 +667,54 @@ const shoppeLinksInput = document.getElementById('shoppeLinksInput');
 const shoppeListbox = document.getElementById('shoppeListbox');
 
 const DEFAULT_LINKS = [
-  'https://shorten.asia/sanpham1',
-  'https://shorten.asia/sanpham2',
-  'https://shorten.asia/sanpham3'
+  'Áo thun nam basic | https://shorten.asia/sanpham1',
+  'Giày sneaker nữ | https://shorten.asia/sanpham2',
+  'Balo laptop chống nước | https://shorten.asia/sanpham3'
 ];
 shoppeLinksInput.value = DEFAULT_LINKS.join('\n');
 
+// Mỗi dòng dạng "Tiêu đề | Link". Nếu không có dấu "|" thì coi cả dòng là link,
+// tiêu đề mặc định là "Sản phẩm Shopee".
 function getShoppeLinks(){
-  return shoppeLinksInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  return shoppeLinksInput.value
+    .split('\n')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(line => {
+      const sepIndex = line.indexOf('|');
+      if(sepIndex === -1){
+        return { title: 'Sản phẩm Shopee', link: line };
+      }
+      const title = line.slice(0, sepIndex).trim() || 'Sản phẩm Shopee';
+      const link = line.slice(sepIndex + 1).trim();
+      return { title, link };
+    })
+    .filter(item => item.link);
 }
 
 function renderShoppeList(pickedIndex = -1){
-  const links = getShoppeLinks();
-  shoppeListbox.innerHTML = links.map((link, i)=>
-    `<div class="listbox-item ${i===pickedIndex?'picked':''}">${escapeHtml(link)}</div>`
-  ).join('') || '<div class="listbox-item">Chưa có link nào</div>';
+  const items = getShoppeLinks();
+  shoppeListbox.innerHTML = items.map((item, i) => `
+    <div class="listbox-item ${i===pickedIndex?'picked':''}">
+      <span class="item-title">${escapeHtml(item.title)}</span>
+      <span class="item-link">${escapeHtml(item.link)}</span>
+    </div>
+  `).join('') || '<div class="listbox-item">Chưa có link nào</div>';
 }
 renderShoppeList();
 shoppeLinksInput.addEventListener('input', ()=> renderShoppeList());
 
 document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
-  const links = getShoppeLinks();
-  if(links.length === 0){ showToast('Danh sách link đang trống'); return; }
-  const idx = Math.floor(Math.random() * links.length);
-  const picked = links[idx];
+  const items = getShoppeLinks();
+  if(items.length === 0){ showToast('Danh sách link đang trống'); return; }
+  const idx = Math.floor(Math.random() * items.length);
+  const picked = items[idx];
   renderShoppeList(idx);
-  const ok = await copyText(picked);
-  showToast(ok ? `Đã copy: ${picked}` : 'Copy thất bại');
+
+  // Copy kèm tiêu đề + link, mỗi phần 1 dòng
+  const textToCopy = `${picked.title}\n${picked.link}`;
+  const ok = await copyText(textToCopy);
+  showToast(ok ? `Đã copy: ${picked.title}` : 'Copy thất bại');
 });
 
 /* =========================================================
