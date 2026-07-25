@@ -516,31 +516,31 @@ document.getElementById('btnClearContent').addEventListener('click', ()=>{
    Mỗi nút giữ 1 BỘ 5 hastag riêng (mảng 5 phần tử). Bấm nút = copy ngay
    nội dung kèm ngày đăng + 5 hastag của nút đó. Bấm biểu tượng ✎ để sửa.
 ========================================================= */
-const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,10];
+const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,9];
 
 // Nhãn chữ hiển thị trên mỗi nút, đi kèm số thứ tự
 const hashtagLabels = {
-  1:  'Tin Tức',
-  2:  'TTMXH',
-  3:  'Cảm Xúc',
-  4:  'Khuyến Mãi',
-  5:  'Đánh Giá',
-  6:  'Tin Nóng',
-  7:  'Uy Tín',
-  8:  'SP Mới',
-  10: 'Tin Nhanh'
+  1:  'Tin tức mxh',
+  2:  'Tin Tức Mạng Xã Hội',
+  3:  'Tin Mới',
+  4:  'Tin Ngắn Mỗi Ngày',
+  5:  'Cảm Xúc Con Người',
+  6:  'ToDay News',
+  7:  'Tin Đường Phố',
+  8:  'TTMXH',
+  9: 'Tin Mới 24h'
 };
 
 const hashtagPresets = {
-  1:  ['#trending','#hot','#viral','#new','#xuhuong'],
-  2:  ['#hot','#trend','#new','#chatluong','#uytin'],
-  3:  ['#sale','#giatot','#khuyenmai','#freeship','#uytin'],
-  4:  ['#freeship','#sale','#giare','#chatluong','#shopee'],
-  5:  ['#review','#danhgia','#trainghiem','#chatluong','#dangmua'],
-  6:  ['#giatot','#uudai','#sale','#freeship','#muangay'],
-  7:  ['#uytin','#chatluong','#baohanh','#chinhhang','#antam'],
-  8:  ['#new','#hangmoi','#trend','#hot','#muangay'],
-  10: ['#hangchat','#chatluong','#baohanh','#uytin','#dangmua']
+  1:  ['#tintucmxh','#mxh24h','#hotnews','#xuhuongmoi','#capnhatnhanh'],
+  2:  ['#tintucmangxahoi','#mangxahoi','#newsdaily','#tinnong24h','#videohot'],
+  3:  ['#tinmoi','#tinnhanh','#capnhat24h','#newsupdate','#hottrendvn'],
+  4:  ['#tinnganmoingay','#banthinhanh','#tinthoisu','#moingaymottin','#thongtin24h'],
+  5:  ['#camxucconnguoi','#cauchuyencuocsong','#yeuthuong','#songtichcuc','#truyencamhung'],
+  6:  ['#todaynews','#breakingnews','#worldnews','#dailyupdate','#latestnews'],
+  7:  ['#tinduongpho','#duongpho24h','#thucte','#hientruong','#cuocsongquanhta'],
+  8:  ['#ttmxh','#tinxuhuong','#newsviral','#capnhatmoi','#tinhomnay'],
+  9: ['#tinmoi24h','#24hnews','#news24','#tintuc24h','#tintucnong']
 };
 
 const hashtagGrid = document.getElementById('hashtagGrid');
