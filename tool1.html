@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Content Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue: #3a4ddb;
+    --blue-dark: #2c3ab0;
+    --navy: #171a3a;
+    --bg: #f6f6fb;
+    --card: #ffffff;
+    --pink: #f1dede;
+    --text: #1c1c28;
+    --muted: #8a8aa3;
+    --red: #e0374a;
+    --green: #52c98a;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    font-family:'Inter', system-ui, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    padding:16px 16px 40px;
+  }
+
+  /* ===== Thanh tab điều hướng ===== */
+  .tabbar{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .tabbtn{
+    border:none;
+    padding:12px 6px;
+    border-radius:14px;
+    background:var(--blue);
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    transition:transform .12s ease, background .12s ease, box-shadow .12s ease;
+    box-shadow:0 4px 10px rgba(58,77,219,.25);
+  }
+  .tabbtn:active{ transform:scale(.96); }
+  .tabbtn.active{ background:var(--navy); box-shadow:0 4px 12px rgba(23,26,58,.35); }
+
+  .page{ display:none; animation:fade .18s ease; }
+  .page.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  h2.title{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:19px;
+    margin:4px 0 12px;
+  }
+  .hint{ font-size:12.5px; color:var(--muted); margin:-6px 0 14px; line-height:1.5; }
+
+  /* ===== Khối soạn nội dung (tab Content) có gạch chân từ sai chính tả ===== */
+  .editor-wrap{
+    position:relative;
+    width:100%;
+    min-height:220px;
+    border-radius:var(--radius);
+    background:var(--card);
+    border:1px solid #e6e6f0;
+    overflow:hidden;
+  }
+  /* Textarea thật: người dùng gõ vào đây, nhưng để CHỮ TRONG SUỐT
+     vì phần chữ hiển thị thực tế được vẽ bởi lớp backdrop bên dưới */
+  .editor-common{
+    position:absolute;
+    inset:0;
+    margin:0;
+    padding:14px;
+    border:0;
+    width:100%;
+    height:100%;
+    font-family:'Inter', system-ui, sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+    overflow-wrap:anywhere;
+  }
+  .editor-backdrop{
+    background:transparent;
+    color:var(--text);
+    overflow:auto;
+    pointer-events:none;
+  }
+  .editor-textarea{
+    background:transparent;
+    color:transparent;
+    caret-color:var(--text);
+    resize:none;
+    overflow:auto;
+  }
+  .editor-textarea:focus{ outline:none; }
+  .misspell{
+    text-decoration:underline;
+    text-decoration-color:var(--red);
+    text-decoration-style:wavy;
+    text-decoration-thickness:1.5px;
+  }
+
+  .field{
+    margin-top:12px;
+  }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .field input[type=text], .field textarea{
+    width:100%;
+    border:1px solid #e6e6f0;
+    background:var(--card);
+    border-radius:var(--radius-sm);
+    padding:11px 12px;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--text);
+  }
+  .field textarea{ resize:vertical; min-height:80px; line-height:1.5; }
+
+  .btnrow{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .btn{
+    flex:1;
+    border:none;
+    padding:13px 14px;
+    border-radius:var(--radius-sm);
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn-primary{ background:var(--blue); color:#fff; }
+  .btn-dark{ background:var(--navy); color:#fff; }
+  .btn-ghost{ background:#eceef7; color:var(--navy); }
+  .btn-danger{ background:#fde8ea; color:var(--red); }
+  .btn-full{ width:100%; }
+
+  /* ===== Danh sách link Shopee (list box) ===== */
+  .listbox{
+    background:var(--card);
+    border:1px solid #e6e6f0;
+    border-radius:var(--radius);
+    max-height:280px;
+    overflow-y:auto;
+  }
+  .listbox-item{
+    padding:12px 14px;
+    font-size:13.5px;
+    border-bottom:1px solid #f0f0f6;
+    word-break:break-all;
+    color:var(--text);
+  }
+  .listbox-item:last-child{ border-bottom:none; }
+  .listbox-item.picked{
+    background:#eef1ff;
+    border-left:3px solid var(--blue);
+    font-weight:600;
+  }
+
+  /* ===== Toast thông báo nhỏ ===== */
+  #toast{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translate(-50%, 20px);
+    background:var(--navy);
+    color:#fff;
+    padding:11px 18px;
+    border-radius:999px;
+    font-size:13.5px;
+    font-weight:600;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:50;
+    box-shadow:0 8px 20px rgba(0,0,0,.2);
+  }
+  #toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .chip{
+    background:var(--navy);
+    color:#fff;
+    font-size:11.5px;
+    font-weight:700;
+    padding:7px 12px;
+    border-radius:999px;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    cursor:pointer;
+    border:none;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= THANH TAB ================= -->
+  <div class="tabbar">
+    <button class="tabbtn active" data-tab="content">Content</button>
+    <button class="tabbtn" data-tab="share">Share</button>
+    <button class="tabbtn" data-tab="shoppe">Shoppe</button>
+    <button class="tabbtn" data-tab="nhanh">Copy nhanh</button>
+  </div>
+
+  <!-- ================= TAB 1: CONTENT ================= -->
+  <section id="page-content" class="page active">
+    <h2 class="title">Tiêu Đề Nội Dung</h2>
+    <p class="hint">Dán hoặc gõ nội dung vào ô bên dưới. Từ nghi sai chính tả tiếng Việt sẽ được gạch chân đỏ (kiểm tra dựa trên cấu trúc âm tiết + từ điển thông dụng, mang tính gợi ý).</p>
+
+    <div class="editor-wrap">
+      <!-- Lớp nền hiển thị chữ có gạch chân đỏ -->
+      <div id="backdrop" class="editor-common editor-backdrop"></div>
+      <!-- Lớp textarea thật để người dùng gõ/dán (chữ trong suốt) -->
+      <textarea id="contentInput" class="editor-common editor-textarea"
+        placeholder="Nhập nội dung bài viết..." spellcheck="false"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="hashtagInput">Hastag (#....)</label>
+      <input type="text" id="hashtagInput" placeholder="#trending #reviewhay">
+    </div>
+
+    <div class="btnrow">
+      <button class="btn btn-primary" id="btnCopyFormatted">Copy nội dung</button>
+      <button class="btn btn-ghost" id="btnClearContent">Xóa</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: SHARE ================= -->
+  <section id="page-share" class="page">
+    <h2 class="title">Chia sẻ tin nhắn</h2>
+    <p class="hint">Nhập nội dung tin nhắn rồi bấm Share để mở bảng chia sẻ của điện thoại (chọn Zalo và gửi cho bạn bè).</p>
+
+    <div class="field" style="margin-top:0">
+      <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:160px"></textarea>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn btn-primary" id="btnShareZalo">🔗 Share qua Zalo</button>
+      <button class="btn btn-danger" id="btnClearShare">Clear</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: SHOPPE ================= -->
+  <section id="page-shoppe" class="page">
+    <h2 class="title">Link Shopee</h2>
+    <p class="hint">Danh sách link Shopee của bạn (mỗi dòng 1 link). Bấm "Chia sẻ ngẫu nhiên" để copy random 1 link mỗi lần bấm.</p>
+
+    <div class="field" style="margin-top:0">
+      <label for="shoppeLinksInput">Danh sách link (mỗi dòng 1 link)</label>
+      <textarea id="shoppeLinksInput" style="min-height:100px"></textarea>
+    </div>
+
+    <div id="shoppeListbox" class="listbox" style="margin-top:12px"></div>
+
+    <div class="btnrow">
+      <button class="btn btn-primary btn-full" id="btnRandomShoppe">🎲 Chia sẻ ngẫu nhiên (Copy)</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 4: COPY NHANH ================= -->
+  <section id="page-nhanh" class="page">
+    <h2 class="title">Copy nhanh</h2>
+    <p class="hint">Dán nội dung bất kỳ và copy ngay lập tức, không cần định dạng thêm.</p>
+
+    <div class="field" style="margin-top:0">
+      <textarea id="quickInput" placeholder="Dán nội dung cần copy nhanh..." style="min-height:160px"></textarea>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn btn-primary" id="btnQuickCopy">Copy nhanh</button>
+      <button class="btn btn-ghost" id="btnQuickPaste">Dán từ clipboard</button>
+    </div>
+
+    <div class="chips" id="quickHistory"></div>
+  </section>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   TIỆN ÍCH DÙNG CHUNG
+========================================================= */
+
+// Hiện thông báo nhỏ ở đáy màn hình
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=> t.classList.remove('show'), 1800);
+}
+
+// Copy text vào clipboard, có fallback cho trình duyệt cũ / http
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    return true;
+  }catch(e){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    }catch(e2){
+      return false;
+    }
+  }
+}
+
+// Escape HTML để chèn an toàn vào backdrop
+function escapeHtml(str){
+  return str
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+/* =========================================================
+   CHUYỂN TAB
+========================================================= */
+document.querySelectorAll('.tabbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* =========================================================
+   TAB CONTENT: kiểm tra chính tả tiếng Việt cơ bản
+   Cách làm: mỗi "từ" tiếng Việt là 1 âm tiết, phải khớp cấu trúc
+   (Phụ âm đầu)? + (nguyên âm 1-3 ký tự)+ + (phụ âm cuối)?
+   Từ nào không khớp cấu trúc và không có trong từ điển thông dụng
+   => bị coi là nghi sai chính tả (gạch chân đỏ).
+========================================================= */
+const VOWELS = "aàáảãạăằắẳẵặâầấẩẫậeèéẻẽẹêềếểễệiìíỉĩịoòóỏõọôồốổỗộơờớởỡợuùúủũụưừứửữựyỳýỷỹỵ";
+const ONSETS = ["ngh","ng","nh","ph","th","tr","ch","gi","kh","qu","b","c","d","đ","g","h","k","l","m","n","p","q","r","s","t","v","x"];
+const FINALS = ["ch","ng","nh","c","m","n","p","t"];
+
+const syllableRegex = new RegExp(
+  "^(" + ONSETS.join("|") + ")?" +
+  "([" + VOWELS + "]{1,3})" +
+  "(" + FINALS.join("|") + ")?$", "i"
+);
+
+// Các từ/tên riêng phổ biến không theo cấu trúc âm tiết Việt nhưng vẫn hợp lệ
+const WHITELIST = new Set([
+  "shopee","zalo","facebook","tiktok","content","share","copy","hastag","hashtag",
+  "sale","freeship","voucher","live","livestream","ok","wifi","admin","app","web",
+  "google","youtube","instagram","link","boy","girl","ib","inbox"
+]);
+
+function isValidVietnameseWord(word){
+  const lower = word.toLowerCase();
+  if(WHITELIST.has(lower)) return true;
+  if(/^\d+$/.test(word)) return true;          // số
+  if(word === word.toUpperCase() && word.length > 1) return true; // viết tắt in hoa: VIP, SALE...
+  return syllableRegex.test(lower);
+}
+
+// Tách chuỗi thành các đoạn chữ và đoạn không phải chữ (giữ nguyên để ghép lại y hệt bản gốc)
+function tokenize(text){
+  return text.match(/[A-Za-zÀ-ỹĐđ]+|[^A-Za-zÀ-ỹĐđ]+/g) || [];
+}
+
+function buildHighlightedHtml(text){
+  const tokens = tokenize(text);
+  let html = "";
+  let prevWasHash = false; // true nếu đoạn ký tự ngay trước kết thúc bằng dấu '#'
+  for(const tok of tokens){
+    const isWord = /[A-Za-zÀ-ỹĐđ]/.test(tok[0]);
+    if(isWord){
+      const skipCheck = prevWasHash;                 // không kiểm tra từ ngay sau dấu #
+      const valid = skipCheck || isValidVietnameseWord(tok);
+      html += valid
+        ? escapeHtml(tok)
+        : `<span class="misspell">${escapeHtml(tok)}</span>`;
+      prevWasHash = false;
+    }else{
+      html += escapeHtml(tok);
+      prevWasHash = tok.trim().endsWith('#');
+    }
+  }
+  return html;
+}
+
+const contentInput = document.getElementById('contentInput');
+const backdrop = document.getElementById('backdrop');
+
+function refreshHighlight(){
+  backdrop.innerHTML = buildHighlightedHtml(contentInput.value) + "\n"; // \n để tránh mất dòng trống cuối
+}
+contentInput.addEventListener('input', refreshHighlight);
+contentInput.addEventListener('paste', ()=> setTimeout(refreshHighlight, 0));
+// Đồng bộ cuộn giữa lớp chữ thật và lớp nền highlight
+contentInput.addEventListener('scroll', ()=>{
+  backdrop.scrollTop = contentInput.scrollTop;
+  backdrop.scrollLeft = contentInput.scrollLeft;
+});
+
+// Nút Copy nội dung: gắn thêm "Ngày đăng" + "Hastag" theo cú pháp yêu cầu
+document.getElementById('btnCopyFormatted').addEventListener('click', async ()=>{
+  const content = contentInput.value.trim();
+  if(!content){ showToast('Chưa có nội dung để copy'); return; }
+
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+  const dateStr = `${dd}/${mm}/${yyyy}`;
+
+  const hashtag = document.getElementById('hashtagInput').value.trim() || '#....';
+
+  const formatted =
+`${content}
+
+Ngày đăng: ${dateStr}
+${hashtag}`;
+
+  const ok = await copyText(formatted);
+  showToast(ok ? 'Đã copy nội dung!' : 'Copy thất bại, vui lòng thử lại');
+});
+
+document.getElementById('btnClearContent').addEventListener('click', ()=>{
+  contentInput.value = '';
+  refreshHighlight();
+});
+
+/* =========================================================
+   TAB SHARE: chia sẻ nhanh nội dung + clear
+========================================================= */
+const shareInput = document.getElementById('shareInput');
+
+document.getElementById('btnShareZalo').addEventListener('click', async ()=>{
+  const text = shareInput.value.trim();
+  if(!text){ showToast('Chưa có nội dung để chia sẻ'); return; }
+
+  // Ưu tiên dùng Web Share API (trên điện thoại sẽ mở bảng chia sẻ có Zalo,
+  // người dùng chọn Zalo rồi chọn 1 bạn bè để gửi)
+  if(navigator.share){
+    try{
+      await navigator.share({ text });
+      return;
+    }catch(err){
+      // Người dùng bấm hủy hoặc thiết bị không hỗ trợ -> rơi xuống fallback bên dưới
+    }
+  }
+
+  // Fallback: copy nội dung rồi mở app Zalo (nếu cài trên điện thoại)
+  await copyText(text);
+  showToast('Đã copy nội dung, đang mở Zalo...');
+  window.location.href = 'zalo://';
+});
+
+document.getElementById('btnClearShare').addEventListener('click', ()=>{
+  shareInput.value = '';
+  shareInput.focus();
+});
+
+/* =========================================================
+   TAB SHOPPE: danh sách link + copy random
+========================================================= */
+const shoppeLinksInput = document.getElementById('shoppeLinksInput');
+const shoppeListbox = document.getElementById('shoppeListbox');
+
+// Danh sách mẫu ban đầu - người dùng có thể sửa lại trong ô textarea
+const DEFAULT_LINKS = [
+  'https://shorten.asia/sanpham1',
+  'https://shorten.asia/sanpham2',
+  'https://shorten.asia/sanpham3'
+];
+shoppeLinksInput.value = DEFAULT_LINKS.join('\n');
+
+function getShoppeLinks(){
+  return shoppeLinksInput.value
+    .split('\n')
+    .map(s=>s.trim())
+    .filter(Boolean);
+}
+
+function renderShoppeList(pickedIndex = -1){
+  const links = getShoppeLinks();
+  shoppeListbox.innerHTML = links.map((link, i)=>
+    `<div class="listbox-item ${i===pickedIndex?'picked':''}">${escapeHtml(link)}</div>`
+  ).join('') || '<div class="listbox-item">Chưa có link nào</div>';
+}
+renderShoppeList();
+shoppeLinksInput.addEventListener('input', ()=> renderShoppeList());
+
+document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
+  const links = getShoppeLinks();
+  if(links.length === 0){ showToast('Danh sách link đang trống'); return; }
+
+  const idx = Math.floor(Math.random() * links.length);
+  const picked = links[idx];
+  renderShoppeList(idx);
+
+  const ok = await copyText(picked);
+  showToast(ok ? `Đã copy: ${picked}` : 'Copy thất bại');
+});
+
+/* =========================================================
+   TAB COPY NHANH: copy tức thì + lịch sử copy gần đây
+========================================================= */
+const quickInput = document.getElementById('quickInput');
+const quickHistory = document.getElementById('quickHistory');
+let historyList = [];
+
+function renderHistory(){
+  quickHistory.innerHTML = historyList.map((item, i)=>
+    `<button class="chip" data-i="${i}" title="${escapeHtml(item)}">${escapeHtml(item.slice(0,18))}${item.length>18?'…':''}</button>`
+  ).join('');
+}
+
+quickHistory.addEventListener('click', async (e)=>{
+  const btn = e.target.closest('.chip');
+  if(!btn) return;
+  const text = historyList[Number(btn.dataset.i)];
+  const ok = await copyText(text);
+  showToast(ok ? 'Đã copy lại!' : 'Copy thất bại');
+});
+
+document.getElementById('btnQuickCopy').addEventListener('click', async ()=>{
+  const text = quickInput.value.trim();
+  if(!text){ showToast('Chưa có nội dung'); return; }
+  const ok = await copyText(text);
+  showToast(ok ? 'Đã copy!' : 'Copy thất bại');
+  if(ok){
+    historyList.unshift(text);
+    historyList = historyList.slice(0,3);
+    renderHistory();
+  }
+});
+
+document.getElementById('btnQuickPaste').addEventListener('click', async ()=>{
+  try{
+    const text = await navigator.clipboard.readText();
+    quickInput.value = text;
+  }catch(e){
+    showToast('Trình duyệt không cho phép đọc clipboard, hãy dán thủ công (Ctrl/Cmd + V)');
+  }
+});
+</script>
+</body>
+</html>
