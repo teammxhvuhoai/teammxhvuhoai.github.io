@@ -413,8 +413,8 @@
     <div class="card">
       <h2 class="title">Vietsub video (Trung / Anh → Việt)</h2>
       <p class="hint">
-        Tải video có chữ trên hình (tiếng Trung hoặc tiếng Anh) → tự nhận diện chữ → dịch sang tiếng Việt → cho sửa lại trước khi ghép đè phụ đề, xuất ra .mp4.
-        <br><strong>Lưu ý:</strong> mọi xử lý chạy ngay trên trình duyệt điện thoại nên khá nặng — nên dùng video <strong>ngắn (dưới ~60 giây)</strong> và độ phân giải vừa phải để tránh treo máy hoặc quá lâu. Bản dịch tự động có thể chưa chính xác 100%, hãy kiểm tra lại trước khi ghép.
+        Tải video lên → chọn nhận diện <strong>chữ trên hình</strong> và/hoặc <strong>giọng nói trong âm thanh</strong> → tự động dịch sang tiếng Việt → cho sửa lại trước khi ghép đè phụ đề, xuất ra .mp4.
+        <br><strong>Lưu ý:</strong> mọi xử lý chạy ngay trên trình duyệt điện thoại nên khá nặng, đặc biệt là nhận diện giọng nói (phải tải mô hình AI ~70–150MB) — nên dùng video <strong>ngắn (dưới ~60 giây)</strong>, dùng Wi-Fi, và độ phân giải vừa phải để tránh treo máy hoặc quá lâu. Bản dịch tự động có thể chưa chính xác 100%, hãy kiểm tra lại trước khi ghép.
       </p>
 
       <input type="file" id="vsVideoInput" accept="video/*" style="display:none">
@@ -428,17 +428,27 @@
       <video id="vsVideoPlayer" controls playsinline style="display:none;width:100%;margin-top:10px;border-radius:var(--radius-md);background:#000"></video>
 
       <div class="field">
-        <label>Chữ trên video là ngôn ngữ nào</label>
+        <label>Nguồn cần dịch</label>
+        <div class="checkrow">
+          <label><input type="checkbox" id="vsModeOcr" checked> Chữ hiển thị trên hình</label>
+          <label><input type="checkbox" id="vsModeAudio"> Giọng nói trong âm thanh</label>
+        </div>
+      </div>
+
+      <div class="field" id="vsOcrLangWrap">
+        <label>Chữ trên hình là ngôn ngữ nào</label>
         <div class="checkrow">
           <label><input type="checkbox" id="vsLangZh" checked> Tiếng Trung</label>
           <label><input type="checkbox" id="vsLangEn" checked> Tiếng Anh</label>
         </div>
       </div>
 
-      <div class="field">
+      <div class="field" id="vsIntervalWrap">
         <label>Lấy mẫu khung hình mỗi (giây) — số càng nhỏ càng chính xác nhưng càng lâu</label>
         <input type="text" id="vsInterval" value="2" inputmode="decimal">
       </div>
+
+      <p class="hint" style="margin-top:6px">Giọng nói trong âm thanh dùng mô hình AI nhận diện đa ngôn ngữ, tự động phát hiện tiếng nói là ngôn ngữ gì (Trung, Anh, v.v.) rồi dịch sang tiếng Việt — không cần chọn ngôn ngữ riêng.</p>
 
       <div class="btnrow">
         <button class="btn btn-primary btn-full" id="vsBtnDetect">1. Nhận diện chữ &amp; Dịch</button>
@@ -851,6 +861,10 @@ document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
 const vsVideoInput   = document.getElementById('vsVideoInput');
 const vsDropzone     = document.getElementById('vsDropzone');
 const vsVideoPlayer  = document.getElementById('vsVideoPlayer');
+const vsModeOcr      = document.getElementById('vsModeOcr');
+const vsModeAudio    = document.getElementById('vsModeAudio');
+const vsOcrLangWrap  = document.getElementById('vsOcrLangWrap');
+const vsIntervalWrap = document.getElementById('vsIntervalWrap');
 const vsLangZh       = document.getElementById('vsLangZh');
 const vsLangEn       = document.getElementById('vsLangEn');
 const vsInterval     = document.getElementById('vsInterval');
@@ -865,7 +879,15 @@ const vsResultPlayer = document.getElementById('vsResultPlayer');
 const vsDownloadLink = document.getElementById('vsDownloadLink');
 
 let vsVideoFile = null;
-let vsCues = []; // { start, end, text, translated }
+let vsCues = []; // { start, end, text, translated, source }
+let vsInputWritten = false; // đã ghi video vào bộ nhớ ffmpeg cho lần xử lý hiện tại chưa
+
+function vsUpdateModeVisibility(){
+  vsOcrLangWrap.style.display = vsModeOcr.checked ? 'block' : 'none';
+  vsIntervalWrap.style.display = vsModeOcr.checked ? 'block' : 'none';
+}
+vsModeOcr.addEventListener('change', vsUpdateModeVisibility);
+vsUpdateModeVisibility();
 
 vsDropzone.addEventListener('click', ()=> vsVideoInput.click());
 vsVideoInput.addEventListener('change', ()=>{
@@ -878,6 +900,7 @@ vsVideoInput.addEventListener('change', ()=>{
   vsResultWrap.style.display = 'none';
   vsStatus.style.display = 'none';
   vsCues = [];
+  vsInputWritten = false;
 });
 
 function vsSetStatus(msg){
