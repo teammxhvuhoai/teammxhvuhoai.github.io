@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <style>
   :root{
     --bg-chrome:#34383F;
@@ -20,6 +22,7 @@
     --accent:#2F5FFF;
     --accent-2:#E8336D;
     --ok:#37B873;
+    --warn:#E8A93B;
     --radius:6px;
     --mono: 'IBM Plex Mono', monospace;
     --display: 'Space Grotesk', sans-serif;
@@ -33,12 +36,16 @@
   }
   button{font-family:var(--body); cursor:pointer;}
   input,select,textarea{font-family:var(--body);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:1px; border-radius:3px;}
 
   /* ---------- layout ---------- */
   #app{display:grid; grid-template-rows:56px 1fr; height:100vh;}
   header{
     display:flex; align-items:center; gap:16px; padding:0 18px;
-    background:var(--bg-chrome); border-bottom:1px solid var(--panel-line);
+    background:linear-gradient(180deg, var(--bg-chrome) 0%, #2F333A 100%);
+    border-bottom:1px solid var(--panel-line);
+    box-shadow:0 2px 10px rgba(0,0,0,.18);
+    position:relative; z-index:2;
   }
   header h1{
     font-family:var(--display); font-size:16px; font-weight:700; letter-spacing:.02em; margin:0;
@@ -50,20 +57,22 @@
     border:1px solid var(--panel-line); background:var(--panel); color:var(--text);
     border-radius:var(--radius); padding:8px 13px; font-size:13px; font-weight:500;
     display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+    transition:background .15s ease, border-color .15s ease, transform .08s ease, box-shadow .15s ease;
   }
-  .btn:hover{border-color:var(--text-dim);}
-  .btn.primary{background:var(--accent); border-color:var(--accent); color:white; font-weight:600;}
+  .btn:hover{border-color:var(--text-dim); box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .btn:active{transform:scale(.97);}
+  .btn.primary{background:linear-gradient(180deg,#3E6BFF,#2451EF); border-color:#2451EF; color:white; font-weight:600; box-shadow:0 2px 10px rgba(47,95,255,.35);}
   .btn.primary:hover{filter:brightness(1.08);}
-  .btn.accent2{background:var(--accent-2); border-color:var(--accent-2); color:white;}
+  .btn.accent2{background:linear-gradient(180deg,#EE4B7C,#D71F5C); border-color:#D71F5C; color:white; box-shadow:0 2px 10px rgba(232,51,109,.3);}
   .btn.ghost{background:transparent;}
-  .btn:disabled{opacity:.4; cursor:not-allowed;}
+  .btn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
   .btn.sm{padding:5px 9px; font-size:12px;}
   select.chip{
     background:var(--panel); color:var(--text); border:1px solid var(--panel-line);
     border-radius:var(--radius); padding:7px 10px; font-size:13px;
   }
 
-  main{display:grid; grid-template-columns:216px 1fr 296px; min-height:0;}
+  main{display:grid; grid-template-columns:216px 1fr 300px; min-height:0;}
 
   /* ---------- sidebar: pages ---------- */
   #pages{
@@ -75,7 +84,9 @@
   .pageThumb{
     position:relative; border-radius:var(--radius); overflow:hidden; margin-bottom:10px;
     border:2px solid transparent; cursor:pointer; background:var(--ink);
+    transition:border-color .15s ease, transform .1s ease; box-shadow:0 2px 8px rgba(0,0,0,.25);
   }
+  .pageThumb:hover{transform:translateY(-1px);}
   .pageThumb.active{border-color:var(--accent-2);}
   .pageThumb canvas{display:block; width:100%; height:auto; background:#111;}
   .pageThumb .tag{
@@ -92,7 +103,7 @@
   #stage{display:flex; flex-direction:column; min-height:0; background:var(--bg-chrome-2);}
   #toolbar{
     display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--panel-line);
-    background:var(--bg-chrome);
+    background:var(--bg-chrome); flex-wrap:wrap;
   }
   #toolbar .divider{width:1px; height:22px; background:var(--panel-line); margin:0 4px;}
   #canvasArea{flex:1; display:flex; align-items:center; justify-content:center; padding:24px; min-height:0; position:relative;}
@@ -133,7 +144,7 @@
     font-family:var(--mono); font-size:11.5px; color:var(--text-dim); min-height:34px; display:flex; align-items:center; gap:10px;
   }
   #status .bar{flex:0 0 140px; height:5px; background:var(--panel-line); border-radius:3px; overflow:hidden; display:none;}
-  #status .bar > i{display:block; height:100%; width:0%; background:var(--ok);}
+  #status .bar > i{display:block; height:100%; width:0%; background:var(--ok); transition:width .15s ease;}
 
   /* ---------- right: properties ---------- */
   #props{background:var(--bg-chrome); border-left:1px solid var(--panel-line); overflow-y:auto; padding:14px;}
@@ -142,15 +153,18 @@
   .field label{display:block; font-size:11.5px; color:var(--text-dim); margin-bottom:5px;}
   .field input[type=text], .field input[type=number], .field textarea, .field select{
     width:100%; background:var(--panel); border:1px solid var(--panel-line); color:var(--text);
-    border-radius:var(--radius); padding:7px 9px; font-size:13px;
+    border-radius:var(--radius); padding:7px 9px; font-size:13px; transition:border-color .15s ease;
   }
+  .field input[type=text]:hover, .field input[type=number]:hover, .field textarea:hover, .field select:hover{border-color:var(--text-dim);}
   .field textarea{resize:vertical; min-height:58px; line-height:1.4;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
   .field input[type=color]{width:100%; height:32px; padding:2px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius);}
   .zoneListItem{
     display:flex; align-items:center; gap:6px; padding:7px 8px; border-radius:var(--radius);
     border:1px solid var(--panel-line); margin-bottom:6px; font-size:12.5px; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
   }
+  .zoneListItem:hover{background:rgba(255,255,255,.03);}
   .zoneListItem.selected{border-color:var(--accent-2);}
   .zoneListItem .dot{width:7px; height:7px; border-radius:50%; background:var(--accent); flex:none;}
   .zoneListItem.video .dot{background:var(--accent-2);}
@@ -159,10 +173,11 @@
   hr.sep{border:none; border-top:1px solid var(--panel-line); margin:16px 0;}
 
   /* ---------- modal ---------- */
-  .modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:50;}
+  .modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:50;}
   .modal{
-    background:var(--bg-chrome); border:1px solid var(--panel-line); border-radius:8px;
+    background:var(--bg-chrome); border:1px solid var(--panel-line); border-radius:10px;
     width:520px; max-width:92vw; max-height:84vh; overflow-y:auto; padding:20px;
+    box-shadow:0 24px 70px rgba(0,0,0,.55);
   }
   .modal h2{font-family:var(--display); font-size:16px; margin:0 0 4px;}
   .modal p.hint{color:var(--text-dim); font-size:12.5px; line-height:1.5; margin:0 0 14px;}
@@ -173,6 +188,11 @@
   table.prev th{color:var(--text-dim); font-weight:500;}
   ::-webkit-scrollbar{width:9px; height:9px;}
   ::-webkit-scrollbar-thumb{background:var(--panel-line); border-radius:5px;}
+
+  /* ---------- export quality UI ---------- */
+  .qualityBadge{font-family:var(--mono); font-size:10.5px; padding:2px 7px; border-radius:10px; border:1px solid var(--panel-line); color:var(--text-dim);}
+  .qualityBadge.hd{color:#8FB0FF; border-color:#3A5BCF;}
+  .qualityBadge.qk{color:#FFC98F; border-color:#CF8A3A;}
 </style>
 </head>
 <body>
@@ -180,6 +200,7 @@
   <header>
     <h1>Nạp nội dung đa trang <span class="mark">// export proof</span></h1>
     <select id="presetSel" class="chip"></select>
+    <select id="qualitySel" class="chip" title="Chất lượng nén video khi xuất MP4"></select>
     <div class="spacer"></div>
     <button class="btn" id="csvBtn">Nhập text hàng loạt (CSV)</button>
     <button class="btn" id="videoBulkBtn">Gán video hàng loạt</button>
@@ -206,7 +227,7 @@
         <div class="divider"></div>
         <button class="btn sm accent2" id="mediaBtn">Phụ đề &amp; Thuyết minh</button>
         <div class="spacer"></div>
-        <button class="btn primary sm" id="exportPageBtn">Tải trang này</button>
+        <button class="btn primary sm" id="exportPageBtn">Tải trang này (MP4)</button>
       </div>
       <div id="canvasArea">
         <div id="canvasWrap">
@@ -229,13 +250,20 @@
 <script>
 /* ===================== STATE ===================== */
 const PRESETS = [
-  {id:'p_1080x1350', label:'Dọc 1080×1350 (Feed 4:5)', w:1080, h:1350},
-  {id:'p_1080x1080', label:'Vuông 1080×1080', w:1080, h:1080},
-  {id:'p_1080x1920', label:'Story/Reels 1080×1920', w:1080, h:1920},
-  {id:'p_1920x1080', label:'Ngang 1920×1080', w:1920, h:1080},
-  {id:'p_a4', label:'A4 dọc 2480×3508', w:2480, h:3508},
+  {id:'p_9x16_1080', label:'Dọc 9:16 · 1080×1920 (Full HD)', w:1080, h:1920},
+  {id:'p_9x16_2k',   label:'Dọc 9:16 · 1440×2560 (2K)',      w:1440, h:2560},
+  {id:'p_3x4_1080',  label:'Dọc 3:4 · 1080×1440 (Full HD)',  w:1080, h:1440},
+  {id:'p_3x4_2k',    label:'Dọc 3:4 · 1620×2160 (2K)',       w:1620, h:2160},
+  {id:'p_4x5_1080',  label:'Dọc 4:5 · 1080×1350 (Feed)',     w:1080, h:1350},
+  {id:'p_1x1_1080',  label:'Vuông 1:1 · 1080×1080',          w:1080, h:1080},
+  {id:'p_16x9_1080', label:'Ngang 16:9 · 1920×1080',         w:1920, h:1080},
+];
+const QUALITIES = [
+  {id:'q_std', label:'Chuẩn (nhanh hơn, file nhẹ)', crf:23},
+  {id:'q_high', label:'Cao (đẹp nhất, file nặng hơn)', crf:18},
 ];
 let preset = PRESETS[0];
+let quality = QUALITIES[1];
 let pages = [];
 let currentPageId = null;
 let selectedZoneId = null;
@@ -249,6 +277,13 @@ PRESETS.forEach(p=>{
 });
 presetSel.value = preset.id;
 presetSel.onchange = ()=>{ preset = PRESETS.find(p=>p.id===presetSel.value); applyCanvasSize(); renderAll(); };
+
+const qualitySel = document.getElementById('qualitySel');
+QUALITIES.forEach(q=>{
+  const o = document.createElement('option'); o.value=q.id; o.textContent=q.label; qualitySel.appendChild(o);
+});
+qualitySel.value = quality.id;
+qualitySel.onchange = ()=>{ quality = QUALITIES.find(q=>q.id===qualitySel.value); };
 
 function currentPage(){ return pages.find(p=>p.id===currentPageId) || null; }
 function selectedZone(){ const pg=currentPage(); return pg ? pg.zones.find(z=>z.id===selectedZoneId) : null; }
@@ -933,6 +968,38 @@ function downloadBlob(blob, filename){
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
 }
 
+/* ---- MP4 transcoding via ffmpeg.wasm (runs entirely in the browser) ---- */
+let ffmpegInstance = null;
+let ffmpegLoadingPromise = null;
+async function getFFmpeg(onLog){
+  if (ffmpegInstance) return ffmpegInstance;
+  if (ffmpegLoadingPromise) return ffmpegLoadingPromise;
+  ffmpegLoadingPromise = (async ()=>{
+    const { FFmpeg } = FFmpegWASM;
+    const ff = new FFmpeg();
+    if (onLog) ff.on('log', ({message})=>onLog(message));
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    const { toBlobURL } = FFmpegUtil;
+    await ff.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+    ffmpegInstance = ff;
+    return ff;
+  })();
+  return ffmpegLoadingPromise;
+}
+async function convertWebmToMp4(webmBlob, crf, onProgress){
+  const ff = await getFFmpeg();
+  ff.on('progress', ({progress})=>{ if (onProgress) onProgress(Math.min(Math.max(progress,0),1)); });
+  const { fetchFile } = FFmpegUtil;
+  await ff.writeFile('input.webm', await fetchFile(webmBlob));
+  await ff.exec(['-i','input.webm','-c:v','libx264','-preset','fast','-crf', String(crf), '-pix_fmt','yuv420p','-movflags','+faststart','-c:a','aac','-b:a','192k','output.mp4']);
+  const data = await ff.readFile('output.mp4');
+  try{ await ff.deleteFile('input.webm'); await ff.deleteFile('output.mp4'); }catch(e){}
+  return new Blob([data.buffer], {type:'video/mp4'});
+}
+
 function renderExportFrame(c, pg, W, H, videoEls, elapsedSec){
   c.clearRect(0,0,W,H); c.fillStyle='#fff'; c.fillRect(0,0,W,H);
   if (pg.bgImg) drawImageCover(c, pg.bgImg, W, H);
@@ -1005,37 +1072,47 @@ async function exportPageAsVideo(pg, videoZones){
 
   const mimeCandidates = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
   const mime = mimeCandidates.find(m=>MediaRecorder.isTypeSupported(m)) || 'video/webm';
-  const recorder = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:6000000});
+  const recorder = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:10000000});
   const chunks = [];
   recorder.ondataavailable = e=>{ if(e.data.size) chunks.push(e.data); };
 
-  const done = new Promise(resolve=>{
+  const webmBlob = await new Promise(resolve=>{
     recorder.onstop = ()=>{
       const blob = new Blob(chunks, {type:mime});
-      downloadBlob(blob, `${pg.name}.webm`);
       Object.values(videoEls).forEach(v=>v.pause());
       narrationEl?.pause();
       audioCtx?.close();
-      resolve();
+      resolve(blob);
     };
+    recorder.start();
+    const start = performance.now();
+    function tick(){
+      const elapsed = (performance.now()-start)/1000;
+      renderExportFrame(c, pg, preset.w, preset.h, videoEls, elapsed);
+      setStatus(`Đang ghi video "${pg.name}"...`, Math.min(elapsed/duration,1) * 0.6);
+      if (elapsed < duration) requestAnimationFrame(tick);
+      else recorder.stop();
+    }
+    requestAnimationFrame(tick);
   });
 
-  recorder.start();
-  const start = performance.now();
-  function tick(){
-    const elapsed = (performance.now()-start)/1000;
-    renderExportFrame(c, pg, preset.w, preset.h, videoEls, elapsed);
-    setStatus(`Đang ghi video "${pg.name}"...`, Math.min(elapsed/duration,1));
-    if (elapsed < duration) requestAnimationFrame(tick);
-    else recorder.stop();
+  // Transcode to real .mp4 (H.264/AAC) at the chosen quality, entirely in-browser
+  try{
+    setStatus(`Đang mã hoá sang MP4 (${preset.w}×${preset.h}, ${quality.label})... lần đầu có thể mất chút thời gian để tải bộ mã hoá.`, 0.65);
+    const mp4Blob = await convertWebmToMp4(webmBlob, quality.crf, (p)=>{
+      setStatus(`Đang mã hoá sang MP4... ${Math.round(p*100)}%`, 0.65 + p*0.35);
+    });
+    downloadBlob(mp4Blob, `${pg.name}.mp4`);
+  }catch(err){
+    console.error(err);
+    setStatus(`Không thể chuyển sang MP4 (${err.message||err}) — đã tải bản .webm thay thế.`);
+    downloadBlob(webmBlob, `${pg.name}.webm`);
   }
-  requestAnimationFrame(tick);
-  await done;
 }
 
 async function exportPage(pg){
   const videoZones = pg.zones.filter(z=>z.type==='video' && z.videoURL);
-  if (videoZones.length===0) await exportPageAsImage(pg);
+  if (videoZones.length===0 && !pg.narrationURL) await exportPageAsImage(pg);
   else await exportPageAsVideo(pg, videoZones);
 }
 
