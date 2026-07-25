@@ -49,7 +49,6 @@
     padding:calc(18px + var(--safe-t)) calc(16px + var(--safe-r)) calc(28px + var(--safe-b)) calc(16px + var(--safe-l));
   }
 
-  /* ===== Header thương hiệu ===== */
   .brand{ margin-bottom:16px; padding:0 2px; }
   .brand-eyebrow{
     font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
@@ -60,7 +59,6 @@
     font-size:24px; letter-spacing:-.01em; color:var(--navy);
   }
 
-  /* ===== Thanh tab dạng segmented, có icon ===== */
   .tabbar{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -82,7 +80,7 @@
     border-radius:var(--radius-md);
     color:var(--muted);
     font-weight:700;
-    font-size:10.8px;
+    font-size:10.5px;
     cursor:pointer;
     transition:background .15s ease, color .15s ease, transform .12s ease;
   }
@@ -117,7 +115,6 @@
     color:var(--muted); margin:16px 0 8px;
   }
 
-  /* ===== Khối soạn nội dung có gạch chân từ sai chính tả ===== */
   .editor-wrap{
     position:relative;
     width:100%;
@@ -154,8 +151,9 @@
     outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light);
   }
   .field textarea{ resize:vertical; min-height:80px; line-height:1.5; -webkit-appearance:none; }
+  .checkrow{ display:flex; gap:16px; font-size:13px; color:var(--ink); flex-wrap:wrap; }
+  .checkrow label{ display:flex; align-items:center; gap:6px; font-weight:500; }
 
-  /* ===== Lưới nút hastag đánh số ===== */
   .hashtag-grid{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
@@ -190,7 +188,6 @@
     font-size:10px; line-height:1; border:none; cursor:pointer;
   }
 
-  /* ===== Chọn video từ thư viện ảnh (tab Share) ===== */
   .dropzone{
     display:flex; align-items:center; justify-content:center; gap:8px;
     border:1.5px dashed var(--border); border-radius:var(--radius-md);
@@ -231,8 +228,8 @@
   .btn-ghost{ background:var(--primary-light); color:var(--primary-dark); }
   .btn-danger{ background:#fde8ea; color:var(--red); }
   .btn-full{ width:100%; }
+  a.btn{ display:flex; align-items:center; justify-content:center; text-decoration:none; }
 
-  /* ===== Danh sách link Shopee (list box) ===== */
   .listbox{
     background:#fbfbfe; border:1px solid var(--border); border-radius:var(--radius-md);
     max-height:240px; overflow-y:auto;
@@ -248,6 +245,23 @@
   }
   .listbox-item .item-title{ display:block; font-weight:700; color:var(--navy); margin-bottom:2px; }
   .listbox-item .item-link{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; }
+
+  .cue-card{
+    margin-top:10px; padding:11px; border:1px solid var(--border); border-radius:var(--radius-sm);
+    background:#fbfbfe;
+  }
+  .cue-time{ font-size:11.5px; font-weight:700; color:var(--primary); }
+  .cue-orig{ font-size:11.5px; color:var(--muted); margin:4px 0 8px; line-height:1.4; word-break:break-word; }
+  .cue-orig b{ color:var(--ink); font-weight:600; }
+  .cue-input{
+    width:100%; border:1px solid var(--border); background:#fff; border-radius:var(--radius-sm);
+    padding:9px 10px; font-size:14.5px; font-family:inherit; min-height:44px; resize:vertical;
+  }
+  .cue-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
+  #vsStatus{
+    background:var(--primary-light); color:var(--primary-dark); border-radius:var(--radius-sm);
+    padding:10px 12px; font-weight:600;
+  }
 
   #toast{
     position:fixed; left:50%; bottom:calc(22px + var(--safe-b));
@@ -266,10 +280,9 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; border:none;
   }
 
-  /* iPhone 12 Pro / small-screen tightening */
   @media (max-width: 400px){
     .brand-title{ font-size:22px; }
-    .tabbtn{ font-size:10px; }
+    .tabbtn{ font-size:9.5px; }
     .hashtag-btn{ padding:12px 4px; }
     .hashtag-btn .num{ font-size:17px; }
   }
@@ -307,11 +320,13 @@
       </svg>
       Shoppe
     </button>
-    <button class="tabbtn" data-tab="nhanh">
+    <button class="tabbtn" data-tab="vietsub">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>
+        <rect x="3" y="5" width="18" height="13" rx="2"/>
+        <path d="M7 21h10"/>
+        <path d="M6.5 10.5h3M6.5 13.5h5M12.5 10.5h5"/>
       </svg>
-      Copy nhanh
+      Vietsub
     </button>
   </div>
 
@@ -348,7 +363,6 @@
 
       <div class="section-label">Video đính kèm (tùy chọn)</div>
 
-      <!-- Ô chọn video: input file ẩn, kích hoạt qua nút bấm bên dưới -->
       <input type="file" id="videoInput" accept="video/*" style="display:none">
 
       <div id="videoDropzone" class="dropzone">
@@ -359,7 +373,6 @@
         <span>Chọn video từ thư viện ảnh</span>
       </div>
 
-      <!-- Khối xem trước video đã chọn, ẩn cho đến khi có file -->
       <div id="videoPreview" class="video-preview" style="display:none">
         <video id="videoPreviewPlayer" controls playsinline></video>
         <div class="video-meta">
@@ -395,28 +408,75 @@
     </div>
   </section>
 
-  <!-- ================= TAB 4: COPY NHANH ================= -->
-  <section id="page-nhanh" class="page">
+  <!-- ================= TAB 4: VIETSUB ================= -->
+  <section id="page-vietsub" class="page">
     <div class="card">
-      <h2 class="title">Copy nhanh</h2>
-      <p class="hint">Dán nội dung bất kỳ và copy ngay lập tức, không cần định dạng thêm.</p>
+      <h2 class="title">Vietsub video (Trung / Anh → Việt)</h2>
+      <p class="hint">
+        Tải video có chữ trên hình (tiếng Trung hoặc tiếng Anh) → tự nhận diện chữ → dịch sang tiếng Việt → cho sửa lại trước khi ghép đè phụ đề, xuất ra .mp4.
+        <br><strong>Lưu ý:</strong> mọi xử lý chạy ngay trên trình duyệt điện thoại nên khá nặng — nên dùng video <strong>ngắn (dưới ~60 giây)</strong> và độ phân giải vừa phải để tránh treo máy hoặc quá lâu. Bản dịch tự động có thể chưa chính xác 100%, hãy kiểm tra lại trước khi ghép.
+      </p>
 
-      <div class="field" style="margin-top:0">
-        <textarea id="quickInput" placeholder="Dán nội dung cần copy nhanh..." style="min-height:150px"></textarea>
+      <input type="file" id="vsVideoInput" accept="video/*" style="display:none">
+      <div id="vsDropzone" class="dropzone">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5.5" width="13" height="13" rx="2"/>
+          <path d="m16 10.5 5-2.8v8.6l-5-2.8"/>
+        </svg>
+        <span>Chọn video cần vietsub</span>
+      </div>
+      <video id="vsVideoPlayer" controls playsinline style="display:none;width:100%;margin-top:10px;border-radius:var(--radius-md);background:#000"></video>
+
+      <div class="field">
+        <label>Chữ trên video là ngôn ngữ nào</label>
+        <div class="checkrow">
+          <label><input type="checkbox" id="vsLangZh" checked> Tiếng Trung</label>
+          <label><input type="checkbox" id="vsLangEn" checked> Tiếng Anh</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Lấy mẫu khung hình mỗi (giây) — số càng nhỏ càng chính xác nhưng càng lâu</label>
+        <input type="text" id="vsInterval" value="2" inputmode="decimal">
       </div>
 
       <div class="btnrow">
-        <button class="btn btn-primary" id="btnQuickCopy">Copy nhanh</button>
-        <button class="btn btn-ghost" id="btnQuickPaste">Dán từ clipboard</button>
+        <button class="btn btn-primary btn-full" id="vsBtnDetect">1. Nhận diện chữ &amp; Dịch</button>
       </div>
 
-      <div class="chips" id="quickHistory"></div>
+      <div id="vsStatus" style="display:none;margin-top:12px"></div>
+
+      <div id="vsCuesWrap" style="display:none">
+        <div class="section-label">Phụ đề tiếng Việt (chỉnh sửa nếu cần)</div>
+        <div id="vsCuesList"></div>
+
+        <div class="btnrow">
+          <button class="btn btn-dark btn-full" id="vsBtnBurn">2. Ghép phụ đề &amp; Xuất .mp4</button>
+        </div>
+        <div class="btnrow">
+          <button class="btn btn-ghost btn-full" id="vsBtnSrt">Tải file phụ đề .srt (dự phòng)</button>
+        </div>
+      </div>
+
+      <div id="vsResultWrap" style="display:none;margin-top:16px">
+        <div class="section-label">Video đã ghép phụ đề</div>
+        <video id="vsResultPlayer" controls playsinline style="width:100%;border-radius:var(--radius-md);background:#000"></video>
+        <div class="btnrow">
+          <a id="vsDownloadLink" class="btn btn-primary btn-full" download="vietsub.mp4">Tải video .mp4</a>
+        </div>
+      </div>
     </div>
   </section>
 
 </div>
 
 <div id="toast"></div>
+
+<!-- Thư viện OCR (nhận diện chữ trên khung hình) -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<!-- Thư viện xử lý video ngay trên trình duyệt (ghép phụ đề, xuất mp4) -->
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
 <script>
 /* =========================================================
@@ -427,7 +487,7 @@ function showToast(msg){
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(()=> t.classList.remove('show'), 2200);
+  showToast._timer = setTimeout(()=> t.classList.remove('show'), 2400);
 }
 
 async function copyText(text){
@@ -481,7 +541,7 @@ const syllableRegex = new RegExp(
 const WHITELIST = new Set([
   "shopee","zalo","facebook","tiktok","content","share","copy","hastag","hashtag",
   "sale","freeship","voucher","live","livestream","ok","wifi","admin","app","web",
-  "google","youtube","instagram","link","boy","girl","ib","inbox"
+  "google","youtube","instagram","link","boy","girl","ib","inbox","vietsub"
 ]);
 
 function isValidVietnameseWord(word){
@@ -618,13 +678,6 @@ ${hashtagLine}`;
 
 /* =========================================================
    TAB SHARE
-   Ghi chú quan trọng: navigator.share() trên iOS/Safari CHÍNH LÀ khung
-   chia sẻ hệ thống dạng nhỏ (sheet trượt lên từ đáy màn hình). Nó tự
-   động đóng lại ngay khi người dùng chọn xong một ứng dụng (vd. Zalo)
-   hoặc khi họ bấm huỷ — không cần và không nên tự điều hướng cả trang
-   bằng zalo:// nữa, vì như vậy sẽ thoát khỏi web app thay vì chỉ mở
-   một khung nhỏ. Nếu thiết bị/trình duyệt không hỗ trợ Web Share API,
-   ta chỉ copy nội dung và báo cho người dùng tự mở Zalo, KHÔNG redirect.
 ========================================================= */
 const shareInput = document.getElementById('shareInput');
 const videoInput = document.getElementById('videoInput');
@@ -661,7 +714,6 @@ btnShareZalo.addEventListener('click', async ()=>{
   const text = shareInput.value.trim();
   if(!text && !selectedVideoFile){ showToast('Chưa có nội dung hoặc video để chia sẻ'); return; }
 
-  // Xây dữ liệu share: ưu tiên gửi kèm video nếu có, kèm text nếu có
   const shareData = {};
   if(selectedVideoFile) shareData.files = [selectedVideoFile];
   if(text) shareData.text = text;
@@ -673,12 +725,9 @@ btnShareZalo.addEventListener('click', async ()=>{
   if(canUseNativeShare){
     btnShareZalo.disabled = true;
     try{
-      // Mở khung chia sẻ nhỏ của hệ điều hành. Khung này tự đóng ngay
-      // sau khi người dùng chọn Zalo (hoặc app khác) và gửi xong.
       await navigator.share(shareData);
       showToast('Đã gửi qua khung chia sẻ');
     }catch(err){
-      // AbortError = người dùng tự đóng khung share, không cần báo lỗi
       if(!err || err.name !== 'AbortError'){
         showToast('Không thể mở khung chia sẻ, đã copy nội dung thay thế');
         if(text) await copyText(text);
@@ -689,8 +738,6 @@ btnShareZalo.addEventListener('click', async ()=>{
     return;
   }
 
-  // Máy/trình duyệt không hỗ trợ Web Share API (hoặc không share được video):
-  // chỉ copy nội dung, KHÔNG điều hướng cả trang sang zalo://
   if(text) await copyText(text);
   showToast(selectedVideoFile
     ? 'Trình duyệt không hỗ trợ gửi video qua khung chia sẻ. Đã copy nội dung — mở Zalo và đính kèm video thủ công.'
@@ -794,44 +841,291 @@ document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
 });
 
 /* =========================================================
-   TAB COPY NHANH
+   TAB VIETSUB
+   Quy trình: chọn video -> trích khung hình theo mốc thời gian ->
+   OCR (Tesseract.js, tiếng Trung/Anh) -> gom thành các đoạn phụ đề ->
+   gọi API Claude để dịch sang tiếng Việt -> người dùng xem/sửa lại ->
+   ghép chữ tiếng Việt đè lên video bằng ffmpeg.wasm (chạy ngay trong
+   trình duyệt) -> xuất file .mp4 để tải về.
 ========================================================= */
-const quickInput = document.getElementById('quickInput');
-const quickHistory = document.getElementById('quickHistory');
-let historyList = [];
+const vsVideoInput   = document.getElementById('vsVideoInput');
+const vsDropzone     = document.getElementById('vsDropzone');
+const vsVideoPlayer  = document.getElementById('vsVideoPlayer');
+const vsLangZh       = document.getElementById('vsLangZh');
+const vsLangEn       = document.getElementById('vsLangEn');
+const vsInterval     = document.getElementById('vsInterval');
+const vsBtnDetect    = document.getElementById('vsBtnDetect');
+const vsStatus       = document.getElementById('vsStatus');
+const vsCuesWrap     = document.getElementById('vsCuesWrap');
+const vsCuesList     = document.getElementById('vsCuesList');
+const vsBtnBurn      = document.getElementById('vsBtnBurn');
+const vsBtnSrt       = document.getElementById('vsBtnSrt');
+const vsResultWrap   = document.getElementById('vsResultWrap');
+const vsResultPlayer = document.getElementById('vsResultPlayer');
+const vsDownloadLink = document.getElementById('vsDownloadLink');
 
-function renderHistory(){
-  quickHistory.innerHTML = historyList.map((item, i)=>
-    `<button class="chip" data-i="${i}" title="${escapeHtml(item)}">${escapeHtml(item.slice(0,18))}${item.length>18?'…':''}</button>`
-  ).join('');
+let vsVideoFile = null;
+let vsCues = []; // { start, end, text, translated }
+
+vsDropzone.addEventListener('click', ()=> vsVideoInput.click());
+vsVideoInput.addEventListener('change', ()=>{
+  const file = vsVideoInput.files && vsVideoInput.files[0];
+  if(!file) return;
+  vsVideoFile = file;
+  vsVideoPlayer.src = URL.createObjectURL(file);
+  vsVideoPlayer.style.display = 'block';
+  vsCuesWrap.style.display = 'none';
+  vsResultWrap.style.display = 'none';
+  vsStatus.style.display = 'none';
+  vsCues = [];
+});
+
+function vsSetStatus(msg){
+  vsStatus.style.display = 'block';
+  vsStatus.textContent = msg;
 }
 
-quickHistory.addEventListener('click', async (e)=>{
-  const btn = e.target.closest('.chip');
-  if(!btn) return;
-  const text = historyList[Number(btn.dataset.i)];
-  const ok = await copyText(text);
-  showToast(ok ? 'Đã copy lại!' : 'Copy thất bại');
-});
+function vsWaitMeta(video){
+  return new Promise(resolve=>{
+    if(video.readyState >= 1) return resolve();
+    video.addEventListener('loadedmetadata', ()=> resolve(), { once:true });
+  });
+}
 
-document.getElementById('btnQuickCopy').addEventListener('click', async ()=>{
-  const text = quickInput.value.trim();
-  if(!text){ showToast('Chưa có nội dung'); return; }
-  const ok = await copyText(text);
-  showToast(ok ? 'Đã copy!' : 'Copy thất bại');
-  if(ok){
-    historyList.unshift(text);
-    historyList = historyList.slice(0,3);
-    renderHistory();
-  }
-});
+function vsSeekTo(video, t){
+  return new Promise(resolve=>{
+    function onSeeked(){ video.removeEventListener('seeked', onSeeked); resolve(); }
+    video.addEventListener('seeked', onSeeked);
+    video.currentTime = Math.max(0, Math.min(t, (video.duration || t) - 0.05));
+  });
+}
 
-document.getElementById('btnQuickPaste').addEventListener('click', async ()=>{
+function vsNorm(s){ return (s || '').replace(/\s+/g,'').trim(); }
+
+function vsFmtTime(t){
+  const m = Math.floor(t/60), s = Math.floor(t%60);
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+async function vsRunDetect(){
+  if(!vsVideoFile){ showToast('Chưa chọn video'); return; }
+  const langs = [];
+  if(vsLangZh.checked) langs.push('chi_sim');
+  if(vsLangEn.checked) langs.push('eng');
+  if(langs.length === 0){ showToast('Chọn ít nhất 1 ngôn ngữ'); return; }
+
+  const interval = Math.max(0.5, parseFloat(vsInterval.value) || 2);
+
+  vsBtnDetect.disabled = true;
+  vsCuesWrap.style.display = 'none';
+  vsResultWrap.style.display = 'none';
+
   try{
-    const text = await navigator.clipboard.readText();
-    quickInput.value = text;
-  }catch(e){
-    showToast('Trình duyệt không cho phép đọc clipboard, hãy dán thủ công (Ctrl/Cmd + V)');
+    await vsWaitMeta(vsVideoPlayer);
+    const duration = vsVideoPlayer.duration;
+    if(!duration || !isFinite(duration)){
+      showToast('Không đọc được thời lượng video');
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = vsVideoPlayer.videoWidth || 640;
+    canvas.height = vsVideoPlayer.videoHeight || 360;
+    const ctx = canvas.getContext('2d');
+
+    vsSetStatus('Đang tải mô hình nhận diện chữ (lần đầu sẽ hơi lâu)...');
+    const worker = await Tesseract.createWorker(langs.join('+'));
+
+    const raw = [];
+    const steps = Math.min(120, Math.ceil(duration / interval));
+    for(let i=0; i<steps; i++){
+      const t = i * interval;
+      await vsSeekTo(vsVideoPlayer, t);
+      ctx.drawImage(vsVideoPlayer, 0, 0, canvas.width, canvas.height);
+      vsSetStatus(`Đang nhận diện chữ: khung ${i+1}/${steps} (${Math.round(((i+1)/steps)*100)}%)`);
+      const { data } = await worker.recognize(canvas);
+      const text = (data.text || '').trim();
+      if(text) raw.push({ time: t, text });
+    }
+    await worker.terminate();
+
+    // Gom các khung liên tiếp có chữ giống nhau thành 1 câu phụ đề
+    const grouped = [];
+    let cur = null;
+    for(const r of raw){
+      if(cur && vsNorm(cur.text) === vsNorm(r.text)){
+        cur.end = r.time + interval;
+      }else{
+        if(cur) grouped.push(cur);
+        cur = { start: r.time, end: r.time + interval, text: r.text };
+      }
+    }
+    if(cur) grouped.push(cur);
+
+    if(grouped.length === 0){
+      vsSetStatus('Không tìm thấy chữ nào trên video. Thử chọn lại ngôn ngữ hoặc giảm số giây lấy mẫu.');
+      return;
+    }
+
+    // Giới hạn số câu để việc dịch + ghép phụ đề không quá nặng cho điện thoại
+    vsCues = grouped.slice(0, 40);
+
+    vsSetStatus(`Tìm thấy ${vsCues.length} đoạn chữ. Đang dịch sang tiếng Việt...`);
+    try{
+      const translations = await vsTranslateCues(vsCues);
+      vsCues.forEach((c,i)=>{ c.translated = translations[i] || ''; });
+      vsSetStatus(`Hoàn tất! ${vsCues.length} đoạn phụ đề đã dịch — kiểm tra/sửa lại bên dưới rồi ghép vào video.`);
+    }catch(err){
+      console.error(err);
+      vsCues.forEach(c=>{ c.translated = ''; });
+      vsSetStatus(`Nhận diện xong ${vsCues.length} đoạn chữ, nhưng dịch tự động thất bại — hãy tự nhập tiếng Việt cho từng đoạn bên dưới.`);
+    }
+
+    vsRenderCues();
+    vsCuesWrap.style.display = 'block';
+  }catch(err){
+    console.error(err);
+    showToast('Nhận diện thất bại, thử lại với video ngắn hơn.');
+  }finally{
+    vsBtnDetect.disabled = false;
+  }
+}
+
+async function vsTranslateCues(cues){
+  const list = cues.map((c,i)=> `${i+1}. ${c.text}`).join('\n');
+  const prompt = `Đây là các đoạn chữ trích xuất từ video (có thể tiếng Trung hoặc tiếng Anh, có thể lẫn lỗi do nhận diện tự động). Hãy dịch từng đoạn sang tiếng Việt tự nhiên, ngắn gọn, phù hợp làm phụ đề video. Chỉ trả lời bằng một mảng JSON các chuỗi tiếng Việt, đúng thứ tự, không thêm chú thích hay markdown:\n\n${list}`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await response.json();
+  const text = (data.content || []).map(b => b.text || '').join('').trim();
+  const clean = text.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  const arr = JSON.parse(clean);
+  if(!Array.isArray(arr)) throw new Error('Kết quả dịch không hợp lệ');
+  return arr;
+}
+
+function vsRenderCues(){
+  vsCuesList.innerHTML = vsCues.map((c,i)=> `
+    <div class="cue-card">
+      <div class="cue-time">${vsFmtTime(c.start)} – ${vsFmtTime(c.end)}</div>
+      <div class="cue-orig"><b>Gốc:</b> ${escapeHtml(c.text)}</div>
+      <textarea data-i="${i}" class="cue-input" placeholder="Nhập bản dịch tiếng Việt...">${escapeHtml(c.translated || '')}</textarea>
+    </div>
+  `).join('');
+  vsCuesList.querySelectorAll('.cue-input').forEach(ta=>{
+    ta.addEventListener('input', (e)=>{
+      const i = Number(e.target.dataset.i);
+      vsCues[i].translated = e.target.value;
+    });
+  });
+}
+
+vsBtnDetect.addEventListener('click', vsRunDetect);
+
+// Xuất file .srt dự phòng — dùng được ngay trong CapCut hoặc trình dựng video khác
+function vsToSrtTime(t){
+  const h = Math.floor(t/3600);
+  const m = Math.floor((t%3600)/60);
+  const s = Math.floor(t%60);
+  const ms = Math.round((t - Math.floor(t)) * 1000);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')},${String(ms).padStart(3,'0')}`;
+}
+function vsBuildSrt(){
+  return vsCues.map((c,i)=> `${i+1}\n${vsToSrtTime(c.start)} --> ${vsToSrtTime(c.end)}\n${c.translated || c.text}\n`).join('\n');
+}
+vsBtnSrt.addEventListener('click', ()=>{
+  if(vsCues.length === 0){ showToast('Chưa có phụ đề'); return; }
+  const blob = new Blob([vsBuildSrt()], { type:'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'vietsub.srt';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 4000);
+  showToast('Đã tải file .srt');
+});
+
+// Ghép phụ đề đè lên video bằng ffmpeg.wasm, xuất .mp4
+let vsFFmpeg = null;
+
+function vsEscapeDrawtext(text){
+  return text
+    .replace(/\\/g, '\\\\\\\\')
+    .replace(/:/g, '\\:')
+    .replace(/'/g, "\u2019")
+    .replace(/%/g, '\\%')
+    .replace(/\n/g, ' ');
+}
+
+async function vsEnsureFFmpeg(){
+  if(vsFFmpeg) return vsFFmpeg;
+  const { FFmpeg } = FFmpegWASM;
+  const { toBlobURL } = FFmpegUtil;
+  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+  const ff = new FFmpeg();
+  ff.on('log', ({ message }) => vsSetStatus(message.slice(0, 90)));
+  await ff.load({
+    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+  });
+  vsFFmpeg = ff;
+  return ff;
+}
+
+vsBtnBurn.addEventListener('click', async ()=>{
+  if(!vsVideoFile || vsCues.length === 0){ showToast('Chưa có video hoặc phụ đề'); return; }
+
+  const drawtexts = vsCues
+    .filter(c => (c.translated || '').trim())
+    .map(c => {
+      const t = vsEscapeDrawtext(c.translated.trim());
+      return `drawtext=fontfile=font.ttf:text='${t}':fontcolor=white:fontsize=h/18:borderw=3:bordercolor=black:x=(w-text_w)/2:y=h-h/8:enable='between(t,${c.start.toFixed(2)},${c.end.toFixed(2)})'`;
+    });
+
+  if(drawtexts.length === 0){ showToast('Chưa có nội dung tiếng Việt để ghép vào video'); return; }
+
+  vsBtnBurn.disabled = true;
+  try{
+    vsSetStatus('Đang tải bộ xử lý video (lần đầu sẽ hơi lâu, ~vài chục MB)...');
+    const ff = await vsEnsureFFmpeg();
+    const { fetchFile } = FFmpegUtil;
+
+    vsSetStatus('Đang nạp video vào bộ xử lý...');
+    await ff.writeFile('input.mp4', await fetchFile(vsVideoFile));
+
+    vsSetStatus('Đang tải font tiếng Việt (có dấu)...');
+    const fontResp = await fetch('https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts/hinted/ttf/NotoSans/NotoSans-Bold.ttf');
+    const fontBuf = new Uint8Array(await fontResp.arrayBuffer());
+    await ff.writeFile('font.ttf', fontBuf);
+
+    const filter = drawtexts.join(',');
+
+    vsSetStatus('Đang ghép phụ đề vào video — có thể mất vài phút tuỳ độ dài video...');
+    await ff.exec(['-i', 'input.mp4', '-vf', filter, '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23', '-c:a', 'copy', 'output.mp4']);
+
+    vsSetStatus('Đang xuất file...');
+    const data = await ff.readFile('output.mp4');
+    const blob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(blob);
+
+    vsResultPlayer.src = url;
+    vsDownloadLink.href = url;
+    vsResultWrap.style.display = 'block';
+    vsSetStatus('Hoàn tất! Xem trước và tải video bên dưới.');
+    showToast('Đã ghép phụ đề xong');
+  }catch(err){
+    console.error(err);
+    vsSetStatus('Ghép phụ đề thất bại: ' + (err && err.message ? err.message : 'lỗi không xác định'));
+    showToast('Thất bại — thử video ngắn hơn, hoặc dùng file .srt dự phòng ở trên.');
+  }finally{
+    vsBtnBurn.disabled = false;
   }
 });
 </script>
