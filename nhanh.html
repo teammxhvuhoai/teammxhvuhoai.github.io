@@ -723,6 +723,35 @@ function drawSubtitles(c, pg, t, W, H){
   c.restore();
 }
 
+/* ===================== NATURAL VIETNAMESE TTS (Google Cloud) ===================== */
+let ttsApiKey = '';
+let ttsVoices = [];
+let ttsRate = 1;
+let ttsEditedText = null;
+let ttsLastAudioURL = null;
+let ttsLastAudioBlob = null;
+let ttsStatusMsg = '';
+
+function ttsTierScore(name){
+  if (/Chirp/i.test(name)) return 4;
+  if (/Neural2/i.test(name)) return 3;
+  if (/Wavenet/i.test(name)) return 2;
+  return 1;
+}
+function ttsTierLabel(name){
+  if (/Chirp/i.test(name)) return 'cao cấp';
+  if (/Neural2/i.test(name)) return 'tự nhiên';
+  if (/Wavenet/i.test(name)) return 'khá tự nhiên';
+  return 'cơ bản';
+}
+function ttsVoiceOptionsHtml(){
+  if (!ttsVoices.length) return '<option value="">(chưa tải — bấm "Tải danh sách giọng tiếng Việt")</option>';
+  return ttsVoices.map(v=>`<option value="${v.name}">${v.name} — ${v.ssmlGender||''} · ${ttsTierLabel(v.name)}</option>`).join('');
+}
+function ttsDefaultText(pg){
+  return pg.zones.filter(z=>z.type==='text' && z.text).map(z=>z.text).join('. ');
+}
+
 /* ===================== MEDIA MODAL (page-level) ===================== */
 function mediaModalHTML(pg){
   const rows = (pg.subtitles||[]).map((s,i)=>`
@@ -747,6 +776,26 @@ function mediaModalHTML(pg){
       <div class="field"><label>Âm lượng thuyết minh (${Math.round(pg.narrationVolume*100)}%)</label><input type="range" id="narVol" min="0" max="1" step="0.05" value="${pg.narrationVolume}"></div>
       <div class="field"><label>Âm lượng video gốc (${Math.round(pg.videoVolume*100)}%)</label><input type="range" id="vidVol" min="0" max="1" step="0.05" value="${pg.videoVolume}"></div>
     </div>
+
+    <hr class="sep">
+    <div class="field"><label>🎙️ Tạo giọng đọc tự nhiên, lưu loát (Google Cloud Text-to-Speech)</label>
+      <div class="emptyHint" style="margin:-2px 0 8px">Cần API key Google Cloud đã bật "Cloud Text-to-Speech API" (có hạn mức dùng miễn phí hàng tháng). Khoá chỉ lưu tạm trong phiên làm việc này (mất khi tải lại trang), chỉ được gửi trực tiếp tới Google, không lưu ở đâu khác.</div>
+      <input type="text" id="ttsKey" placeholder="Dán Google Cloud API key" value="${escapeHtml(ttsApiKey)}">
+    </div>
+    <div class="row2">
+      <div class="field"><label>Giọng đọc</label><select id="ttsVoiceSel">${ttsVoiceOptionsHtml()}</select></div>
+      <div class="field"><label>Tốc độ đọc (${ttsRate.toFixed(2)}x)</label><input type="range" id="ttsRate" min="0.7" max="1.3" step="0.05" value="${ttsRate}"></div>
+    </div>
+    <div class="field"><button class="btn sm" id="ttsLoadVoices">Tải danh sách giọng tiếng Việt</button></div>
+    <div class="field"><label>Văn bản cần đọc</label><textarea id="ttsText" style="min-height:80px">${escapeHtml(ttsEditedText!==null ? ttsEditedText : ttsDefaultText(pg))}</textarea></div>
+    <div class="field">
+      <button class="btn sm accent2" id="ttsGenerate">Tạo giọng đọc</button>
+      <span id="ttsStatus" style="font-family:var(--mono);font-size:11.5px;color:var(--text-dim);margin-left:6px">${escapeHtml(ttsStatusMsg)}</span>
+    </div>
+    ${ttsLastAudioURL ? `
+      <audio controls src="${ttsLastAudioURL}" style="width:100%;margin-bottom:8px"></audio>
+      <button class="btn sm primary" id="ttsUseAsNarration">Dùng làm thuyết minh cho trang này</button>
+      <button class="btn sm" id="ttsDownload">Tải mp3</button>` : ''}
 
     <hr class="sep">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
@@ -778,6 +827,63 @@ function bindMediaModalEvents(pg){
   };
   document.getElementById('showSub').onchange = e=>{ pg.showSubtitles = e.target.checked; };
   document.getElementById('speakPageBtn').onclick = ()=>speakPage(pg);
+
+  document.getElementById('ttsKey').oninput = e=>{ ttsApiKey = e.target.value; };
+  document.getElementById('ttsRate').oninput = e=>{
+    ttsRate = +e.target.value;
+    e.target.previousElementSibling.textContent = `Tốc độ đọc (${ttsRate.toFixed(2)}x)`;
+  };
+  document.getElementById('ttsText').oninput = e=>{ ttsEditedText = e.target.value; };
+  document.getElementById('ttsLoadVoices').onclick = async ()=>{
+    if (!ttsApiKey){ ttsStatusMsg = 'Cần nhập API key trước.'; refresh(); return; }
+    ttsStatusMsg = 'Đang tải danh sách giọng...'; refresh();
+    try{
+      const res = await fetch(`https://texttospeech.googleapis.com/v1/voices?languageCode=vi-VN&key=${encodeURIComponent(ttsApiKey)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Lỗi không xác định');
+      ttsVoices = (data.voices||[]).sort((a,b)=>ttsTierScore(b.name)-ttsTierScore(a.name));
+      ttsStatusMsg = `Đã tải ${ttsVoices.length} giọng.`;
+    }catch(err){ ttsStatusMsg = 'Lỗi: '+err.message; }
+    refresh();
+  };
+  document.getElementById('ttsGenerate').onclick = async ()=>{
+    const text = document.getElementById('ttsText').value.trim();
+    const voiceName = document.getElementById('ttsVoiceSel').value;
+    if (!ttsApiKey){ ttsStatusMsg = 'Cần nhập API key trước.'; refresh(); return; }
+    if (!voiceName){ ttsStatusMsg = 'Hãy tải và chọn giọng đọc trước.'; refresh(); return; }
+    if (!text){ ttsStatusMsg = 'Chưa có văn bản để đọc.'; refresh(); return; }
+    if (text.length > 4800){ ttsStatusMsg = 'Văn bản quá dài (>4800 ký tự), hãy rút ngắn.'; refresh(); return; }
+    ttsStatusMsg = 'Đang tạo giọng đọc...'; refresh();
+    try{
+      const res = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${encodeURIComponent(ttsApiKey)}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          input:{text},
+          voice:{languageCode:'vi-VN', name:voiceName},
+          audioConfig:{audioEncoding:'MP3', speakingRate: ttsRate}
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Lỗi không xác định');
+      const raw = atob(data.audioContent);
+      const arr = new Uint8Array(raw.length);
+      for (let i=0;i<raw.length;i++) arr[i] = raw.charCodeAt(i);
+      const blob = new Blob([arr], {type:'audio/mp3'});
+      if (ttsLastAudioURL) URL.revokeObjectURL(ttsLastAudioURL);
+      ttsLastAudioURL = URL.createObjectURL(blob);
+      ttsLastAudioBlob = blob;
+      ttsStatusMsg = 'Đã tạo xong — nghe thử bên dưới.';
+    }catch(err){ ttsStatusMsg = 'Lỗi: '+err.message; }
+    refresh();
+  };
+  document.getElementById('ttsUseAsNarration')?.addEventListener('click', ()=>{
+    pg.narrationFile = {name:'giong-doc-tts.mp3'};
+    pg.narrationURL = ttsLastAudioURL;
+    refresh();
+  });
+  document.getElementById('ttsDownload')?.addEventListener('click', ()=>{
+    downloadBlob(ttsLastAudioBlob, 'giong-doc-tts.mp3');
+  });
   document.getElementById('srtFile').onchange = e=>{
     const f = e.target.files[0]; if (!f) return;
     const r = new FileReader();
@@ -794,6 +900,8 @@ function bindMediaModalEvents(pg){
   });
 }
 function openPageMediaModal(pg){
+  ttsEditedText = null;
+  ttsStatusMsg = '';
   openModal(mediaModalHTML(pg));
   bindMediaModalEvents(pg);
 }
