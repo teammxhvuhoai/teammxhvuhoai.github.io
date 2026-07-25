@@ -5,302 +5,342 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Content Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --blue: #3a4ddb;
-    --blue-dark: #2c3ab0;
-    --navy: #171a3a;
-    --bg: #f6f6fb;
-    --card: #ffffff;
-    --pink: #f1dede;
-    --text: #1c1c28;
-    --muted: #8a8aa3;
-    --red: #e0374a;
-    --green: #52c98a;
-    --radius: 16px;
-    --radius-sm: 10px;
+    --primary: #4f46e5;
+    --primary-dark: #3c34b0;
+    --primary-light: #eef0fd;
+    --navy: #14162c;
+    --bg-top: #eef0fb;
+    --bg-bot: #f7f7fb;
+    --surface: #ffffff;
+    --border: #e8e9f3;
+    --ink: #171933;
+    --muted: #8b8da6;
+    --red: #ef4444;
+    --green: #16a34a;
+    --amber: #f59e0b;
+    --radius-lg: 22px;
+    --radius-md: 15px;
+    --radius-sm: 11px;
+    --shadow-sm: 0 1px 2px rgba(20,22,44,.05);
+    --shadow-md: 0 10px 30px rgba(20,22,44,.09);
   }
   *{ box-sizing:border-box; }
   body{
     margin:0;
     font-family:'Inter', system-ui, sans-serif;
-    background:var(--bg);
-    color:var(--text);
+    color:var(--ink);
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 320px);
     -webkit-font-smoothing:antialiased;
   }
   .app{
     max-width:480px;
     margin:0 auto;
     min-height:100vh;
-    background:var(--bg);
-    padding:16px 16px 40px;
+    padding:22px 16px 48px;
   }
 
-  /* ===== Thanh tab điều hướng ===== */
+  /* ===== Header thương hiệu ===== */
+  .brand{ margin-bottom:18px; padding:0 2px; }
+  .brand-eyebrow{
+    font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--primary); margin-bottom:4px;
+  }
+  .brand-title{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:600;
+    font-size:26px; letter-spacing:-.01em; color:var(--navy);
+  }
+
+  /* ===== Thanh tab dạng segmented, có icon ===== */
   .tabbar{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:8px;
-    margin-bottom:20px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:6px;
+    box-shadow:var(--shadow-sm);
+    margin-bottom:22px;
   }
   .tabbtn{
-    border:none;
-    padding:12px 6px;
-    border-radius:14px;
-    background:var(--blue);
-    color:#fff;
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    border:none; background:transparent;
+    padding:10px 4px 9px;
+    border-radius:var(--radius-md);
+    color:var(--muted);
     font-weight:700;
-    font-size:13px;
+    font-size:11.5px;
     cursor:pointer;
-    transition:transform .12s ease, background .12s ease, box-shadow .12s ease;
-    box-shadow:0 4px 10px rgba(58,77,219,.25);
+    transition:background .15s ease, color .15s ease, transform .12s ease;
   }
-  .tabbtn:active{ transform:scale(.96); }
-  .tabbtn.active{ background:var(--navy); box-shadow:0 4px 12px rgba(23,26,58,.35); }
+  .tabbtn svg{ width:19px; height:19px; stroke:currentColor; }
+  .tabbtn:active{ transform:scale(.94); }
+  .tabbtn.active{
+    background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color:#fff;
+    box-shadow:0 6px 16px rgba(79,70,229,.32);
+  }
 
   .page{ display:none; animation:fade .18s ease; }
   .page.active{ display:block; }
-  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  @keyframes fade{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:none;} }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+    padding:18px;
+    margin-bottom:14px;
+  }
 
   h2.title{
-    font-family:'Fraunces', serif;
-    font-style:italic;
-    font-weight:600;
-    font-size:19px;
-    margin:4px 0 12px;
+    font-family:'Fraunces', serif; font-style:italic; font-weight:600;
+    font-size:19px; margin:0 0 6px; color:var(--navy);
   }
-  .hint{ font-size:12.5px; color:var(--muted); margin:-6px 0 14px; line-height:1.5; }
+  .hint{ font-size:12.5px; color:var(--muted); margin:0 0 14px; line-height:1.55; }
+  .section-label{
+    font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--muted); margin:18px 0 9px;
+  }
 
-  /* ===== Khối soạn nội dung (tab Content) có gạch chân từ sai chính tả ===== */
+  /* ===== Khối soạn nội dung có gạch chân từ sai chính tả ===== */
   .editor-wrap{
     position:relative;
     width:100%;
-    min-height:220px;
-    border-radius:var(--radius);
-    background:var(--card);
-    border:1px solid #e6e6f0;
+    min-height:200px;
+    border-radius:var(--radius-md);
+    background:#fbfbfe;
+    border:1px solid var(--border);
     overflow:hidden;
   }
-  /* Textarea thật: người dùng gõ vào đây, nhưng để CHỮ TRONG SUỐT
-     vì phần chữ hiển thị thực tế được vẽ bởi lớp backdrop bên dưới */
+  .editor-wrap:focus-within{ border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
   .editor-common{
-    position:absolute;
-    inset:0;
-    margin:0;
-    padding:14px;
-    border:0;
-    width:100%;
-    height:100%;
+    position:absolute; inset:0; margin:0; padding:14px;
+    border:0; width:100%; height:100%;
     font-family:'Inter', system-ui, sans-serif;
-    font-size:15px;
-    line-height:1.6;
-    white-space:pre-wrap;
-    word-wrap:break-word;
-    overflow-wrap:anywhere;
+    font-size:15px; line-height:1.65;
+    white-space:pre-wrap; word-wrap:break-word; overflow-wrap:anywhere;
   }
-  .editor-backdrop{
-    background:transparent;
-    color:var(--text);
-    overflow:auto;
-    pointer-events:none;
-  }
-  .editor-textarea{
-    background:transparent;
-    color:transparent;
-    caret-color:var(--text);
-    resize:none;
-    overflow:auto;
-  }
+  .editor-backdrop{ background:transparent; color:var(--ink); overflow:auto; pointer-events:none; }
+  .editor-textarea{ background:transparent; color:transparent; caret-color:var(--ink); resize:none; overflow:auto; }
   .editor-textarea:focus{ outline:none; }
   .misspell{
-    text-decoration:underline;
-    text-decoration-color:var(--red);
-    text-decoration-style:wavy;
-    text-decoration-thickness:1.5px;
+    text-decoration:underline; text-decoration-color:var(--red);
+    text-decoration-style:wavy; text-decoration-thickness:1.5px;
   }
 
-  .field{
-    margin-top:12px;
-  }
-  .field label{
-    display:block;
-    font-size:12.5px;
-    font-weight:600;
-    color:var(--muted);
-    margin-bottom:6px;
-  }
+  .field{ margin-top:12px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:6px; }
   .field input[type=text], .field textarea{
-    width:100%;
-    border:1px solid #e6e6f0;
-    background:var(--card);
-    border-radius:var(--radius-sm);
-    padding:11px 12px;
-    font-size:14px;
-    font-family:inherit;
-    color:var(--text);
+    width:100%; border:1px solid var(--border); background:#fbfbfe;
+    border-radius:var(--radius-sm); padding:11px 12px;
+    font-size:14px; font-family:inherit; color:var(--ink);
+  }
+  .field input[type=text]:focus, .field textarea:focus{
+    outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light);
   }
   .field textarea{ resize:vertical; min-height:80px; line-height:1.5; }
 
+  /* ===== Lưới nút hastag đánh số ===== */
+  .hashtag-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+  }
+  .hashtag-btn{
+    position:relative;
+    border:1px solid var(--border);
+    background:#fbfbfe;
+    border-radius:var(--radius-md);
+    padding:12px 8px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+  }
+  .hashtag-btn:active{ transform:scale(.95); }
+  .hashtag-btn:hover{ border-color:var(--primary); box-shadow:var(--shadow-sm); }
+  .hashtag-btn .num{
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px; color:var(--primary);
+    display:block; line-height:1;
+  }
+  .hashtag-btn .preview{
+    display:block; margin-top:5px; font-size:10.5px; color:var(--muted);
+    font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .hashtag-btn .edit-pin{
+    position:absolute; top:5px; right:6px;
+    width:16px; height:16px; border-radius:50%;
+    background:var(--primary-light); color:var(--primary);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; line-height:1; border:none; cursor:pointer;
+  }
+
   .btnrow{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
   .btn{
-    flex:1;
-    border:none;
-    padding:13px 14px;
-    border-radius:var(--radius-sm);
-    font-weight:700;
-    font-size:14px;
-    cursor:pointer;
-    transition:transform .12s ease, opacity .12s ease;
+    flex:1; border:none; padding:13px 14px; border-radius:var(--radius-sm);
+    font-weight:700; font-size:14px; cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease, box-shadow .12s ease;
   }
   .btn:active{ transform:scale(.97); }
-  .btn-primary{ background:var(--blue); color:#fff; }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff;
+    box-shadow:0 8px 18px rgba(79,70,229,.28);
+  }
   .btn-dark{ background:var(--navy); color:#fff; }
-  .btn-ghost{ background:#eceef7; color:var(--navy); }
+  .btn-ghost{ background:var(--primary-light); color:var(--primary-dark); }
   .btn-danger{ background:#fde8ea; color:var(--red); }
   .btn-full{ width:100%; }
 
   /* ===== Danh sách link Shopee (list box) ===== */
   .listbox{
-    background:var(--card);
-    border:1px solid #e6e6f0;
-    border-radius:var(--radius);
-    max-height:280px;
-    overflow-y:auto;
+    background:#fbfbfe; border:1px solid var(--border); border-radius:var(--radius-md);
+    max-height:260px; overflow-y:auto;
   }
   .listbox-item{
-    padding:12px 14px;
-    font-size:13.5px;
-    border-bottom:1px solid #f0f0f6;
-    word-break:break-all;
-    color:var(--text);
+    padding:12px 14px; font-size:13.5px; border-bottom:1px solid var(--border);
+    word-break:break-all; color:var(--ink);
   }
   .listbox-item:last-child{ border-bottom:none; }
   .listbox-item.picked{
-    background:#eef1ff;
-    border-left:3px solid var(--blue);
-    font-weight:600;
+    background:var(--primary-light); border-left:3px solid var(--primary); font-weight:600;
   }
 
-  /* ===== Toast thông báo nhỏ ===== */
   #toast{
-    position:fixed;
-    left:50%;
-    bottom:24px;
-    transform:translate(-50%, 20px);
-    background:var(--navy);
-    color:#fff;
-    padding:11px 18px;
-    border-radius:999px;
-    font-size:13.5px;
-    font-weight:600;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .2s ease, transform .2s ease;
-    z-index:50;
-    box-shadow:0 8px 20px rgba(0,0,0,.2);
+    position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px);
+    background:var(--navy); color:#fff; padding:11px 20px; border-radius:999px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease; z-index:50;
+    box-shadow:0 10px 24px rgba(0,0,0,.22); max-width:90%; text-align:center;
   }
   #toast.show{ opacity:1; transform:translate(-50%, 0); }
 
-  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
   .chip{
-    background:var(--navy);
-    color:#fff;
-    font-size:11.5px;
-    font-weight:700;
-    padding:7px 12px;
-    border-radius:999px;
-    max-width:100%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    cursor:pointer;
-    border:none;
+    background:var(--navy); color:#fff; font-size:11.5px; font-weight:700;
+    padding:7px 12px; border-radius:999px; max-width:100%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; border:none;
   }
 </style>
 </head>
 <body>
 <div class="app">
 
+  <div class="brand">
+    <div class="brand-eyebrow">Bộ công cụ nội dung</div>
+    <div class="brand-title">Content Studio</div>
+  </div>
+
   <!-- ================= THANH TAB ================= -->
   <div class="tabbar">
-    <button class="tabbtn active" data-tab="content">Content</button>
-    <button class="tabbtn" data-tab="share">Share</button>
-    <button class="tabbtn" data-tab="shoppe">Shoppe</button>
-    <button class="tabbtn" data-tab="nhanh">Copy nhanh</button>
+    <button class="tabbtn active" data-tab="content">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 3.5h8l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/>
+        <path d="M14 3.5V7.5h4"/>
+        <path d="M7.5 12h7M7.5 15h7M7.5 18h4.5"/>
+      </svg>
+      Content
+    </button>
+    <button class="tabbtn" data-tab="share">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6" cy="12" r="2.3"/><circle cx="17" cy="5.5" r="2.3"/><circle cx="17" cy="18.5" r="2.3"/>
+        <path d="M8.1 10.8 14.9 7.2M8.1 13.2 14.9 16.8"/>
+      </svg>
+      Share
+    </button>
+    <button class="tabbtn" data-tab="shoppe">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="12" rx="2"/>
+        <path d="M8 8V6a4 4 0 0 1 8 0v2"/>
+      </svg>
+      Shoppe
+    </button>
+    <button class="tabbtn" data-tab="nhanh">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>
+      </svg>
+      Copy nhanh
+    </button>
   </div>
 
   <!-- ================= TAB 1: CONTENT ================= -->
   <section id="page-content" class="page active">
-    <h2 class="title">Tiêu Đề Nội Dung</h2>
-    <p class="hint">Dán hoặc gõ nội dung vào ô bên dưới. Từ nghi sai chính tả tiếng Việt sẽ được gạch chân đỏ (kiểm tra dựa trên cấu trúc âm tiết + từ điển thông dụng, mang tính gợi ý).</p>
+    <div class="card">
+      <h2 class="title">Tiêu Đề Nội Dung</h2>
+      <p class="hint">Dán hoặc gõ nội dung vào ô bên dưới. Từ nghi sai chính tả tiếng Việt sẽ được gạch chân đỏ (kiểm tra dựa trên cấu trúc âm tiết + từ điển thông dụng, mang tính gợi ý).</p>
 
-    <div class="editor-wrap">
-      <!-- Lớp nền hiển thị chữ có gạch chân đỏ -->
-      <div id="backdrop" class="editor-common editor-backdrop"></div>
-      <!-- Lớp textarea thật để người dùng gõ/dán (chữ trong suốt) -->
-      <textarea id="contentInput" class="editor-common editor-textarea"
-        placeholder="Nhập nội dung bài viết..." spellcheck="false"></textarea>
-    </div>
+      <div class="editor-wrap">
+        <div id="backdrop" class="editor-common editor-backdrop"></div>
+        <textarea id="contentInput" class="editor-common editor-textarea"
+          placeholder="Nhập nội dung bài viết..." spellcheck="false"></textarea>
+      </div>
 
-    <div class="field">
-      <label for="hashtagInput">Hastag (#....)</label>
-      <input type="text" id="hashtagInput" placeholder="#trending #reviewhay">
-    </div>
+      <div class="section-label">Chọn hastag &amp; copy nội dung</div>
+      <div id="hashtagGrid" class="hashtag-grid"></div>
 
-    <div class="btnrow">
-      <button class="btn btn-primary" id="btnCopyFormatted">Copy nội dung</button>
-      <button class="btn btn-ghost" id="btnClearContent">Xóa</button>
+      <div class="btnrow">
+        <button class="btn btn-ghost btn-full" id="btnClearContent">Xóa nội dung</button>
+      </div>
     </div>
   </section>
 
   <!-- ================= TAB 2: SHARE ================= -->
   <section id="page-share" class="page">
-    <h2 class="title">Chia sẻ tin nhắn</h2>
-    <p class="hint">Nhập nội dung tin nhắn rồi bấm Share để mở bảng chia sẻ của điện thoại (chọn Zalo và gửi cho bạn bè).</p>
+    <div class="card">
+      <h2 class="title">Chia sẻ tin nhắn</h2>
+      <p class="hint">Nhập nội dung tin nhắn rồi bấm Share để mở bảng chia sẻ của điện thoại (chọn Zalo và gửi cho bạn bè).</p>
 
-    <div class="field" style="margin-top:0">
-      <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:160px"></textarea>
-    </div>
+      <div class="field" style="margin-top:0">
+        <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:160px"></textarea>
+      </div>
 
-    <div class="btnrow">
-      <button class="btn btn-primary" id="btnShareZalo">🔗 Share qua Zalo</button>
-      <button class="btn btn-danger" id="btnClearShare">Clear</button>
+      <div class="btnrow">
+        <button class="btn btn-primary" id="btnShareZalo">Share qua Zalo</button>
+        <button class="btn btn-danger" id="btnClearShare">Clear</button>
+      </div>
     </div>
   </section>
 
   <!-- ================= TAB 3: SHOPPE ================= -->
   <section id="page-shoppe" class="page">
-    <h2 class="title">Link Shopee</h2>
-    <p class="hint">Danh sách link Shopee của bạn (mỗi dòng 1 link). Bấm "Chia sẻ ngẫu nhiên" để copy random 1 link mỗi lần bấm.</p>
+    <div class="card">
+      <h2 class="title">Link Shopee</h2>
+      <p class="hint">Danh sách link Shopee của bạn (mỗi dòng 1 link). Bấm "Chia sẻ ngẫu nhiên" để copy random 1 link mỗi lần bấm.</p>
 
-    <div class="field" style="margin-top:0">
-      <label for="shoppeLinksInput">Danh sách link (mỗi dòng 1 link)</label>
-      <textarea id="shoppeLinksInput" style="min-height:100px"></textarea>
-    </div>
+      <div class="field" style="margin-top:0">
+        <label for="shoppeLinksInput">Danh sách link (mỗi dòng 1 link)</label>
+        <textarea id="shoppeLinksInput" style="min-height:100px"></textarea>
+      </div>
 
-    <div id="shoppeListbox" class="listbox" style="margin-top:12px"></div>
+      <div class="section-label">Danh sách</div>
+      <div id="shoppeListbox" class="listbox"></div>
 
-    <div class="btnrow">
-      <button class="btn btn-primary btn-full" id="btnRandomShoppe">🎲 Chia sẻ ngẫu nhiên (Copy)</button>
+      <div class="btnrow">
+        <button class="btn btn-primary btn-full" id="btnRandomShoppe">Chia sẻ ngẫu nhiên (Copy)</button>
+      </div>
     </div>
   </section>
 
   <!-- ================= TAB 4: COPY NHANH ================= -->
   <section id="page-nhanh" class="page">
-    <h2 class="title">Copy nhanh</h2>
-    <p class="hint">Dán nội dung bất kỳ và copy ngay lập tức, không cần định dạng thêm.</p>
+    <div class="card">
+      <h2 class="title">Copy nhanh</h2>
+      <p class="hint">Dán nội dung bất kỳ và copy ngay lập tức, không cần định dạng thêm.</p>
 
-    <div class="field" style="margin-top:0">
-      <textarea id="quickInput" placeholder="Dán nội dung cần copy nhanh..." style="min-height:160px"></textarea>
+      <div class="field" style="margin-top:0">
+        <textarea id="quickInput" placeholder="Dán nội dung cần copy nhanh..." style="min-height:160px"></textarea>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn btn-primary" id="btnQuickCopy">Copy nhanh</button>
+        <button class="btn btn-ghost" id="btnQuickPaste">Dán từ clipboard</button>
+      </div>
+
+      <div class="chips" id="quickHistory"></div>
     </div>
-
-    <div class="btnrow">
-      <button class="btn btn-primary" id="btnQuickCopy">Copy nhanh</button>
-      <button class="btn btn-ghost" id="btnQuickPaste">Dán từ clipboard</button>
-    </div>
-
-    <div class="chips" id="quickHistory"></div>
   </section>
 
 </div>
@@ -311,17 +351,14 @@
 /* =========================================================
    TIỆN ÍCH DÙNG CHUNG
 ========================================================= */
-
-// Hiện thông báo nhỏ ở đáy màn hình
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(()=> t.classList.remove('show'), 1800);
+  showToast._timer = setTimeout(()=> t.classList.remove('show'), 1900);
 }
 
-// Copy text vào clipboard, có fallback cho trình duyệt cũ / http
 async function copyText(text){
   try{
     await navigator.clipboard.writeText(text);
@@ -337,18 +374,12 @@ async function copyText(text){
       document.execCommand('copy');
       document.body.removeChild(ta);
       return true;
-    }catch(e2){
-      return false;
-    }
+    }catch(e2){ return false; }
   }
 }
 
-// Escape HTML để chèn an toàn vào backdrop
 function escapeHtml(str){
-  return str
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 /* =========================================================
@@ -365,10 +396,6 @@ document.querySelectorAll('.tabbtn').forEach(btn=>{
 
 /* =========================================================
    TAB CONTENT: kiểm tra chính tả tiếng Việt cơ bản
-   Cách làm: mỗi "từ" tiếng Việt là 1 âm tiết, phải khớp cấu trúc
-   (Phụ âm đầu)? + (nguyên âm 1-3 ký tự)+ + (phụ âm cuối)?
-   Từ nào không khớp cấu trúc và không có trong từ điển thông dụng
-   => bị coi là nghi sai chính tả (gạch chân đỏ).
 ========================================================= */
 const VOWELS = "aàáảãạăằắẳẵặâầấẩẫậeèéẻẽẹêềếểễệiìíỉĩịoòóỏõọôồốổỗộơờớởỡợuùúủũụưừứửữựyỳýỷỹỵ";
 const ONSETS = ["ngh","ng","nh","ph","th","tr","ch","gi","kh","qu","b","c","d","đ","g","h","k","l","m","n","p","q","r","s","t","v","x"];
@@ -380,7 +407,6 @@ const syllableRegex = new RegExp(
   "(" + FINALS.join("|") + ")?$", "i"
 );
 
-// Các từ/tên riêng phổ biến không theo cấu trúc âm tiết Việt nhưng vẫn hợp lệ
 const WHITELIST = new Set([
   "shopee","zalo","facebook","tiktok","content","share","copy","hastag","hashtag",
   "sale","freeship","voucher","live","livestream","ok","wifi","admin","app","web",
@@ -390,12 +416,11 @@ const WHITELIST = new Set([
 function isValidVietnameseWord(word){
   const lower = word.toLowerCase();
   if(WHITELIST.has(lower)) return true;
-  if(/^\d+$/.test(word)) return true;          // số
-  if(word === word.toUpperCase() && word.length > 1) return true; // viết tắt in hoa: VIP, SALE...
+  if(/^\d+$/.test(word)) return true;
+  if(word === word.toUpperCase() && word.length > 1) return true;
   return syllableRegex.test(lower);
 }
 
-// Tách chuỗi thành các đoạn chữ và đoạn không phải chữ (giữ nguyên để ghép lại y hệt bản gốc)
 function tokenize(text){
   return text.match(/[A-Za-zÀ-ỹĐđ]+|[^A-Za-zÀ-ỹĐđ]+/g) || [];
 }
@@ -403,15 +428,13 @@ function tokenize(text){
 function buildHighlightedHtml(text){
   const tokens = tokenize(text);
   let html = "";
-  let prevWasHash = false; // true nếu đoạn ký tự ngay trước kết thúc bằng dấu '#'
+  let prevWasHash = false;
   for(const tok of tokens){
     const isWord = /[A-Za-zÀ-ỹĐđ]/.test(tok[0]);
     if(isWord){
-      const skipCheck = prevWasHash;                 // không kiểm tra từ ngay sau dấu #
+      const skipCheck = prevWasHash;
       const valid = skipCheck || isValidVietnameseWord(tok);
-      html += valid
-        ? escapeHtml(tok)
-        : `<span class="misspell">${escapeHtml(tok)}</span>`;
+      html += valid ? escapeHtml(tok) : `<span class="misspell">${escapeHtml(tok)}</span>`;
       prevWasHash = false;
     }else{
       html += escapeHtml(tok);
@@ -425,37 +448,13 @@ const contentInput = document.getElementById('contentInput');
 const backdrop = document.getElementById('backdrop');
 
 function refreshHighlight(){
-  backdrop.innerHTML = buildHighlightedHtml(contentInput.value) + "\n"; // \n để tránh mất dòng trống cuối
+  backdrop.innerHTML = buildHighlightedHtml(contentInput.value) + "\n";
 }
 contentInput.addEventListener('input', refreshHighlight);
 contentInput.addEventListener('paste', ()=> setTimeout(refreshHighlight, 0));
-// Đồng bộ cuộn giữa lớp chữ thật và lớp nền highlight
 contentInput.addEventListener('scroll', ()=>{
   backdrop.scrollTop = contentInput.scrollTop;
   backdrop.scrollLeft = contentInput.scrollLeft;
-});
-
-// Nút Copy nội dung: gắn thêm "Ngày đăng" + "Hastag" theo cú pháp yêu cầu
-document.getElementById('btnCopyFormatted').addEventListener('click', async ()=>{
-  const content = contentInput.value.trim();
-  if(!content){ showToast('Chưa có nội dung để copy'); return; }
-
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2,'0');
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const yyyy = now.getFullYear();
-  const dateStr = `${dd}/${mm}/${yyyy}`;
-
-  const hashtag = document.getElementById('hashtagInput').value.trim() || '#....';
-
-  const formatted =
-`${content}
-
-Ngày đăng: ${dateStr}
-${hashtag}`;
-
-  const ok = await copyText(formatted);
-  showToast(ok ? 'Đã copy nội dung!' : 'Copy thất bại, vui lòng thử lại');
 });
 
 document.getElementById('btnClearContent').addEventListener('click', ()=>{
@@ -464,7 +463,75 @@ document.getElementById('btnClearContent').addEventListener('click', ()=>{
 });
 
 /* =========================================================
-   TAB SHARE: chia sẻ nhanh nội dung + clear
+   LƯỚI NÚT HASTAG ĐÁNH SỐ (1,2,3,4,5,6,7,8,10)
+   Mỗi nút giữ 1 hastag riêng. Bấm nút = copy ngay nội dung
+   kèm ngày đăng + hastag của nút đó. Bấm biểu tượng ✎ để sửa hastag.
+========================================================= */
+const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,10];
+const hashtagPresets = {
+  1:  '#trending',
+  2:  '#hot',
+  3:  '#sale',
+  4:  '#freeship',
+  5:  '#review',
+  6:  '#giatot',
+  7:  '#uytin',
+  8:  '#new',
+  10: '#hangchat'
+};
+
+const hashtagGrid = document.getElementById('hashtagGrid');
+
+function renderHashtagGrid(){
+  hashtagGrid.innerHTML = HASHTAG_NUMBERS.map(n => `
+    <div class="hashtag-btn" data-n="${n}">
+      <button class="edit-pin" data-edit="${n}" title="Sửa hastag">✎</button>
+      <span class="num">${n}</span>
+      <span class="preview">${escapeHtml(hashtagPresets[n])}</span>
+    </div>
+  `).join('');
+}
+renderHashtagGrid();
+
+// Bấm vào nút số (không phải nút sửa) -> copy nội dung kèm hastag tương ứng
+hashtagGrid.addEventListener('click', async (e)=>{
+  const editBtn = e.target.closest('[data-edit]');
+  if(editBtn){
+    const n = editBtn.dataset.edit;
+    const current = hashtagPresets[n];
+    const next = prompt(`Sửa hastag cho nút ${n}:`, current);
+    if(next !== null && next.trim() !== ''){
+      hashtagPresets[n] = next.trim();
+      renderHashtagGrid();
+    }
+    return; // không copy khi chỉ đang sửa
+  }
+
+  const card = e.target.closest('.hashtag-btn');
+  if(!card) return;
+
+  const content = contentInput.value.trim();
+  if(!content){ showToast('Chưa có nội dung để copy'); return; }
+
+  const n = card.dataset.n;
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+  const dateStr = `${dd}/${mm}/${yyyy}`;
+
+  const formatted =
+`${content}
+
+Ngày đăng: ${dateStr}
+${hashtagPresets[n]}`;
+
+  const ok = await copyText(formatted);
+  showToast(ok ? `Đã copy với ${hashtagPresets[n]}` : 'Copy thất bại, vui lòng thử lại');
+});
+
+/* =========================================================
+   TAB SHARE
 ========================================================= */
 const shareInput = document.getElementById('shareInput');
 
@@ -472,18 +539,11 @@ document.getElementById('btnShareZalo').addEventListener('click', async ()=>{
   const text = shareInput.value.trim();
   if(!text){ showToast('Chưa có nội dung để chia sẻ'); return; }
 
-  // Ưu tiên dùng Web Share API (trên điện thoại sẽ mở bảng chia sẻ có Zalo,
-  // người dùng chọn Zalo rồi chọn 1 bạn bè để gửi)
   if(navigator.share){
-    try{
-      await navigator.share({ text });
-      return;
-    }catch(err){
-      // Người dùng bấm hủy hoặc thiết bị không hỗ trợ -> rơi xuống fallback bên dưới
-    }
+    try{ await navigator.share({ text }); return; }
+    catch(err){ /* người dùng hủy hoặc không hỗ trợ -> dùng fallback bên dưới */ }
   }
 
-  // Fallback: copy nội dung rồi mở app Zalo (nếu cài trên điện thoại)
   await copyText(text);
   showToast('Đã copy nội dung, đang mở Zalo...');
   window.location.href = 'zalo://';
@@ -495,12 +555,11 @@ document.getElementById('btnClearShare').addEventListener('click', ()=>{
 });
 
 /* =========================================================
-   TAB SHOPPE: danh sách link + copy random
+   TAB SHOPPE
 ========================================================= */
 const shoppeLinksInput = document.getElementById('shoppeLinksInput');
 const shoppeListbox = document.getElementById('shoppeListbox');
 
-// Danh sách mẫu ban đầu - người dùng có thể sửa lại trong ô textarea
 const DEFAULT_LINKS = [
   'https://shorten.asia/sanpham1',
   'https://shorten.asia/sanpham2',
@@ -509,10 +568,7 @@ const DEFAULT_LINKS = [
 shoppeLinksInput.value = DEFAULT_LINKS.join('\n');
 
 function getShoppeLinks(){
-  return shoppeLinksInput.value
-    .split('\n')
-    .map(s=>s.trim())
-    .filter(Boolean);
+  return shoppeLinksInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
 }
 
 function renderShoppeList(pickedIndex = -1){
@@ -527,17 +583,15 @@ shoppeLinksInput.addEventListener('input', ()=> renderShoppeList());
 document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
   const links = getShoppeLinks();
   if(links.length === 0){ showToast('Danh sách link đang trống'); return; }
-
   const idx = Math.floor(Math.random() * links.length);
   const picked = links[idx];
   renderShoppeList(idx);
-
   const ok = await copyText(picked);
   showToast(ok ? `Đã copy: ${picked}` : 'Copy thất bại');
 });
 
 /* =========================================================
-   TAB COPY NHANH: copy tức thì + lịch sử copy gần đây
+   TAB COPY NHANH
 ========================================================= */
 const quickInput = document.getElementById('quickInput');
 const quickHistory = document.getElementById('quickHistory');
