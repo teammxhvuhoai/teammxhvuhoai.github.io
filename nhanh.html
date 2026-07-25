@@ -203,6 +203,8 @@
         <button class="btn sm" id="delZoneBtn">Xoá vùng</button>
         <div class="divider"></div>
         <button class="btn sm" id="dupPageBtn">Nhân bản trang</button>
+        <div class="divider"></div>
+        <button class="btn sm accent2" id="mediaBtn">Phụ đề &amp; Thuyết minh</button>
         <div class="spacer"></div>
         <button class="btn primary sm" id="exportPageBtn">Tải trang này</button>
       </div>
@@ -344,7 +346,8 @@ function addPageFromFile(file){
   const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = ()=>{
-    const pg = { id:nid('page'), name:file.name.replace(/\.[^.]+$/,''), bgImg:img, zones:[] };
+    const pg = { id:nid('page'), name:file.name.replace(/\.[^.]+$/,''), bgImg:img, zones:[],
+      narrationFile:null, narrationURL:null, narrationVolume:1, videoVolume:1, subtitles:[], showSubtitles:true };
     pages.push(pg);
     if (!currentPageId) currentPageId = pg.id;
     renderAll();
@@ -386,7 +389,9 @@ function renderPageList(){
 document.getElementById('dupPageBtn').onclick = ()=>{
   const pg = currentPage(); if (!pg) return;
   const copy = JSON.parse(JSON.stringify(pg.zones.map(z=>({...z, id:nid('zone'), videoURL:undefined, videoFile:undefined, _previewVideoEl:undefined}))));
-  const np = { id:nid('page'), name: pg.name+'-copy', bgImg: pg.bgImg, zones: copy };
+  const np = { id:nid('page'), name: pg.name+'-copy', bgImg: pg.bgImg, zones: copy,
+    narrationFile:null, narrationURL:null, narrationVolume:pg.narrationVolume, videoVolume:pg.videoVolume,
+    subtitles: JSON.parse(JSON.stringify(pg.subtitles||[])), showSubtitles: pg.showSubtitles };
   pages.splice(pages.indexOf(pg)+1, 0, np);
   currentPageId = np.id; renderAll();
 };
@@ -528,6 +533,12 @@ function renderProps(){
       </div>
       <div class="field"><label>Màu chữ</label><input type="color" id="p_color" value="${z.color}"></div>
       <div class="field"><label><input type="checkbox" id="p_bg" ${z.bg?'checked':''} style="width:auto;margin-right:6px;">Nền phủ phía sau chữ</label></div>
+      <hr class="sep">
+      <div class="field"><label>Giọng đọc thử (Text-to-Speech)</label>
+        <select id="p_voice">${voiceOptionsHtml()}</select>
+      </div>
+      <div class="field"><button class="btn sm" id="p_speak">🔊 Nghe thử giọng đọc</button></div>
+      <div class="emptyHint" style="margin-top:-4px">Chỉ để nghe thử trong trình duyệt. Muốn giọng đọc có trong video tải về, hãy ghi âm lại (hoặc dùng công cụ TTS ngoài) rồi tải lên ở mục "Phụ đề &amp; Thuyết minh".</div>
     `;
     document.getElementById('p_key').oninput = e=>{ z.key=e.target.value; renderAll(); };
     document.getElementById('p_text').oninput = e=>{ z.text=e.target.value; renderPreviewCanvas(); renderPageList(); };
@@ -537,6 +548,14 @@ function renderProps(){
     document.getElementById('p_weight').onchange = e=>{ z.weight=e.target.value; renderPreviewCanvas(); };
     document.getElementById('p_color').oninput = e=>{ z.color=e.target.value; renderPreviewCanvas(); };
     document.getElementById('p_bg').onchange = e=>{ z.bg=e.target.checked; renderPreviewCanvas(); };
+    document.getElementById('p_speak').onclick = ()=>{
+      if (!z.text || !z.text.trim()) return;
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(z.text);
+      const chosen = speechSynthesis.getVoices().find(v=>v.name===document.getElementById('p_voice').value);
+      if (chosen) utter.voice = chosen;
+      speechSynthesis.speak(utter);
+    };
   } else {
     body.innerHTML = `
       <div class="field"><label>Khoá / tên khớp file video hàng loạt</label><input type="text" id="p_key" value="${z.key}"></div>
@@ -633,6 +652,157 @@ document.getElementById('videoBulkBtn').onclick = ()=>{
   };
 };
 
+/* ===================== TTS VOICES ===================== */
+function voiceOptionsHtml(){
+  const voices = speechSynthesis.getVoices();
+  if (!voices.length) return '<option value="">(đang tải danh sách giọng...)</option>';
+  const viIdx = voices.findIndex(v=>/^vi/i.test(v.lang));
+  return voices.map((v,i)=>`<option value="${v.name}" ${i===Math.max(viIdx,0)?'selected':''}>${v.name} (${v.lang})</option>`).join('');
+}
+speechSynthesis.onvoiceschanged = ()=>{ const z=selectedZone(); if (z && z.type==='text') renderProps(); };
+
+function speakPage(pg){
+  speechSynthesis.cancel();
+  pg.zones.filter(z=>z.type==='text' && z.text && z.text.trim()).forEach(z=>{
+    speechSynthesis.speak(new SpeechSynthesisUtterance(z.text));
+  });
+}
+
+/* ===================== SUBTITLES (SRT) ===================== */
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function parseSRT(text){
+  const blocks = text.replace(/\r/g,'').trim().split(/\n\n+/);
+  const cues = [];
+  blocks.forEach(b=>{
+    const lines = b.split('\n');
+    let idx = /^\d+$/.test((lines[0]||'').trim()) ? 1 : 0;
+    const timeLine = lines[idx] || '';
+    const m = timeLine.match(/(\d\d):(\d\d):(\d\d)[,.](\d+)\s*-->\s*(\d\d):(\d\d):(\d\d)[,.](\d+)/);
+    if (!m) return;
+    const start = (+m[1])*3600 + (+m[2])*60 + (+m[3]) + (+m[4])/1000;
+    const end   = (+m[5])*3600 + (+m[6])*60 + (+m[7]) + (+m[8])/1000;
+    const text = lines.slice(idx+1).join(' ').trim();
+    if (text) cues.push({start, end, text});
+  });
+  return cues;
+}
+function parseTimeStr(s){
+  s = String(s).trim();
+  const parts = s.split(':');
+  if (parts.length===2) return (+parts[0])*60 + parseFloat(parts[1]||0);
+  return parseFloat(s) || 0;
+}
+function formatTime(t){
+  t = Math.max(0, t||0);
+  const m = Math.floor(t/60), sec = t - m*60;
+  return String(m).padStart(2,'0') + ':' + sec.toFixed(1).padStart(4,'0');
+}
+function drawCaptionText(c, text, cx, cy, maxW, lineH){
+  const words = String(text).split(' ');
+  let lines = [], line = '';
+  words.forEach(w=>{
+    const t = line ? line+' '+w : w;
+    if (c.measureText(t).width > maxW && line){ lines.push(line); line = w; } else line = t;
+  });
+  lines.push(line);
+  const totalH = lines.length * lineH;
+  let startY = cy - totalH/2 + lineH/2;
+  lines.forEach((l,i)=> c.fillText(l, cx, startY + i*lineH));
+}
+function drawSubtitles(c, pg, t, W, H){
+  if (t===undefined || pg.showSubtitles===false) return;
+  const cue = (pg.subtitles||[]).find(s=> t>=s.start && t<=s.end && s.text);
+  if (!cue) return;
+  const barH = H*0.12, y = H - barH - H*0.035;
+  c.save();
+  c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillRect(0, y, W, barH);
+  c.fillStyle = '#ffffff'; c.textAlign='center'; c.textBaseline='middle';
+  c.font = `600 ${Math.round(H*0.032)}px Inter, sans-serif`;
+  drawCaptionText(c, cue.text, W/2, y+barH/2, W*0.9, H*0.038);
+  c.restore();
+}
+
+/* ===================== MEDIA MODAL (page-level) ===================== */
+function mediaModalHTML(pg){
+  const rows = (pg.subtitles||[]).map((s,i)=>`
+    <tr data-i="${i}">
+      <td><input type="text" class="subStart" value="${formatTime(s.start)}" style="width:64px"></td>
+      <td><input type="text" class="subEnd" value="${formatTime(s.end)}" style="width:64px"></td>
+      <td><input type="text" class="subText" value="${escapeHtml(s.text)}" style="width:100%"></td>
+      <td><button class="btn sm delSub">×</button></td>
+    </tr>`).join('');
+  return `
+    <h2>Phụ đề &amp; thuyết minh — ${escapeHtml(pg.name)}</h2>
+    <p class="hint">Áp dụng khi trang này được xuất thành video (có video hoặc thuyết minh). Trang chỉ có ảnh/text sẽ xuất PNG và bỏ qua phần này.</p>
+
+    <div class="field"><label>Âm thanh thuyết minh (mp3/wav)</label>
+      <input type="file" id="narFile" accept="audio/*">
+      ${pg.narrationURL ? `
+        <div style="margin-top:6px;font-family:var(--mono);font-size:11.5px;color:var(--ok)">✓ ${escapeHtml(pg.narrationFile?.name||'')}</div>
+        <audio controls src="${pg.narrationURL}" style="width:100%;margin-top:6px"></audio>
+        <button class="btn sm" id="narClear" style="margin-top:6px">Gỡ thuyết minh</button>` : ''}
+    </div>
+    <div class="row2">
+      <div class="field"><label>Âm lượng thuyết minh (${Math.round(pg.narrationVolume*100)}%)</label><input type="range" id="narVol" min="0" max="1" step="0.05" value="${pg.narrationVolume}"></div>
+      <div class="field"><label>Âm lượng video gốc (${Math.round(pg.videoVolume*100)}%)</label><input type="range" id="vidVol" min="0" max="1" step="0.05" value="${pg.videoVolume}"></div>
+    </div>
+
+    <hr class="sep">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim)"><input type="checkbox" id="showSub" ${pg.showSubtitles!==false?'checked':''}>Ghi phụ đề khi xuất video</label>
+      <button class="btn sm" id="speakPageBtn">🔊 Nghe thử toàn trang (TTS)</button>
+    </div>
+    <div class="field" style="margin-top:10px"><label>Nhập phụ đề từ file .srt</label><input type="file" id="srtFile" accept=".srt,text/plain"></div>
+    <table class="prev" id="subTable"><thead><tr><th>Bắt đầu</th><th>Kết thúc</th><th>Nội dung</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4" style="color:var(--text-dim)">Chưa có dòng phụ đề nào</td></tr>'}</tbody></table>
+    <button class="btn sm" id="addSubRow" style="margin-top:8px">+ Thêm dòng phụ đề</button>
+
+    <div class="actions"><button class="btn primary" data-close>Xong</button></div>
+  `;
+}
+function bindMediaModalEvents(pg){
+  const refresh = ()=>{ document.querySelector('.modal').innerHTML = mediaModalHTML(pg); bindMediaModalEvents(pg); };
+  document.getElementById('narFile').onchange = e=>{
+    const f = e.target.files[0]; if (!f) return;
+    pg.narrationFile = f; pg.narrationURL = URL.createObjectURL(f); refresh();
+  };
+  document.getElementById('narClear')?.addEventListener('click', ()=>{ pg.narrationFile=null; pg.narrationURL=null; refresh(); });
+  document.getElementById('narVol').oninput = e=>{
+    pg.narrationVolume = +e.target.value;
+    e.target.previousElementSibling.textContent = `Âm lượng thuyết minh (${Math.round(pg.narrationVolume*100)}%)`;
+  };
+  document.getElementById('vidVol').oninput = e=>{
+    pg.videoVolume = +e.target.value;
+    e.target.previousElementSibling.textContent = `Âm lượng video gốc (${Math.round(pg.videoVolume*100)}%)`;
+  };
+  document.getElementById('showSub').onchange = e=>{ pg.showSubtitles = e.target.checked; };
+  document.getElementById('speakPageBtn').onclick = ()=>speakPage(pg);
+  document.getElementById('srtFile').onchange = e=>{
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{ pg.subtitles = (pg.subtitles||[]).concat(parseSRT(r.result)); refresh(); };
+    r.readAsText(f);
+  };
+  document.getElementById('addSubRow').onclick = ()=>{ pg.subtitles = pg.subtitles||[]; pg.subtitles.push({start:0,end:2,text:''}); refresh(); };
+  document.querySelectorAll('#subTable tbody tr[data-i]').forEach(tr=>{
+    const i = +tr.dataset.i;
+    tr.querySelector('.subStart').onchange = e=>{ pg.subtitles[i].start = parseTimeStr(e.target.value); };
+    tr.querySelector('.subEnd').onchange = e=>{ pg.subtitles[i].end = parseTimeStr(e.target.value); };
+    tr.querySelector('.subText').oninput = e=>{ pg.subtitles[i].text = e.target.value; };
+    tr.querySelector('.delSub').onclick = ()=>{ pg.subtitles.splice(i,1); refresh(); };
+  });
+}
+function openPageMediaModal(pg){
+  openModal(mediaModalHTML(pg));
+  bindMediaModalEvents(pg);
+}
+document.getElementById('mediaBtn').onclick = ()=>{
+  const pg = currentPage();
+  if (!pg){ setStatus('Hãy thêm một trang trước.'); return; }
+  openPageMediaModal(pg);
+};
+
 function openModal(html){
   const ov = document.createElement('div'); ov.className='modalOverlay'; ov.id='modalOverlay';
   const m = document.createElement('div'); m.className='modal'; m.innerHTML = html;
@@ -655,13 +825,14 @@ function downloadBlob(blob, filename){
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
 }
 
-function renderExportFrame(c, pg, W, H, videoEls){
+function renderExportFrame(c, pg, W, H, videoEls, elapsedSec){
   c.clearRect(0,0,W,H); c.fillStyle='#fff'; c.fillRect(0,0,W,H);
   if (pg.bgImg) drawImageCover(c, pg.bgImg, W, H);
   pg.zones.forEach(z=>{
     if (z.type==='text') drawZoneText(c, z, W, H);
     else drawZoneVideoFrame(c, z, W, H, videoEls[z.id]);
   });
+  drawSubtitles(c, pg, elapsedSec, W, H);
 }
 
 async function exportPageAsImage(pg){
@@ -677,6 +848,7 @@ async function exportPageAsVideo(pg, videoZones){
   setStatus(`Đang chuẩn bị video cho "${pg.name}"...`);
   const off = document.createElement('canvas'); off.width=preset.w; off.height=preset.h;
   const c = off.getContext('2d');
+
   const videoEls = {};
   await Promise.all(videoZones.map(z=>new Promise(res=>{
     const v = document.createElement('video');
@@ -684,19 +856,44 @@ async function exportPageAsVideo(pg, videoZones){
     v.addEventListener('loadedmetadata', ()=>res());
     videoEls[z.id] = v;
   })));
-  const durations = videoZones.map(z=>videoEls[z.id].duration).filter(d=>isFinite(d) && d>0);
-  const duration = Math.min(Math.max(durations.length ? Math.max(...durations) : 5, 1), 20);
+
+  let narrationEl = null;
+  if (pg.narrationURL){
+    narrationEl = document.createElement('audio');
+    narrationEl.src = pg.narrationURL; narrationEl.muted = true; narrationEl.loop = false;
+    await new Promise(res=>narrationEl.addEventListener('loadedmetadata', res, {once:true}));
+  }
+
+  const durations = videoZones.map(z=>videoEls[z.id].duration).filter(d=>isFinite(d)&&d>0);
+  if (narrationEl && isFinite(narrationEl.duration)) durations.push(narrationEl.duration);
+  const duration = Math.min(Math.max(durations.length ? Math.max(...durations) : 5, 1), 60);
 
   await Promise.all(Object.values(videoEls).map(v=>v.play().catch(()=>{})));
+  if (narrationEl) await narrationEl.play().catch(()=>{});
 
   const stream = off.captureStream(30);
-  // try to carry audio from the first video zone that has an audio track
+
+  // mix narration audio + each video zone's own audio into a single track
+  let audioCtx = null;
   try {
-    const firstV = Object.values(videoEls)[0];
-    const vStream = firstV.captureStream ? firstV.captureStream() : null;
-    const audioTrack = vStream && vStream.getAudioTracks()[0];
-    if (audioTrack) stream.addTrack(audioTrack);
-  } catch(e){}
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const dest = audioCtx.createMediaStreamDestination();
+    Object.values(videoEls).forEach(v=>{
+      try{
+        const src = audioCtx.createMediaElementSource(v);
+        const gain = audioCtx.createGain(); gain.gain.value = pg.videoVolume ?? 1;
+        src.connect(gain).connect(dest);
+      }catch(e){}
+    });
+    if (narrationEl){
+      try{
+        const src = audioCtx.createMediaElementSource(narrationEl);
+        const gain = audioCtx.createGain(); gain.gain.value = pg.narrationVolume ?? 1;
+        src.connect(gain).connect(dest);
+      }catch(e){}
+    }
+    dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+  } catch(e){ console.warn('Không thể trộn âm thanh:', e); }
 
   const mimeCandidates = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
   const mime = mimeCandidates.find(m=>MediaRecorder.isTypeSupported(m)) || 'video/webm';
@@ -708,7 +905,9 @@ async function exportPageAsVideo(pg, videoZones){
     recorder.onstop = ()=>{
       const blob = new Blob(chunks, {type:mime});
       downloadBlob(blob, `${pg.name}.webm`);
-      Object.values(videoEls).forEach(v=>{ v.pause(); });
+      Object.values(videoEls).forEach(v=>v.pause());
+      narrationEl?.pause();
+      audioCtx?.close();
       resolve();
     };
   });
@@ -717,7 +916,7 @@ async function exportPageAsVideo(pg, videoZones){
   const start = performance.now();
   function tick(){
     const elapsed = (performance.now()-start)/1000;
-    renderExportFrame(c, pg, preset.w, preset.h, videoEls);
+    renderExportFrame(c, pg, preset.w, preset.h, videoEls, elapsed);
     setStatus(`Đang ghi video "${pg.name}"...`, Math.min(elapsed/duration,1));
     if (elapsed < duration) requestAnimationFrame(tick);
     else recorder.stop();
