@@ -930,12 +930,110 @@ function vsFmtTime(t){
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
+async function vsDetectOcr(duration, langs, interval){
+  const canvas = document.createElement('canvas');
+  canvas.width = vsVideoPlayer.videoWidth || 640;
+  canvas.height = vsVideoPlayer.videoHeight || 360;
+  const ctx = canvas.getContext('2d');
+
+  vsSetStatus('Đang tải mô hình nhận diện chữ (lần đầu sẽ hơi lâu)...');
+  const worker = await Tesseract.createWorker(langs.join('+'));
+
+  const raw = [];
+  const steps = Math.min(120, Math.ceil(duration / interval));
+  for(let i=0; i<steps; i++){
+    const t = i * interval;
+    await vsSeekTo(vsVideoPlayer, t);
+    ctx.drawImage(vsVideoPlayer, 0, 0, canvas.width, canvas.height);
+    vsSetStatus(`Đang nhận diện chữ trên hình: khung ${i+1}/${steps} (${Math.round(((i+1)/steps)*100)}%)`);
+    const { data } = await worker.recognize(canvas);
+    const text = (data.text || '').trim();
+    if(text) raw.push({ time: t, text });
+  }
+  await worker.terminate();
+
+  // Gom các khung liên tiếp có chữ giống nhau thành 1 câu phụ đề
+  const grouped = [];
+  let cur = null;
+  for(const r of raw){
+    if(cur && vsNorm(cur.text) === vsNorm(r.text)){
+      cur.end = r.time + interval;
+    }else{
+      if(cur) grouped.push(cur);
+      cur = { start: r.time, end: r.time + interval, text: r.text, source: 'ocr' };
+    }
+  }
+  if(cur) grouped.push(cur);
+  return grouped;
+}
+
+let vsWhisperPipe = null;
+
+async function vsEnsureWhisper(){
+  if(vsWhisperPipe) return vsWhisperPipe;
+  vsSetStatus('Đang tải mô hình nhận diện giọng nói (lần đầu khá lâu, ~70-150MB)...');
+  const { pipeline, env } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js');
+  env.allowLocalModels = false;
+  vsWhisperPipe = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
+    progress_callback: (p)=>{
+      if(p && p.status === 'progress' && typeof p.progress === 'number'){
+        vsSetStatus(`Đang tải mô hình giọng nói: ${Math.round(p.progress)}%`);
+      }
+    }
+  });
+  return vsWhisperPipe;
+}
+
+async function vsWriteInputIfNeeded(ff){
+  if(vsInputWritten) return;
+  const { fetchFile } = FFmpegUtil;
+  await ff.writeFile('input.mp4', await fetchFile(vsVideoFile));
+  vsInputWritten = true;
+}
+
+async function vsDetectAudioSpeech(){
+  vsSetStatus('Đang tách âm thanh từ video...');
+  const ff = await vsEnsureFFmpeg();
+  await vsWriteInputIfNeeded(ff);
+  await ff.exec(['-i', 'input.mp4', '-vn', '-ac', '1', '-ar', '16000', '-f', 'wav', 'audio.wav']);
+  const wavBytes = await ff.readFile('audio.wav');
+
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioCtx({ sampleRate: 16000 });
+  const arrayBuf = wavBytes.buffer.slice(wavBytes.byteOffset, wavBytes.byteOffset + wavBytes.byteLength);
+  const audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
+  const channelData = audioBuffer.getChannelData(0);
+
+  const transcriber = await vsEnsureWhisper();
+  vsSetStatus('Đang nhận diện giọng nói trong video...');
+  const output = await transcriber(channelData, {
+    chunk_length_s: 30,
+    stride_length_s: 5,
+    return_timestamps: true,
+  });
+
+  const chunks = (output && output.chunks) || [];
+  return chunks
+    .map(ch => {
+      const ts = ch.timestamp || [0, 0];
+      const start = ts[0] || 0;
+      const end = (ts[1] != null ? ts[1] : start + 3);
+      const text = (ch.text || '').trim();
+      return { start, end, text, source: 'audio' };
+    })
+    .filter(c => c.text);
+}
+
 async function vsRunDetect(){
   if(!vsVideoFile){ showToast('Chưa chọn video'); return; }
+  const doOcr = vsModeOcr.checked;
+  const doAudio = vsModeAudio.checked;
+  if(!doOcr && !doAudio){ showToast('Chọn ít nhất 1 nguồn cần dịch'); return; }
+
   const langs = [];
   if(vsLangZh.checked) langs.push('chi_sim');
   if(vsLangEn.checked) langs.push('eng');
-  if(langs.length === 0){ showToast('Chọn ít nhất 1 ngôn ngữ'); return; }
+  if(doOcr && langs.length === 0){ showToast('Chọn ít nhất 1 ngôn ngữ cho chữ trên hình'); return; }
 
   const interval = Math.max(0.5, parseFloat(vsInterval.value) || 2);
 
@@ -951,64 +1049,43 @@ async function vsRunDetect(){
       return;
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = vsVideoPlayer.videoWidth || 640;
-    canvas.height = vsVideoPlayer.videoHeight || 360;
-    const ctx = canvas.getContext('2d');
+    let ocrCues = [];
+    let audioCues = [];
 
-    vsSetStatus('Đang tải mô hình nhận diện chữ (lần đầu sẽ hơi lâu)...');
-    const worker = await Tesseract.createWorker(langs.join('+'));
-
-    const raw = [];
-    const steps = Math.min(120, Math.ceil(duration / interval));
-    for(let i=0; i<steps; i++){
-      const t = i * interval;
-      await vsSeekTo(vsVideoPlayer, t);
-      ctx.drawImage(vsVideoPlayer, 0, 0, canvas.width, canvas.height);
-      vsSetStatus(`Đang nhận diện chữ: khung ${i+1}/${steps} (${Math.round(((i+1)/steps)*100)}%)`);
-      const { data } = await worker.recognize(canvas);
-      const text = (data.text || '').trim();
-      if(text) raw.push({ time: t, text });
+    if(doOcr){
+      ocrCues = await vsDetectOcr(duration, langs, interval);
     }
-    await worker.terminate();
-
-    // Gom các khung liên tiếp có chữ giống nhau thành 1 câu phụ đề
-    const grouped = [];
-    let cur = null;
-    for(const r of raw){
-      if(cur && vsNorm(cur.text) === vsNorm(r.text)){
-        cur.end = r.time + interval;
-      }else{
-        if(cur) grouped.push(cur);
-        cur = { start: r.time, end: r.time + interval, text: r.text };
-      }
+    if(doAudio){
+      audioCues = await vsDetectAudioSpeech();
     }
-    if(cur) grouped.push(cur);
 
-    if(grouped.length === 0){
-      vsSetStatus('Không tìm thấy chữ nào trên video. Thử chọn lại ngôn ngữ hoặc giảm số giây lấy mẫu.');
+    let allCues = [...ocrCues, ...audioCues].sort((a,b)=> a.start - b.start);
+
+    if(allCues.length === 0){
+      vsSetStatus('Không tìm thấy chữ hoặc giọng nói nào. Thử đổi tuỳ chọn hoặc video khác.');
       return;
     }
 
-    // Giới hạn số câu để việc dịch + ghép phụ đề không quá nặng cho điện thoại
-    vsCues = grouped.slice(0, 40);
+    // Giới hạn tổng số câu để việc dịch + ghép phụ đề không quá nặng cho điện thoại
+    allCues = allCues.slice(0, 60);
 
-    vsSetStatus(`Tìm thấy ${vsCues.length} đoạn chữ. Đang dịch sang tiếng Việt...`);
+    vsSetStatus(`Tìm thấy ${allCues.length} đoạn. Đang dịch sang tiếng Việt...`);
     try{
-      const translations = await vsTranslateCues(vsCues);
-      vsCues.forEach((c,i)=>{ c.translated = translations[i] || ''; });
-      vsSetStatus(`Hoàn tất! ${vsCues.length} đoạn phụ đề đã dịch — kiểm tra/sửa lại bên dưới rồi ghép vào video.`);
+      const translations = await vsTranslateCues(allCues);
+      allCues.forEach((c,i)=>{ c.translated = translations[i] || ''; });
+      vsSetStatus(`Hoàn tất! ${allCues.length} đoạn phụ đề đã dịch — kiểm tra/sửa lại bên dưới rồi ghép vào video.`);
     }catch(err){
       console.error(err);
-      vsCues.forEach(c=>{ c.translated = ''; });
-      vsSetStatus(`Nhận diện xong ${vsCues.length} đoạn chữ, nhưng dịch tự động thất bại — hãy tự nhập tiếng Việt cho từng đoạn bên dưới.`);
+      allCues.forEach(c=>{ c.translated = ''; });
+      vsSetStatus(`Nhận diện xong ${allCues.length} đoạn, nhưng dịch tự động thất bại — hãy tự nhập tiếng Việt cho từng đoạn bên dưới.`);
     }
 
+    vsCues = allCues;
     vsRenderCues();
     vsCuesWrap.style.display = 'block';
   }catch(err){
     console.error(err);
-    showToast('Nhận diện thất bại, thử lại với video ngắn hơn.');
+    showToast('Nhận diện thất bại, thử lại với video ngắn hơn hoặc bỏ bớt tuỳ chọn.');
   }finally{
     vsBtnDetect.disabled = false;
   }
@@ -1038,7 +1115,7 @@ async function vsTranslateCues(cues){
 function vsRenderCues(){
   vsCuesList.innerHTML = vsCues.map((c,i)=> `
     <div class="cue-card">
-      <div class="cue-time">${vsFmtTime(c.start)} – ${vsFmtTime(c.end)}</div>
+      <div class="cue-time">${vsFmtTime(c.start)} – ${vsFmtTime(c.end)} <span style="color:var(--muted);font-weight:600">· ${c.source === 'audio' ? 'giọng nói' : 'chữ trên hình'}</span></div>
       <div class="cue-orig"><b>Gốc:</b> ${escapeHtml(c.text)}</div>
       <textarea data-i="${i}" class="cue-input" placeholder="Nhập bản dịch tiếng Việt...">${escapeHtml(c.translated || '')}</textarea>
     </div>
@@ -1118,10 +1195,9 @@ vsBtnBurn.addEventListener('click', async ()=>{
   try{
     vsSetStatus('Đang tải bộ xử lý video (lần đầu sẽ hơi lâu, ~vài chục MB)...');
     const ff = await vsEnsureFFmpeg();
-    const { fetchFile } = FFmpegUtil;
 
     vsSetStatus('Đang nạp video vào bộ xử lý...');
-    await ff.writeFile('input.mp4', await fetchFile(vsVideoFile));
+    await vsWriteInputIfNeeded(ff);
 
     vsSetStatus('Đang tải font tiếng Việt (có dấu)...');
     const fontResp = await fetch('https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts/hinted/ttf/NotoSans/NotoSans-Bold.ttf');
