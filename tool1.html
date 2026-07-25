@@ -164,8 +164,13 @@
   .hashtag-btn:active{ transform:scale(.95); }
   .hashtag-btn:hover{ border-color:var(--primary); box-shadow:var(--shadow-sm); }
   .hashtag-btn .num{
-    font-family:'Fraunces', serif; font-weight:600; font-size:22px; color:var(--primary);
+    font-family:'Fraunces', serif; font-weight:600; font-size:20px; color:var(--primary);
     display:block; line-height:1;
+  }
+  .hashtag-btn .label{
+    display:block; margin-top:4px; font-size:10.5px; font-weight:700;
+    letter-spacing:.03em; color:var(--navy); text-transform:uppercase;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .hashtag-btn .edit-pin{
     position:absolute; top:5px; right:6px;
@@ -512,6 +517,20 @@ document.getElementById('btnClearContent').addEventListener('click', ()=>{
    nội dung kèm ngày đăng + 5 hastag của nút đó. Bấm biểu tượng ✎ để sửa.
 ========================================================= */
 const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,10];
+
+// Nhãn chữ hiển thị trên mỗi nút, đi kèm số thứ tự
+const hashtagLabels = {
+  1:  'Tin Tức',
+  2:  'TTMXH',
+  3:  'Cảm Xúc',
+  4:  'Khuyến Mãi',
+  5:  'Đánh Giá',
+  6:  'Tin Nóng',
+  7:  'Uy Tín',
+  8:  'SP Mới',
+  10: 'Tin Nhanh'
+};
+
 const hashtagPresets = {
   1:  ['#trending','#hot','#viral','#new','#xuhuong'],
   2:  ['#hot','#trend','#new','#chatluong','#uytin'],
@@ -534,6 +553,7 @@ function renderHashtagGrid(){
     <div class="hashtag-btn" data-n="${n}" title="Bấm để copy kèm 5 hastag của nút ${n}">
       <button class="edit-pin" data-edit="${n}" title="Sửa 5 hastag">✎</button>
       <span class="num">${n}</span>
+      <span class="label">${escapeHtml(hashtagLabels[n] || '')}</span>
     </div>
   `).join('');
 }
@@ -669,9 +689,42 @@ const shoppeLinksInput = document.getElementById('shoppeLinksInput');
 const shoppeListbox = document.getElementById('shoppeListbox');
 
 const DEFAULT_LINKS = [
-  'Áo thun nam basic | https://shorten.asia/sanpham1',
-  'Giày sneaker nữ | https://shorten.asia/sanpham2',
-  'Balo laptop chống nước | https://shorten.asia/sanpham3'
+  'Tấm pin mặt trời loại A 185W Tấm pin mặt trời silicon đơn tinh thể công suất đầy đủ Mô-đun PV | https://s.shopee.vn/6L1mJUYpt2',
+  'Combo 20 Tấm pin năng lượng mặt trời LONGi 445W | https://s.shopee.vn/2g8TwoJxIv',
+  'Combo tấm Pin năng lượng mặt trời JinKO 440W | https://s.shopee.vn/gNPZAFUGZ',
+  'Tấm pin năng lượng mặt trời dã ngoại cắm trại EcoFlow 400W Portable Solar Panel | https://s.shopee.vn/6VLCVtE2cm',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/1BJgA6QNYT',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/7AatJ8U0Kw',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/6VLCVuv12l',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/4Va88FTIqQ',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/6py2uXcV4u',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/17ilzPGk0',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/7KuJVTHlk9',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/60Ovv1jo22',
+  'Deal Sản phẩm pin năng lượng mặt trời thi công công trình điện hộ gia đình. | https://s.shopee.vn/7pqa6P4Bgi',
+  'Deal Quạt Mini tích hợp sò lạnh | https://s.shopee.vn/1gFZahEg1a',
+  'Deal Quạt Hot | https://s.shopee.vn/AUqy7Af2tm',
+  'Voucher Thời Trang Nữ | https://s.shopee.vn/BQloEhujt',
+  'Voucher Son bóng lifter Gloss | https://s.shopee.vn/6VKpMYpN8l',
+  'Voucher Camera giám sát | https://s.shopee.vn/8V5tkKBdX3',
+  'Voucher Thẻ nhớ | https://s.shopee.vn/5L8ryXGhGf',
+  'Voucher Thẻ nhớ 32g/64g | https://s.shopee.vn/3B4NOaFoqW',
+  'Voucher Thiết bị định vị thông minh | https://s.shopee.vn/7AaWA0h2eG',
+  'Voucher Quạt tốc độ gió cao | https://s.shopee.vn/8pik98naPI',
+  'Voucher Máy sấy tóc | https://s.shopee.vn/30kxCSdqv5',
+  'Voucher Camera wwiffi | https://s.shopee.vn/qgTrrsZDR',
+  'Voucher Quạt tích điện | https://s.shopee.vn/6Ai0DjDGHA',
+  'Voucher Kính cường lực | https://s.shopee.vn/8V5v0431s4',
+  'Voucher Combo túi mũ cói đi biển | https://s.shopee.vn/8pilOiITyK',
+  'Voucher Đàm maxi hai dây tiểu thư | https://s.shopee.vn/5VSJQfiLSs',
+  'Voucher Sơ mi nam | https://s.shopee.vn/9Kf1zmdgZm',
+  'Voucher Tã quần chính hãng cho bé | https://s.shopee.vn/1qZ141epD2',
+  'Voucher Quạt tubo z 3600 | https://s.shopee.vn/2VohrHk8oA',
+  'Voucher sữa rửa mặt mát lạnh | https://s.shopee.vn/qgTsG30yI',
+  'Voucher khẩu trang chống nắng | https://s.shopee.vn/3LNoqsx5ar',
+  'Voucher Dây đeo điện thoại | https://s.shopee.vn/gN3g0v5e7',
+  'Voucher Ốp điện thoại | https://s.shopee.vn/qgTsMVs13',
+  'Voucher Áo điều hòa giải pháp mùa chống nóng mùa hè | https://s.shopee.vn/3VhO7XIs4L'
 ];
 shoppeLinksInput.value = DEFAULT_LINKS.join('\n');
 
