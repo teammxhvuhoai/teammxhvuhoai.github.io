@@ -179,6 +179,30 @@
     font-size:10px; line-height:1; border:none; cursor:pointer;
   }
 
+  /* ===== Chọn video từ thư viện ảnh (tab Share) ===== */
+  .dropzone{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    border:1.5px dashed var(--border); border-radius:var(--radius-md);
+    background:#fbfbfe; color:var(--muted); font-size:13px; font-weight:600;
+    padding:16px 12px; cursor:pointer; transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .dropzone svg{ width:19px; height:19px; stroke:currentColor; flex-shrink:0; }
+  .dropzone:hover{ border-color:var(--primary); color:var(--primary-dark); background:var(--primary-light); }
+  .video-preview{
+    margin-top:10px; border:1px solid var(--border); border-radius:var(--radius-md);
+    overflow:hidden; background:#000;
+  }
+  .video-preview video{ display:block; width:100%; max-height:260px; background:#000; }
+  .video-meta{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:9px 12px; background:var(--surface); font-size:12px; color:var(--muted); font-weight:600;
+  }
+  .video-meta span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .remove-video{
+    flex-shrink:0; border:none; background:#fde8ea; color:var(--red);
+    width:22px; height:22px; border-radius:50%; font-size:12px; cursor:pointer;
+  }
+
   .btnrow{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
   .btn{
     flex:1; border:none; padding:13px 14px; border-radius:var(--radius-sm);
@@ -291,10 +315,32 @@
   <section id="page-share" class="page">
     <div class="card">
       <h2 class="title">Chia sẻ tin nhắn</h2>
-      <p class="hint">Nhập nội dung tin nhắn rồi bấm Share để mở bảng chia sẻ của điện thoại (chọn Zalo và gửi cho bạn bè).</p>
+      <p class="hint">Nhập nội dung tin nhắn, chọn thêm video từ thư viện ảnh nếu muốn, rồi bấm Share để mở bảng chia sẻ của điện thoại (chọn Zalo và gửi cho bạn bè).</p>
 
       <div class="field" style="margin-top:0">
         <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:160px"></textarea>
+      </div>
+
+      <div class="section-label">Video đính kèm (tùy chọn)</div>
+
+      <!-- Ô chọn video: input file ẩn, kích hoạt qua nút bấm bên dưới -->
+      <input type="file" id="videoInput" accept="video/*" style="display:none">
+
+      <div id="videoDropzone" class="dropzone">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5.5" width="13" height="13" rx="2"/>
+          <path d="m16 10.5 5-2.8v8.6l-5-2.8"/>
+        </svg>
+        <span>Chọn video từ thư viện ảnh</span>
+      </div>
+
+      <!-- Khối xem trước video đã chọn, ẩn cho đến khi có file -->
+      <div id="videoPreview" class="video-preview" style="display:none">
+        <video id="videoPreviewPlayer" controls playsinline></video>
+        <div class="video-meta">
+          <span id="videoFileName">—</span>
+          <button type="button" id="btnRemoveVideo" class="remove-video" title="Bỏ video này">✕</button>
+        </div>
       </div>
 
       <div class="btnrow">
@@ -534,11 +580,65 @@ ${hashtagPresets[n]}`;
    TAB SHARE
 ========================================================= */
 const shareInput = document.getElementById('shareInput');
+const videoInput = document.getElementById('videoInput');
+const videoDropzone = document.getElementById('videoDropzone');
+const videoPreview = document.getElementById('videoPreview');
+const videoPreviewPlayer = document.getElementById('videoPreviewPlayer');
+const videoFileName = document.getElementById('videoFileName');
+
+let selectedVideoFile = null; // File video đang chọn (hoặc null nếu chưa chọn)
+
+// Bấm vùng dropzone -> mở thư viện ảnh/video của điện thoại
+videoDropzone.addEventListener('click', ()=> videoInput.click());
+
+// Người dùng chọn xong video trong thư viện
+videoInput.addEventListener('change', ()=>{
+  const file = videoInput.files && videoInput.files[0];
+  if(!file) return;
+  selectedVideoFile = file;
+
+  const url = URL.createObjectURL(file);
+  videoPreviewPlayer.src = url;
+  const sizeMb = (file.size / (1024*1024)).toFixed(1);
+  videoFileName.textContent = `${file.name} · ${sizeMb} MB`;
+  videoPreview.style.display = 'block';
+});
+
+// Bỏ video đã chọn
+document.getElementById('btnRemoveVideo').addEventListener('click', ()=>{
+  selectedVideoFile = null;
+  videoInput.value = '';
+  videoPreviewPlayer.removeAttribute('src');
+  videoPreview.style.display = 'none';
+});
 
 document.getElementById('btnShareZalo').addEventListener('click', async ()=>{
   const text = shareInput.value.trim();
-  if(!text){ showToast('Chưa có nội dung để chia sẻ'); return; }
+  if(!text && !selectedVideoFile){ showToast('Chưa có nội dung hoặc video để chia sẻ'); return; }
 
+  // Trường hợp có video: dùng Web Share API cấp độ file (chia sẻ text + video cùng lúc)
+  if(selectedVideoFile){
+    const shareData = { files: [selectedVideoFile] };
+    if(text) shareData.text = text;
+
+    if(navigator.canShare && navigator.canShare(shareData)){
+      try{
+        await navigator.share(shareData);
+        return;
+      }catch(err){
+        // Người dùng hủy hộp thoại chia sẻ -> không làm gì thêm
+        if(err && err.name === 'AbortError') return;
+      }
+    }
+
+    // Thiết bị/trình duyệt không hỗ trợ chia sẻ file -> hướng dẫn thủ công
+    if(text) await copyText(text);
+    showToast('Máy không hỗ trợ gửi video trực tiếp. Đã copy nội dung, hãy mở Zalo và đính kèm video thủ công.');
+    window.location.href = 'zalo://';
+    return;
+  }
+
+  // Trường hợp chỉ có text: chia sẻ như bình thường
   if(navigator.share){
     try{ await navigator.share({ text }); return; }
     catch(err){ /* người dùng hủy hoặc không hỗ trợ -> dùng fallback bên dưới */ }
@@ -551,6 +651,10 @@ document.getElementById('btnShareZalo').addEventListener('click', async ()=>{
 
 document.getElementById('btnClearShare').addEventListener('click', ()=>{
   shareInput.value = '';
+  selectedVideoFile = null;
+  videoInput.value = '';
+  videoPreviewPlayer.removeAttribute('src');
+  videoPreview.style.display = 'none';
   shareInput.focus();
 });
 
