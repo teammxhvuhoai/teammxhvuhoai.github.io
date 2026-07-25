@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
 <title>Content Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,57 +26,67 @@
     --radius-sm: 11px;
     --shadow-sm: 0 1px 2px rgba(20,22,44,.05);
     --shadow-md: 0 10px 30px rgba(20,22,44,.09);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
   }
-  *{ box-sizing:border-box; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ height:100%; }
   body{
     margin:0;
     font-family:'Inter', system-ui, sans-serif;
     color:var(--ink);
     background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 320px);
     -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
   }
   .app{
-    max-width:480px;
+    max-width:430px;
     margin:0 auto;
     min-height:100vh;
-    padding:22px 16px 48px;
+    min-height:100dvh;
+    padding:calc(18px + var(--safe-t)) calc(16px + var(--safe-r)) calc(28px + var(--safe-b)) calc(16px + var(--safe-l));
   }
 
   /* ===== Header thương hiệu ===== */
-  .brand{ margin-bottom:18px; padding:0 2px; }
+  .brand{ margin-bottom:16px; padding:0 2px; }
   .brand-eyebrow{
     font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
     color:var(--primary); margin-bottom:4px;
   }
   .brand-title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
-    font-size:26px; letter-spacing:-.01em; color:var(--navy);
+    font-size:24px; letter-spacing:-.01em; color:var(--navy);
   }
 
   /* ===== Thanh tab dạng segmented, có icon ===== */
   .tabbar{
     display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:8px;
+    gap:6px;
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:var(--radius-lg);
     padding:6px;
     box-shadow:var(--shadow-sm);
-    margin-bottom:22px;
+    margin-bottom:18px;
+    position:sticky;
+    top:calc(8px + var(--safe-t));
+    z-index:20;
   }
   .tabbtn{
-    display:flex; flex-direction:column; align-items:center; gap:5px;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
     border:none; background:transparent;
-    padding:10px 4px 9px;
+    padding:9px 2px 8px;
     border-radius:var(--radius-md);
     color:var(--muted);
     font-weight:700;
-    font-size:11.5px;
+    font-size:10.8px;
     cursor:pointer;
     transition:background .15s ease, color .15s ease, transform .12s ease;
   }
-  .tabbtn svg{ width:19px; height:19px; stroke:currentColor; }
+  .tabbtn svg{ width:18px; height:18px; stroke:currentColor; }
   .tabbtn:active{ transform:scale(.94); }
   .tabbtn.active{
     background:linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -93,25 +103,25 @@
     border:1px solid var(--border);
     border-radius:var(--radius-lg);
     box-shadow:var(--shadow-sm);
-    padding:18px;
+    padding:16px;
     margin-bottom:14px;
   }
 
   h2.title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
-    font-size:19px; margin:0 0 6px; color:var(--navy);
+    font-size:18px; margin:0 0 6px; color:var(--navy);
   }
-  .hint{ font-size:12.5px; color:var(--muted); margin:0 0 14px; line-height:1.55; }
+  .hint{ font-size:12px; color:var(--muted); margin:0 0 14px; line-height:1.55; }
   .section-label{
-    font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
-    color:var(--muted); margin:18px 0 9px;
+    font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--muted); margin:16px 0 8px;
   }
 
   /* ===== Khối soạn nội dung có gạch chân từ sai chính tả ===== */
   .editor-wrap{
     position:relative;
     width:100%;
-    min-height:200px;
+    min-height:180px;
     border-radius:var(--radius-md);
     background:#fbfbfe;
     border:1px solid var(--border);
@@ -119,14 +129,14 @@
   }
   .editor-wrap:focus-within{ border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
   .editor-common{
-    position:absolute; inset:0; margin:0; padding:14px;
+    position:absolute; inset:0; margin:0; padding:13px;
     border:0; width:100%; height:100%;
     font-family:'Inter', system-ui, sans-serif;
-    font-size:15px; line-height:1.65;
+    font-size:16px; line-height:1.6;
     white-space:pre-wrap; word-wrap:break-word; overflow-wrap:anywhere;
   }
   .editor-backdrop{ background:transparent; color:var(--ink); overflow:auto; pointer-events:none; }
-  .editor-textarea{ background:transparent; color:transparent; caret-color:var(--ink); resize:none; overflow:auto; }
+  .editor-textarea{ background:transparent; color:transparent; caret-color:var(--ink); resize:none; overflow:auto; -webkit-appearance:none; }
   .editor-textarea:focus{ outline:none; }
   .misspell{
     text-decoration:underline; text-decoration-color:var(--red);
@@ -134,29 +144,29 @@
   }
 
   .field{ margin-top:12px; }
-  .field label{ display:block; font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  .field label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
   .field input[type=text], .field textarea{
     width:100%; border:1px solid var(--border); background:#fbfbfe;
     border-radius:var(--radius-sm); padding:11px 12px;
-    font-size:14px; font-family:inherit; color:var(--ink);
+    font-size:16px; font-family:inherit; color:var(--ink);
   }
   .field input[type=text]:focus, .field textarea:focus{
     outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light);
   }
-  .field textarea{ resize:vertical; min-height:80px; line-height:1.5; }
+  .field textarea{ resize:vertical; min-height:80px; line-height:1.5; -webkit-appearance:none; }
 
   /* ===== Lưới nút hastag đánh số ===== */
   .hashtag-grid{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
-    gap:10px;
+    gap:9px;
   }
   .hashtag-btn{
     position:relative;
     border:1px solid var(--border);
     background:#fbfbfe;
     border-radius:var(--radius-md);
-    padding:16px 8px;
+    padding:14px 6px;
     text-align:center;
     cursor:pointer;
     transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
@@ -164,17 +174,17 @@
   .hashtag-btn:active{ transform:scale(.95); }
   .hashtag-btn:hover{ border-color:var(--primary); box-shadow:var(--shadow-sm); }
   .hashtag-btn .num{
-    font-family:'Fraunces', serif; font-weight:600; font-size:20px; color:var(--primary);
+    font-family:'Fraunces', serif; font-weight:600; font-size:19px; color:var(--primary);
     display:block; line-height:1;
   }
   .hashtag-btn .label{
-    display:block; margin-top:4px; font-size:10.5px; font-weight:700;
+    display:block; margin-top:4px; font-size:10px; font-weight:700;
     letter-spacing:.03em; color:var(--navy); text-transform:uppercase;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .hashtag-btn .edit-pin{
     position:absolute; top:5px; right:6px;
-    width:16px; height:16px; border-radius:50%;
+    width:20px; height:20px; border-radius:50%;
     background:var(--primary-light); color:var(--primary);
     display:flex; align-items:center; justify-content:center;
     font-size:10px; line-height:1; border:none; cursor:pointer;
@@ -193,7 +203,7 @@
     margin-top:10px; border:1px solid var(--border); border-radius:var(--radius-md);
     overflow:hidden; background:#000;
   }
-  .video-preview video{ display:block; width:100%; max-height:260px; background:#000; }
+  .video-preview video{ display:block; width:100%; max-height:240px; background:#000; }
   .video-meta{
     display:flex; align-items:center; justify-content:space-between; gap:8px;
     padding:9px 12px; background:var(--surface); font-size:12px; color:var(--muted); font-weight:600;
@@ -206,11 +216,13 @@
 
   .btnrow{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
   .btn{
-    flex:1; border:none; padding:13px 14px; border-radius:var(--radius-sm);
-    font-weight:700; font-size:14px; cursor:pointer;
+    flex:1; border:none; padding:14px 14px; border-radius:var(--radius-sm);
+    font-weight:700; font-size:14.5px; cursor:pointer;
     transition:transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+    min-height:46px;
   }
   .btn:active{ transform:scale(.97); }
+  .btn:disabled{ opacity:.55; pointer-events:none; }
   .btn-primary{
     background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff;
     box-shadow:0 8px 18px rgba(79,70,229,.28);
@@ -223,10 +235,11 @@
   /* ===== Danh sách link Shopee (list box) ===== */
   .listbox{
     background:#fbfbfe; border:1px solid var(--border); border-radius:var(--radius-md);
-    max-height:260px; overflow-y:auto;
+    max-height:240px; overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   }
   .listbox-item{
-    padding:12px 14px; font-size:13.5px; border-bottom:1px solid var(--border);
+    padding:12px 14px; font-size:13px; border-bottom:1px solid var(--border);
     word-break:break-all; color:var(--ink);
   }
   .listbox-item:last-child{ border-bottom:none; }
@@ -234,14 +247,15 @@
     background:var(--primary-light); border-left:3px solid var(--primary); font-weight:600;
   }
   .listbox-item .item-title{ display:block; font-weight:700; color:var(--navy); margin-bottom:2px; }
-  .listbox-item .item-link{ display:block; font-size:12px; color:var(--muted); font-weight:400; }
+  .listbox-item .item-link{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; }
 
   #toast{
-    position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px);
+    position:fixed; left:50%; bottom:calc(22px + var(--safe-b));
+    transform:translate(-50%, 20px);
     background:var(--navy); color:#fff; padding:11px 20px; border-radius:999px;
-    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none;
+    font-size:13px; font-weight:600; opacity:0; pointer-events:none;
     transition:opacity .2s ease, transform .2s ease; z-index:50;
-    box-shadow:0 10px 24px rgba(0,0,0,.22); max-width:90%; text-align:center;
+    box-shadow:0 10px 24px rgba(0,0,0,.22); max-width:88%; text-align:center;
   }
   #toast.show{ opacity:1; transform:translate(-50%, 0); }
 
@@ -250,6 +264,14 @@
     background:var(--navy); color:#fff; font-size:11.5px; font-weight:700;
     padding:7px 12px; border-radius:999px; max-width:100%;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; border:none;
+  }
+
+  /* iPhone 12 Pro / small-screen tightening */
+  @media (max-width: 400px){
+    .brand-title{ font-size:22px; }
+    .tabbtn{ font-size:10px; }
+    .hashtag-btn{ padding:12px 4px; }
+    .hashtag-btn .num{ font-size:17px; }
   }
 </style>
 </head>
@@ -318,10 +340,10 @@
   <section id="page-share" class="page">
     <div class="card">
       <h2 class="title">Chia sẻ nội dung</h2>
-      <p class="hint">Nhập nội dung tin nhắn, chọn thêm video từ thư viện ảnh nếu muốn, rồi bấm Share để mở bảng chia sẻ của điện thoại (chọn Zalo và gửi cho bạn bè).</p>
+      <p class="hint">Nhập nội dung tin nhắn, chọn thêm video nếu muốn, rồi bấm nút bên dưới để mở khung chia sẻ nhỏ của iPhone — chọn Zalo, gửi xong khung sẽ tự đóng lại.</p>
 
       <div class="field" style="margin-top:0">
-        <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:160px"></textarea>
+        <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:150px"></textarea>
       </div>
 
       <div class="section-label">Video đính kèm (tùy chọn)</div>
@@ -380,7 +402,7 @@
       <p class="hint">Dán nội dung bất kỳ và copy ngay lập tức, không cần định dạng thêm.</p>
 
       <div class="field" style="margin-top:0">
-        <textarea id="quickInput" placeholder="Dán nội dung cần copy nhanh..." style="min-height:160px"></textarea>
+        <textarea id="quickInput" placeholder="Dán nội dung cần copy nhanh..." style="min-height:150px"></textarea>
       </div>
 
       <div class="btnrow">
@@ -405,7 +427,7 @@ function showToast(msg){
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(showToast._timer);
-  showToast._timer = setTimeout(()=> t.classList.remove('show'), 1900);
+  showToast._timer = setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
 async function copyText(text){
@@ -512,13 +534,10 @@ document.getElementById('btnClearContent').addEventListener('click', ()=>{
 });
 
 /* =========================================================
-   LƯỚI NÚT HASTAG ĐÁNH SỐ (1,2,3,4,5,6,7,8,10)
-   Mỗi nút giữ 1 BỘ 5 hastag riêng (mảng 5 phần tử). Bấm nút = copy ngay
-   nội dung kèm ngày đăng + 5 hastag của nút đó. Bấm biểu tượng ✎ để sửa.
+   LƯỚI NÚT HASTAG ĐÁNH SỐ (1..9)
 ========================================================= */
 const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,9];
 
-// Nhãn chữ hiển thị trên mỗi nút, đi kèm số thứ tự
 const hashtagLabels = {
   1:  'Tin tức mxh',
   2:  'Tin Tức Mạng Xã Hội',
@@ -528,7 +547,7 @@ const hashtagLabels = {
   6:  'ToDay News',
   7:  'Tin Đường Phố',
   8:  'TTMXH',
-  9: 'Tin Mới 24h'
+  9:  'Tin Mới 24h'
 };
 
 const hashtagPresets = {
@@ -540,12 +559,11 @@ const hashtagPresets = {
   6:  ['#todaynews','#breakingnews','#worldnews','#dailyupdate','#latestnews'],
   7:  ['#tinduongpho','#duongpho24h','#thucte','#hientruong','#cuocsongquanhta'],
   8:  ['#ttmxh','#tinxuhuong','#newsviral','#capnhatmoi','#tinhomnay'],
-  9: ['#tinmoi24h','#24hnews','#news24','#tintuc24h','#tintucnong']
+  9:  ['#tinmoi24h','#24hnews','#news24','#tintuc24h','#tintucnong']
 };
 
 const hashtagGrid = document.getElementById('hashtagGrid');
 
-// Ghép 1 bộ hastag thành chuỗi để hiển thị/copy (phân cách bằng khoảng trắng)
 function joinHashtags(arr){ return arr.join(' '); }
 
 function renderHashtagGrid(){
@@ -559,7 +577,6 @@ function renderHashtagGrid(){
 }
 renderHashtagGrid();
 
-// Bấm vào nút số (không phải nút sửa) -> copy nội dung kèm 5 hastag tương ứng
 hashtagGrid.addEventListener('click', async (e)=>{
   const editBtn = e.target.closest('[data-edit]');
   if(editBtn){
@@ -567,13 +584,12 @@ hashtagGrid.addEventListener('click', async (e)=>{
     const current = joinHashtags(hashtagPresets[n]);
     const next = prompt(`Sửa 5 hastag cho nút ${n} (cách nhau bằng dấu cách):`, current);
     if(next !== null && next.trim() !== ''){
-      // Tách theo khoảng trắng, loại bỏ rỗng, luôn giữ đúng 5 hastag
       let list = next.trim().split(/\s+/).filter(Boolean).slice(0, 5);
       while(list.length < 5) list.push('#hashtag');
       hashtagPresets[n] = list;
       renderHashtagGrid();
     }
-    return; // không copy khi chỉ đang sửa
+    return;
   }
 
   const card = e.target.closest('.hashtag-btn');
@@ -602,6 +618,13 @@ ${hashtagLine}`;
 
 /* =========================================================
    TAB SHARE
+   Ghi chú quan trọng: navigator.share() trên iOS/Safari CHÍNH LÀ khung
+   chia sẻ hệ thống dạng nhỏ (sheet trượt lên từ đáy màn hình). Nó tự
+   động đóng lại ngay khi người dùng chọn xong một ứng dụng (vd. Zalo)
+   hoặc khi họ bấm huỷ — không cần và không nên tự điều hướng cả trang
+   bằng zalo:// nữa, vì như vậy sẽ thoát khỏi web app thay vì chỉ mở
+   một khung nhỏ. Nếu thiết bị/trình duyệt không hỗ trợ Web Share API,
+   ta chỉ copy nội dung và báo cho người dùng tự mở Zalo, KHÔNG redirect.
 ========================================================= */
 const shareInput = document.getElementById('shareInput');
 const videoInput = document.getElementById('videoInput');
@@ -609,13 +632,12 @@ const videoDropzone = document.getElementById('videoDropzone');
 const videoPreview = document.getElementById('videoPreview');
 const videoPreviewPlayer = document.getElementById('videoPreviewPlayer');
 const videoFileName = document.getElementById('videoFileName');
+const btnShareZalo = document.getElementById('btnShareZalo');
 
-let selectedVideoFile = null; // File video đang chọn (hoặc null nếu chưa chọn)
+let selectedVideoFile = null;
 
-// Bấm vùng dropzone -> mở thư viện ảnh/video của điện thoại
 videoDropzone.addEventListener('click', ()=> videoInput.click());
 
-// Người dùng chọn xong video trong thư viện
 videoInput.addEventListener('change', ()=>{
   const file = videoInput.files && videoInput.files[0];
   if(!file) return;
@@ -628,7 +650,6 @@ videoInput.addEventListener('change', ()=>{
   videoPreview.style.display = 'block';
 });
 
-// Bỏ video đã chọn
 document.getElementById('btnRemoveVideo').addEventListener('click', ()=>{
   selectedVideoFile = null;
   videoInput.value = '';
@@ -636,41 +657,44 @@ document.getElementById('btnRemoveVideo').addEventListener('click', ()=>{
   videoPreview.style.display = 'none';
 });
 
-document.getElementById('btnShareZalo').addEventListener('click', async ()=>{
+btnShareZalo.addEventListener('click', async ()=>{
   const text = shareInput.value.trim();
   if(!text && !selectedVideoFile){ showToast('Chưa có nội dung hoặc video để chia sẻ'); return; }
 
-  // Trường hợp có video: dùng Web Share API cấp độ file (chia sẻ text + video cùng lúc)
-  if(selectedVideoFile){
-    const shareData = { files: [selectedVideoFile] };
-    if(text) shareData.text = text;
+  // Xây dữ liệu share: ưu tiên gửi kèm video nếu có, kèm text nếu có
+  const shareData = {};
+  if(selectedVideoFile) shareData.files = [selectedVideoFile];
+  if(text) shareData.text = text;
 
-    if(navigator.canShare && navigator.canShare(shareData)){
-      try{
-        await navigator.share(shareData);
-        return;
-      }catch(err){
-        // Người dùng hủy hộp thoại chia sẻ -> không làm gì thêm
-        if(err && err.name === 'AbortError') return;
+  const canUseNativeShare =
+    !!navigator.share &&
+    (!selectedVideoFile || (navigator.canShare && navigator.canShare(shareData)));
+
+  if(canUseNativeShare){
+    btnShareZalo.disabled = true;
+    try{
+      // Mở khung chia sẻ nhỏ của hệ điều hành. Khung này tự đóng ngay
+      // sau khi người dùng chọn Zalo (hoặc app khác) và gửi xong.
+      await navigator.share(shareData);
+      showToast('Đã gửi qua khung chia sẻ');
+    }catch(err){
+      // AbortError = người dùng tự đóng khung share, không cần báo lỗi
+      if(!err || err.name !== 'AbortError'){
+        showToast('Không thể mở khung chia sẻ, đã copy nội dung thay thế');
+        if(text) await copyText(text);
       }
+    }finally{
+      btnShareZalo.disabled = false;
     }
-
-    // Thiết bị/trình duyệt không hỗ trợ chia sẻ file -> hướng dẫn thủ công
-    if(text) await copyText(text);
-    showToast('Máy không hỗ trợ gửi video trực tiếp. Đã copy nội dung, hãy mở Zalo và đính kèm video thủ công.');
-    window.location.href = 'zalo://';
     return;
   }
 
-  // Trường hợp chỉ có text: chia sẻ như bình thường
-  if(navigator.share){
-    try{ await navigator.share({ text }); return; }
-    catch(err){ /* người dùng hủy hoặc không hỗ trợ -> dùng fallback bên dưới */ }
-  }
-
-  await copyText(text);
-  showToast('Đã copy nội dung, đang mở Zalo...');
-  window.location.href = 'zalo://';
+  // Máy/trình duyệt không hỗ trợ Web Share API (hoặc không share được video):
+  // chỉ copy nội dung, KHÔNG điều hướng cả trang sang zalo://
+  if(text) await copyText(text);
+  showToast(selectedVideoFile
+    ? 'Trình duyệt không hỗ trợ gửi video qua khung chia sẻ. Đã copy nội dung — mở Zalo và đính kèm video thủ công.'
+    : 'Trình duyệt không hỗ trợ khung chia sẻ. Đã copy nội dung — dán vào Zalo thủ công.');
 });
 
 document.getElementById('btnClearShare').addEventListener('click', ()=>{
@@ -728,8 +752,6 @@ const DEFAULT_LINKS = [
 ];
 shoppeLinksInput.value = DEFAULT_LINKS.join('\n');
 
-// Mỗi dòng dạng "Tiêu đề | Link". Nếu không có dấu "|" thì coi cả dòng là link,
-// tiêu đề mặc định là "Sản phẩm Shopee".
 function getShoppeLinks(){
   return shoppeLinksInput.value
     .split('\n')
@@ -766,7 +788,6 @@ document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
   const picked = items[idx];
   renderShoppeList(idx);
 
-  // Copy kèm tiêu đề + link, mỗi phần 1 dòng
   const textToCopy = `${picked.title}\n${picked.link}`;
   const ok = await copyText(textToCopy);
   showToast(ok ? `Đã copy: ${picked.title}` : 'Copy thất bại');
