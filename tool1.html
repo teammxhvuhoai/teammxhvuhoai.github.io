@@ -211,6 +211,27 @@
     width:22px; height:22px; border-radius:50%; font-size:12px; cursor:pointer;
   }
 
+  /* ===== Lưới xem trước nhiều file ảnh/video (tab Share) ===== */
+  .media-list{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:10px;
+  }
+  .media-item{
+    position:relative; border:1px solid var(--border); border-radius:var(--radius-sm);
+    overflow:hidden; background:#000; aspect-ratio:1/1;
+  }
+  .media-item img, .media-item video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .media-item .media-badge{
+    position:absolute; bottom:4px; left:4px; background:rgba(0,0,0,.6); color:#fff;
+    font-size:9px; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+    padding:2px 6px; border-radius:999px;
+  }
+  .media-item .media-remove{
+    position:absolute; top:4px; right:4px; width:20px; height:20px; border-radius:50%;
+    border:none; background:rgba(0,0,0,.62); color:#fff; font-size:11px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .media-count{ font-size:11.5px; color:var(--muted); font-weight:600; margin-top:8px; }
+
   .btnrow{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
   .btn{
     flex:1; border:none; padding:14px 14px; border-radius:var(--radius-sm);
@@ -355,31 +376,25 @@
   <section id="page-share" class="page">
     <div class="card">
       <h2 class="title">Chia sẻ nội dung</h2>
-      <p class="hint">Nhập nội dung tin nhắn, chọn thêm video nếu muốn, rồi bấm nút bên dưới để mở khung chia sẻ nhỏ của iPhone — chọn Zalo, gửi xong khung sẽ tự đóng lại.</p>
+      <p class="hint">Nhập nội dung tin nhắn, chọn thêm ảnh hoặc video (có thể chọn nhiều file cùng lúc) nếu muốn, rồi bấm nút bên dưới để mở khung chia sẻ nhỏ của iPhone — chọn Zalo, gửi xong khung sẽ tự đóng lại.</p>
 
       <div class="field" style="margin-top:0">
         <textarea id="shareInput" placeholder="Nhập nội dung tin nhắn muốn gửi..." style="min-height:150px"></textarea>
       </div>
 
-      <div class="section-label">Video đính kèm (tùy chọn)</div>
+      <div class="section-label">Ảnh / Video đính kèm (tùy chọn — chọn được nhiều file cùng lúc)</div>
 
-      <input type="file" id="videoInput" accept="video/*" style="display:none">
+      <input type="file" id="mediaInput" accept="image/*,video/*" multiple style="display:none">
 
-      <div id="videoDropzone" class="dropzone">
+      <div id="mediaDropzone" class="dropzone">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="5.5" width="13" height="13" rx="2"/>
           <path d="m16 10.5 5-2.8v8.6l-5-2.8"/>
         </svg>
-        <span>Chọn video từ thư viện ảnh</span>
+        <span>Chọn ảnh hoặc video (có thể chọn nhiều file)</span>
       </div>
 
-      <div id="videoPreview" class="video-preview" style="display:none">
-        <video id="videoPreviewPlayer" controls playsinline></video>
-        <div class="video-meta">
-          <span id="videoFileName">—</span>
-          <button type="button" id="btnRemoveVideo" class="remove-video" title="Bỏ video này">✕</button>
-        </div>
-      </div>
+      <div id="mediaList" class="media-list" style="display:none"></div>
 
       <div class="btnrow">
         <button class="btn btn-primary" id="btnShareZalo">Share Luôn Dép Lào</button>
@@ -690,47 +705,65 @@ ${hashtagLine}`;
    TAB SHARE
 ========================================================= */
 const shareInput = document.getElementById('shareInput');
-const videoInput = document.getElementById('videoInput');
-const videoDropzone = document.getElementById('videoDropzone');
-const videoPreview = document.getElementById('videoPreview');
-const videoPreviewPlayer = document.getElementById('videoPreviewPlayer');
-const videoFileName = document.getElementById('videoFileName');
+const mediaInput = document.getElementById('mediaInput');
+const mediaDropzone = document.getElementById('mediaDropzone');
+const mediaList = document.getElementById('mediaList');
 const btnShareZalo = document.getElementById('btnShareZalo');
 
-let selectedVideoFile = null;
+let selectedFiles = []; // File[] — có thể trộn ảnh và video
 
-videoDropzone.addEventListener('click', ()=> videoInput.click());
+mediaDropzone.addEventListener('click', ()=> mediaInput.click());
 
-videoInput.addEventListener('change', ()=>{
-  const file = videoInput.files && videoInput.files[0];
-  if(!file) return;
-  selectedVideoFile = file;
-
-  const url = URL.createObjectURL(file);
-  videoPreviewPlayer.src = url;
-  const sizeMb = (file.size / (1024*1024)).toFixed(1);
-  videoFileName.textContent = `${file.name} · ${sizeMb} MB`;
-  videoPreview.style.display = 'block';
+mediaInput.addEventListener('change', ()=>{
+  const files = Array.from(mediaInput.files || []);
+  if(files.length === 0) return;
+  selectedFiles = selectedFiles.concat(files);
+  mediaInput.value = ''; // cho phép chọn lại đúng file đó ở lần sau nếu cần
+  renderMediaList();
 });
 
-document.getElementById('btnRemoveVideo').addEventListener('click', ()=>{
-  selectedVideoFile = null;
-  videoInput.value = '';
-  videoPreviewPlayer.removeAttribute('src');
-  videoPreview.style.display = 'none';
-});
+function renderMediaList(){
+  if(selectedFiles.length === 0){
+    mediaList.style.display = 'none';
+    mediaList.innerHTML = '';
+    return;
+  }
+  mediaList.style.display = 'grid';
+  mediaList.innerHTML = selectedFiles.map((f, i) => {
+    const url = URL.createObjectURL(f);
+    const isVideo = f.type.startsWith('video/');
+    const preview = isVideo
+      ? `<video src="${url}" muted playsinline preload="metadata"></video>`
+      : `<img src="${url}" alt="">`;
+    return `
+      <div class="media-item">
+        ${preview}
+        <span class="media-badge">${isVideo ? 'Video' : 'Ảnh'}</span>
+        <button type="button" class="media-remove" data-i="${i}" title="Bỏ file này">✕</button>
+      </div>
+    `;
+  }).join('') + `<div class="media-count" style="grid-column:1/-1">${selectedFiles.length} file đã chọn</div>`;
+
+  mediaList.querySelectorAll('.media-remove').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.i);
+      selectedFiles.splice(i, 1);
+      renderMediaList();
+    });
+  });
+}
 
 btnShareZalo.addEventListener('click', async ()=>{
   const text = shareInput.value.trim();
-  if(!text && !selectedVideoFile){ showToast('Chưa có nội dung hoặc video để chia sẻ'); return; }
+  if(!text && selectedFiles.length === 0){ showToast('Chưa có nội dung hoặc file để chia sẻ'); return; }
 
   const shareData = {};
-  if(selectedVideoFile) shareData.files = [selectedVideoFile];
+  if(selectedFiles.length > 0) shareData.files = selectedFiles;
   if(text) shareData.text = text;
 
   const canUseNativeShare =
     !!navigator.share &&
-    (!selectedVideoFile || (navigator.canShare && navigator.canShare(shareData)));
+    (selectedFiles.length === 0 || (navigator.canShare && navigator.canShare(shareData)));
 
   if(canUseNativeShare){
     btnShareZalo.disabled = true;
@@ -749,17 +782,15 @@ btnShareZalo.addEventListener('click', async ()=>{
   }
 
   if(text) await copyText(text);
-  showToast(selectedVideoFile
-    ? 'Trình duyệt không hỗ trợ gửi video qua khung chia sẻ. Đã copy nội dung — mở Zalo và đính kèm video thủ công.'
+  showToast(selectedFiles.length > 0
+    ? 'Trình duyệt/Zalo không hỗ trợ gửi nhiều file kiểu này. Đã copy nội dung — mở Zalo và đính kèm ảnh/video thủ công.'
     : 'Trình duyệt không hỗ trợ khung chia sẻ. Đã copy nội dung — dán vào Zalo thủ công.');
 });
 
 document.getElementById('btnClearShare').addEventListener('click', ()=>{
   shareInput.value = '';
-  selectedVideoFile = null;
-  videoInput.value = '';
-  videoPreviewPlayer.removeAttribute('src');
-  videoPreview.style.display = 'none';
+  selectedFiles = [];
+  renderMediaList();
   shareInput.focus();
 });
 
