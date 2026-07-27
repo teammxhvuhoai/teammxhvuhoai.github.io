@@ -821,7 +821,13 @@ document.getElementById('btnClearShare').addEventListener('click', ()=>{
 ========================================================= */
 const shoppeLinksInput = document.getElementById('shoppeLinksInput');
 const shoppeListbox = document.getElementById('shoppeListbox');
-
+const LS_SHOPPE_KEY = 'cs_shoppe_links_v1';
+// Nếu đã từng lưu thì dùng bản đã lưu, chưa có thì dùng mặc định
+const savedLinks = localStorage.getItem(LS_SHOPPE_KEY);
+shoppeLinksInput.value = savedLinks !== null ? savedLinks : DEFAULT_LINKS.join('\n');
+function saveShoppeLinks(){
+  try{ localStorage.setItem(LS_SHOPPE_KEY, shoppeLinksInput.value); }catch(e){}
+}
 const DEFAULT_LINKS = [
   'Tấm pin mặt trời loại A 185W Tấm pin mặt trời silicon đơn tinh thể công suất đầy đủ Mô-đun PV | https://s.shopee.vn/6L1mJUYpt2',
   'Combo 20 Tấm pin năng lượng mặt trời LONGi 445W | https://s.shopee.vn/2g8TwoJxIv',
@@ -860,16 +866,6 @@ const DEFAULT_LINKS = [
   'Voucher Ốp điện thoại | https://s.shopee.vn/qgTsMVs13',
   'Voucher Áo điều hòa giải pháp mùa chống nóng mùa hè | https://s.shopee.vn/3VhO7XIs4L'
 ];
-const LS_SHOPPE_KEY = 'cs_shoppe_links_v1';
-
-// Nếu đã từng lưu thì dùng bản đã lưu, chưa có thì dùng mặc định
-const savedLinks = localStorage.getItem(LS_SHOPPE_KEY);
-shoppeLinksInput.value = savedLinks !== null ? savedLinks : DEFAULT_LINKS.join('\n');
-
-function saveShoppeLinks(){
-  try{ localStorage.setItem(LS_SHOPPE_KEY, shoppeLinksInput.value); }catch(e){}
-}
-
 shoppeLinksInput.addEventListener('input', ()=>{
   renderShoppeList();
   saveShoppeLinks();
