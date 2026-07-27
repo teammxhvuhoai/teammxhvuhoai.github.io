@@ -603,11 +603,23 @@ function buildHighlightedHtml(text){
 const contentInput = document.getElementById('contentInput');
 const backdrop = document.getElementById('backdrop');
 
+const LS_CONTENT_KEY = 'cs_content_v1';
+
+// Nạp lại nội dung đã lưu khi mở lại trang
+contentInput.value = localStorage.getItem(LS_CONTENT_KEY) || '';
+
 function refreshHighlight(){
   backdrop.innerHTML = buildHighlightedHtml(contentInput.value) + "\n";
 }
-contentInput.addEventListener('input', refreshHighlight);
-contentInput.addEventListener('paste', ()=> setTimeout(refreshHighlight, 0));
+
+function saveContent(){
+  try{ localStorage.setItem(LS_CONTENT_KEY, contentInput.value); }catch(e){}
+}
+
+refreshHighlight(); // hiển thị nội dung đã nạp ngay khi load trang
+
+contentInput.addEventListener('input', ()=>{ refreshHighlight(); saveContent(); });
+contentInput.addEventListener('paste', ()=> setTimeout(()=>{ refreshHighlight(); saveContent(); }, 0));
 contentInput.addEventListener('scroll', ()=>{
   backdrop.scrollTop = contentInput.scrollTop;
   backdrop.scrollLeft = contentInput.scrollLeft;
@@ -616,6 +628,7 @@ contentInput.addEventListener('scroll', ()=>{
 document.getElementById('btnClearContent').addEventListener('click', ()=>{
   contentInput.value = '';
   refreshHighlight();
+  saveContent();
 });
 
 /* =========================================================
@@ -648,7 +661,15 @@ const hashtagPresets = {
 };
 
 const hashtagGrid = document.getElementById('hashtagGrid');
-
+const LS_HASHTAG_KEY = 'cs_hashtag_presets_v1';
+// Nạp preset đã lưu (nếu có) khi khởi động, đè lên hashtagPresets mặc định
+try{
+  const saved = JSON.parse(localStorage.getItem(LS_HASHTAG_KEY) || 'null');
+  if(saved) Object.assign(hashtagPresets, saved);
+}catch(e){}
+function saveHashtagPresets(){
+  try{ localStorage.setItem(LS_HASHTAG_KEY, JSON.stringify(hashtagPresets)); }catch(e){}
+}
 function joinHashtags(arr){ return arr.join(' '); }
 
 function renderHashtagGrid(){
@@ -673,6 +694,7 @@ hashtagGrid.addEventListener('click', async (e)=>{
       while(list.length < 5) list.push('#hashtag');
       hashtagPresets[n] = list;
       renderHashtagGrid();
+      saveHashtagPresets();
     }
     return;
   }
@@ -838,37 +860,21 @@ const DEFAULT_LINKS = [
   'Voucher Ốp điện thoại | https://s.shopee.vn/qgTsMVs13',
   'Voucher Áo điều hòa giải pháp mùa chống nóng mùa hè | https://s.shopee.vn/3VhO7XIs4L'
 ];
-shoppeLinksInput.value = DEFAULT_LINKS.join('\n');
+const LS_SHOPPE_KEY = 'cs_shoppe_links_v1';
 
-function getShoppeLinks(){
-  return shoppeLinksInput.value
-    .split('\n')
-    .map(s => s.trim())
-    .filter(Boolean)
-    .map(line => {
-      const sepIndex = line.indexOf('|');
-      if(sepIndex === -1){
-        return { title: 'Sản phẩm Shopee', link: line };
-      }
-      const title = line.slice(0, sepIndex).trim() || 'Sản phẩm Shopee';
-      const link = line.slice(sepIndex + 1).trim();
-      return { title, link };
-    })
-    .filter(item => item.link);
+// Nếu đã từng lưu thì dùng bản đã lưu, chưa có thì dùng mặc định
+const savedLinks = localStorage.getItem(LS_SHOPPE_KEY);
+shoppeLinksInput.value = savedLinks !== null ? savedLinks : DEFAULT_LINKS.join('\n');
+
+function saveShoppeLinks(){
+  try{ localStorage.setItem(LS_SHOPPE_KEY, shoppeLinksInput.value); }catch(e){}
 }
 
-function renderShoppeList(pickedIndex = -1){
-  const items = getShoppeLinks();
-  shoppeListbox.innerHTML = items.map((item, i) => `
-    <div class="listbox-item ${i===pickedIndex?'picked':''}">
-      <span class="item-title">${escapeHtml(item.title)}</span>
-      <span class="item-link">${escapeHtml(item.link)}</span>
-    </div>
-  `).join('') || '<div class="listbox-item">Chưa có link nào</div>';
-}
-renderShoppeList();
-shoppeLinksInput.addEventListener('input', ()=> renderShoppeList());
-
+shoppeLinksInput.addEventListener('input', ()=>{
+  renderShoppeList();
+  saveShoppeLinks();
+});
+  
 document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
   const items = getShoppeLinks();
   if(items.length === 0){ showToast('Danh sách link đang trống'); return; }
