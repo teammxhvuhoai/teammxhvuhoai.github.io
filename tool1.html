@@ -863,13 +863,6 @@ shoppeLinksInput.addEventListener('input', ()=>{
   renderShoppeList();
   saveShoppeLinks();
 });
-  const LS_SHOPPE_KEY = 'cs_shoppe_links_v1';
-// Nếu đã từng lưu thì dùng bản đã lưu, chưa có thì dùng mặc định
-const savedLinks = localStorage.getItem(LS_SHOPPE_KEY);
-shoppeLinksInput.value = savedLinks !== null ? savedLinks : DEFAULT_LINKS.join('\n');
-function saveShoppeLinks(){
-  try{ localStorage.setItem(LS_SHOPPE_KEY, shoppeLinksInput.value); }catch(e){}
-}
 document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
   const items = getShoppeLinks();
   if(items.length === 0){ showToast('Danh sách link đang trống'); return; }
@@ -881,7 +874,13 @@ document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
   const ok = await copyText(textToCopy);
   showToast(ok ? `Đã copy: ${picked.title}` : 'Copy thất bại');
 });
-
+const LS_SHOPPE_KEY = 'cs_shoppe_links_v1';
+// Nếu đã từng lưu thì dùng bản đã lưu, chưa có thì dùng mặc định
+const savedLinks = localStorage.getItem(LS_SHOPPE_KEY);
+shoppeLinksInput.value = savedLinks !== null ? savedLinks : DEFAULT_LINKS.join('\n');
+function saveShoppeLinks(){
+  try{ localStorage.setItem(LS_SHOPPE_KEY, shoppeLinksInput.value); }catch(e){}
+}
 /* =========================================================
    TAB VIETSUB
    Quy trình: chọn video -> trích khung hình theo mốc thời gian ->
