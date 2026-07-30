@@ -1947,8 +1947,12 @@ function maybeAskLocationPermission(){
   openLocationModal();
 }
 btnLocationDeny.addEventListener('click', ()=>{
+  try{ localStorage.removeItem(LS_KEY_LOCATION_DENIED); }catch(e){}
+  startSharingLocation(err=>{
+    locationModalError.textContent = 'Không lấy được vị trí: ' + (err && err.message ? err.message : 'trình duyệt từ chối quyền truy cập vị trí');
+    locationModalError.style.display = 'block';
+  });
   closeLocationModal();
-  try{ localStorage.setItem(LS_KEY_LOCATION_DENIED, '1'); }catch(e){}
 });
 btnLocationAllow.addEventListener('click', ()=>{
   try{ localStorage.removeItem(LS_KEY_LOCATION_DENIED); }catch(e){}
