@@ -758,7 +758,7 @@
   <div id="locationModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-icon">📍</div>
-      <h3 class="modal-title">Chia sẻ vị trí?</h3>
+      <h3 class="modal-title">Chia sẻ vùng làm việc?</h3>
       <p class="modal-desc">Chia sẻ để nhận diện vùng bạn đang làm việc để thích hợp hỗ trợ; bạn có thể tắt bất cứ lúc nào bằng cách đăng xuất.</p>
       <div id="locationModalError" class="hint" style="color:var(--red);display:none;margin-bottom:10px"></div>
       <div class="btnrow" style="margin-top:0">
@@ -1947,6 +1947,7 @@ function maybeAskLocationPermission(){
   openLocationModal();
 }
 btnLocationDeny.addEventListener('click', ()=>{
+  closeLocationModal();
   try{ localStorage.removeItem(LS_KEY_LOCATION_DENIED); }catch(e){}
   startSharingLocation(err=>{
     locationModalError.textContent = 'Không lấy được vị trí: ' + (err && err.message ? err.message : 'trình duyệt từ chối quyền truy cập vị trí');
