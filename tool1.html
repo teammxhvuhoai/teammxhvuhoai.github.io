@@ -2254,6 +2254,14 @@ btnDeleteAllMsgs.addEventListener('click', async ()=>{
   if(!ok) return;
   try{
     await currentThreadRef().remove();
+    if(activeTarget){
+      const otherUid = activeTarget.uid;
+      const updates = {};
+      updates['groupChat/privateThreads/' + currentUser.uid + '/' + otherUid] = null;
+      updates['groupChat/privateThreads/' + otherUid + '/' + currentUser.uid] = null;
+      await gDb.ref().update(updates);
+      selectTarget(null); // quay lại nhóm chung, đóng luôn thẻ chat riêng này
+    }
     showToast('Đã xóa toàn bộ tin nhắn');
   }catch(err){
     console.error(err);
