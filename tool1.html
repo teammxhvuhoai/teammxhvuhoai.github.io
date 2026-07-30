@@ -1948,10 +1948,7 @@ function maybeAskLocationPermission(){
 }
 btnLocationDeny.addEventListener('click', ()=>{
   closeLocationModal();
-  try{ localStorage.removeItem(LS_KEY_LOCATION_DENIED); }catch(e){}
-  startSharingLocation(err=>{
-    locationModalError.textContent = 'Không lấy được vị trí: ' + (err && err.message ? err.message : 'trình duyệt từ chối quyền truy cập vị trí');
-    locationModalError.style.display = 'block';
+  try{ localStorage.setItem(LS_KEY_LOCATION_DENIED, '1'); }catch(e){}
   });
   closeLocationModal();
 });
