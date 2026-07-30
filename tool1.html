@@ -1949,8 +1949,6 @@ function maybeAskLocationPermission(){
 btnLocationDeny.addEventListener('click', ()=>{
   closeLocationModal();
   try{ localStorage.setItem(LS_KEY_LOCATION_DENIED, '1'); }catch(e){}
-  });
-  closeLocationModal();
 });
 btnLocationAllow.addEventListener('click', ()=>{
   try{ localStorage.removeItem(LS_KEY_LOCATION_DENIED); }catch(e){}
