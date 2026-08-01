@@ -8,24 +8,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --primary: #4f46e5;
-    --primary-dark: #3c34b0;
-    --primary-light: #eef0fd;
-    --navy: #14162c;
-    --bg-top: #eef0fb;
-    --bg-bot: #f7f7fb;
+    --primary: #6D28D9;
+    --primary-dark: #4C1D95;
+    --primary-light: #F1ECFE;
+    --accent: #0EA5B7;
+    --accent-light: #E3F8FA;
+    --navy: #0B1023;
+    --bg-top: #EEF0FF;
+    --bg-bot: #F8F8FC;
     --surface: #ffffff;
-    --border: #e8e9f3;
-    --ink: #171933;
-    --muted: #8b8da6;
-    --red: #ef4444;
-    --green: #16a34a;
-    --amber: #f59e0b;
+    --border: #E7E5F3;
+    --ink: #191A2E;
+    --muted: #8A8AA3;
+    --red: #EF4444;
+    --green: #16A34A;
+    --amber: #F59E0B;
     --radius-lg: 22px;
     --radius-md: 15px;
     --radius-sm: 11px;
-    --shadow-sm: 0 1px 2px rgba(20,22,44,.05);
-    --shadow-md: 0 10px 30px rgba(20,22,44,.09);
+    --shadow-sm: 0 1px 2px rgba(24,17,60,.06);
+    --shadow-md: 0 12px 32px rgba(76,29,149,.14);
     --safe-t: env(safe-area-inset-top, 0px);
     --safe-b: env(safe-area-inset-bottom, 0px);
     --safe-l: env(safe-area-inset-left, 0px);
@@ -37,12 +39,16 @@
     margin:0;
     font-family:'Inter', system-ui, sans-serif;
     color:var(--ink);
-    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 320px);
+    background:
+      radial-gradient(720px 320px at 100% -8%, rgba(14,165,183,.10), transparent 60%),
+      radial-gradient(720px 360px at -10% 0%, rgba(109,40,217,.12), transparent 55%),
+      linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 340px);
     -webkit-font-smoothing:antialiased;
     overscroll-behavior-y:none;
   }
   .app{
     max-width:430px;
+
     margin:0 auto;
     min-height:100vh;
     min-height:100dvh;
@@ -51,7 +57,7 @@
   .brand{ margin-bottom:16px; padding:0 2px; }
   .brand-eyebrow{
     font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--primary); margin-bottom:4px;
+    color:var(--accent); margin-bottom:4px;
   }
   .brand-title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
@@ -351,6 +357,23 @@
     display:flex; align-items:center; gap:8px; background:var(--primary-light); border-radius:var(--radius-sm);
     padding:8px 10px; margin-bottom:10px;
   }
+  .switch-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--accent-light); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:10px 12px; margin-bottom:10px;
+  }
+  .switch-row .switch-label{ font-size:12px; font-weight:700; color:var(--ink); line-height:1.4; }
+  .switch{ position:relative; display:inline-block; width:44px; height:26px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; position:absolute; }
+  .switch .slider{
+    position:absolute; inset:0; cursor:pointer; background:#d6d5e6; border-radius:999px; transition:background .18s ease;
+  }
+  .switch .slider:before{
+    position:absolute; content:""; height:20px; width:20px; left:3px; top:3px;
+    background:#fff; border-radius:50%; transition:transform .18s ease; box-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+  .switch input:checked + .slider{ background:linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+  .switch input:checked + .slider:before{ transform:translateX(18px); }
   .group-user-badge img{ width:28px; height:28px; border-radius:50%; object-fit:cover; }
   .group-user-badge .name{ font-size:12.5px; font-weight:700; color:var(--navy); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   /* ===== Popup đăng nhập nhỏ & popup xác nhận dùng chung ===== */
@@ -676,6 +699,13 @@
           <button id="btnDeleteAllMsgs" class="btn btn-danger" style="flex:none;padding:8px 10px;font-size:12px;min-height:auto" title="Xóa toàn bộ tin nhắn của cuộc trò chuyện đang mở">🗑</button>
           <button id="btnLogout" class="btn btn-ghost" style="flex:none;padding:8px 12px;font-size:12px;min-height:auto">Đăng xuất</button>
         </div>
+      </div>
+      <div class="switch-row">
+        <span class="switch-label">🔔 Thông báo tin nhắn (rung &amp; hiện trên màn hình)</span>
+        <label class="switch">
+          <input type="checkbox" id="notifToggle">
+          <span class="slider"></span>
+        </label>
       </div>
       <div class="group-user-badge">
         <img id="myAvatar" src="" alt="">
@@ -1867,11 +1897,93 @@ const groupMediaInput  = document.getElementById('groupMediaInput');
 const chatMediaGrid    = document.getElementById('chatMediaGrid');
 const groupBadge       = document.getElementById('groupBadge');
 const btnEditProfile   = document.getElementById('btnEditProfile');
+const notifToggle      = document.getElementById('notifToggle');
 
 const loginModalOverlay  = document.getElementById('loginModalOverlay');
 const btnCloseLoginModal = document.getElementById('btnCloseLoginModal');
 const btnGoogleLoginModal= document.getElementById('btnGoogleLoginModal');
 const loginModalError    = document.getElementById('loginModalError');
+
+/* =========================================================
+   THÔNG BÁO TIN NHẮN: RUNG MÁY + HIỆN THÔNG BÁO TRÊN MÀN HÌNH
+   Bật/tắt bằng nút gạt "Thông báo tin nhắn". Khi bật:
+   - Rung máy (Vibration API) mỗi khi có tin nhắn MỚI gửi đến (không phải do
+     chính mình gửi, không tính lịch sử tin nhắn cũ lúc mới đăng nhập).
+   - Hiện thông báo hệ thống kiểu Messenger (Notification API) với tên người
+     gửi + nội dung rút gọn, trừ khi đang mở đúng ngay cuộc trò chuyện đó và
+     tab đang hiển thị (vì lúc đó đã thấy tin nhắn ngay trong khung chat rồi).
+   LƯU Ý THỰC TẾ VỀ NỀN TẢNG (không phải lỗi của trang):
+   - Rung máy: Android (Chrome, Edge, Samsung Internet...) hỗ trợ tốt. Safari
+     trên iPhone/iPad KHÔNG hỗ trợ Vibration API ở bất kỳ hình thức nào —
+     đây là giới hạn của Safari/iOS, không cách nào bật được từ JavaScript.
+   - Thông báo trên màn hình: Android hỗ trợ tốt ngay trên tab trình duyệt.
+     Trên iPhone/iPad, Safari CHỈ hỗ trợ Notification API khi trang đã được
+     "Thêm vào Màn hình chính" (cài như PWA) và chạy từ iOS 16.4 trở lên —
+     mở bằng tab Safari thường sẽ không xin được quyền thông báo.
+========================================================= */
+let notifEnabled = false;          // người dùng đã bật nút gạt hay chưa (lưu trong localStorage)
+let notifPermissionGranted = false;// trình duyệt đã cấp quyền Notification hay chưa
+const LS_KEY_NOTIF = 'contentTool_notifEnabled';
+function loadNotifPref(){
+  try{ notifEnabled = localStorage.getItem(LS_KEY_NOTIF) === '1'; }catch(e){}
+  notifPermissionGranted = ('Notification' in window) && Notification.permission === 'granted';
+  if(notifToggle) notifToggle.checked = notifEnabled;
+}
+function triggerVibration(){
+  if(navigator.vibrate){
+    try{ navigator.vibrate([200, 100, 200]); }catch(e){}
+  }
+}
+// Không hiện thông báo hệ thống nếu người dùng đang mở đúng cuộc trò chuyện đó
+// và tab đang hiển thị trước mắt — vì tin nhắn đã hiện sẵn trong khung chat rồi.
+function isConversationCurrentlyVisible(isPrivate, fromUid){
+  if(document.hidden) return false;
+  const onGroupTab = document.getElementById('page-group').classList.contains('active');
+  if(!onGroupTab) return false;
+  if(isPrivate) return !!(activeTarget && activeTarget.uid === fromUid);
+  return !activeTarget;
+}
+function handleIncomingMessage({ name, text, attachments, photoURL, isPrivate, fromUid }){
+  if(!notifEnabled) return;
+  if(!currentUser || fromUid === currentUser.uid) return; // an toàn: không tự thông báo tin nhắn của chính mình
+  triggerVibration();
+  if(isConversationCurrentlyVisible(isPrivate, fromUid)) return;
+  const bodyText = text || (attachments && attachments.length ? `Đã gửi ${attachments.length} ảnh/video` : 'Tin nhắn mới');
+  if(notifPermissionGranted && 'Notification' in window){
+    try{
+      const n = new Notification(name || 'Ẩn danh', {
+        body: bodyText,
+        icon: photoURL || undefined,
+        tag: isPrivate ? ('dm-' + fromUid) : 'group-chat'
+      });
+      n.onclick = ()=>{ window.focus(); n.close(); };
+    }catch(err){ console.error('Không hiện được thông báo:', err); }
+  }
+}
+if(notifToggle){
+  notifToggle.addEventListener('change', async ()=>{
+    if(notifToggle.checked){
+      notifEnabled = true;
+      try{ localStorage.setItem(LS_KEY_NOTIF, '1'); }catch(e){}
+      if('Notification' in window){
+        try{
+          const perm = await Notification.requestPermission();
+          notifPermissionGranted = perm === 'granted';
+          showToast(notifPermissionGranted
+            ? 'Đã bật thông báo tin nhắn'
+            : 'Trình duyệt đang chặn thông báo trên màn hình — vẫn bật rung khi có tin nhắn (nếu máy hỗ trợ). Vào cài đặt trình duyệt để cấp lại quyền nếu muốn xem thông báo.');
+        }catch(err){ console.error(err); }
+      }else{
+        showToast('Đã bật rung khi có tin nhắn — trình duyệt này không hỗ trợ hiện thông báo trên màn hình.');
+      }
+    }else{
+      notifEnabled = false;
+      try{ localStorage.setItem(LS_KEY_NOTIF, '0'); }catch(e){}
+      showToast('Đã tắt thông báo tin nhắn');
+    }
+  });
+}
+loadNotifPref();
 
 /* ---------- Popup hồ sơ nhóm: tên hiển thị + ảnh đại diện riêng ---------- */
 const profileModalOverlay      = document.getElementById('profileModalOverlay');
@@ -2434,12 +2546,28 @@ function selectTarget(target){
 }
 
 /* ---------- Lắng nghe nhóm chung (luôn bật, phục vụ cả hiển thị lẫn tính badge) ---------- */
+let publicMessagesLoaded = false; // đánh dấu đã tải xong lượt đầu (lịch sử cũ), để không rung/thông báo nhầm khi mới đăng nhập
+let publicKnownIds = new Set();
 function setupPublicListeners(){
+  publicMessagesLoaded = false;
+  publicKnownIds = new Set();
   messagesRef.limitToLast(200).on('value', snap=>{
     const val = snap.val() || {};
     publicMessages = Object.keys(val)
       .map(k => ({ id:k, ...val[k] }))
       .sort((a,b)=> (a.timestamp||0) - (b.timestamp||0));
+    if(publicMessagesLoaded){
+      publicMessages.forEach(m=>{
+        if(!publicKnownIds.has(m.id)){
+          handleIncomingMessage({
+            name: m.name, text: m.text, attachments: m.attachments,
+            photoURL: m.photoURL, isPrivate: false, fromUid: m.uid
+          });
+        }
+      });
+    }
+    publicKnownIds = new Set(publicMessages.map(m=>m.id));
+    publicMessagesLoaded = true;
     if(!activeTarget){ allMessages = publicMessages; renderMessages(); }
     updateUnreadDisplay();
   });
@@ -2450,11 +2578,37 @@ function setupPublicListeners(){
     updateUnreadDisplay();
   });
 }
-/* ---------- Danh sách các cuộc nhắn riêng đã từng có (kể cả khi người kia offline) ---------- */
+/* ---------- Danh sách các cuộc nhắn riêng đã từng có (kể cả khi người kia offline) ----------
+   Node này luôn được lắng nghe (không chỉ khi đang mở đúng cuộc trò chuyện đó), nên tiện dùng
+   để phát hiện tin nhắn riêng MỚI gửi đến (dù đang xem nhóm chung hay cuộc trò chuyện khác) và
+   rung/thông báo tương ứng — so sánh lastTimestamp mới nhất với lần lưu trước đó cho từng người. */
+let privateThreadsLoaded = false;
+let prevPrivateThreadTimestamps = {}; // {otherUid: lastTimestamp đã biết trước đó}
 function setupPrivateThreadsListener(uid){
+  privateThreadsLoaded = false;
+  prevPrivateThreadTimestamps = {};
   privateThreadsRef = gDb.ref('groupChat/privateThreads/' + uid);
   privateThreadsRef.on('value', snap=>{
-    privateThreadsData = snap.val() || {};
+    const newData = snap.val() || {};
+    if(privateThreadsLoaded){
+      Object.keys(newData).forEach(otherUid=>{
+        const t = newData[otherUid];
+        if(!t || t.lastSenderUid === currentUser.uid) return;
+        const prevTs = prevPrivateThreadTimestamps[otherUid] || 0;
+        if((t.lastTimestamp || 0) > prevTs){
+          handleIncomingMessage({
+            name: t.name, text: t.lastMessage, attachments: null,
+            photoURL: t.photoURL, isPrivate: true, fromUid: otherUid
+          });
+        }
+      });
+    }
+    prevPrivateThreadTimestamps = {};
+    Object.keys(newData).forEach(otherUid=>{
+      prevPrivateThreadTimestamps[otherUid] = (newData[otherUid] && newData[otherUid].lastTimestamp) || 0;
+    });
+    privateThreadsLoaded = true;
+    privateThreadsData = newData;
     renderTargetRow();
     updateUnreadDisplay();
   });
