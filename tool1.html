@@ -3431,52 +3431,15 @@ btnTkFetch.addEventListener('click', async ()=>{
 });
 
 /* ---------- RedNote (Xiaohongshu) ---------- */
+/* ---------- RedNote (Xiaohongshu) ---------- */
 const rnShareInput = document.getElementById('rnShareInput');
 const btnRnOpen    = document.getElementById('btnRnOpen');
-const rnVideoWrap  = document.getElementById('rnVideoWrap');
-const rnTitleWrap  = document.getElementById('rnTitleWrap');
-const rnTitleText  = document.getElementById('rnTitleText');
-enableDblClickCopy(rnTitleText);
-btnRnOpen.addEventListener('click', async ()=>{
+btnRnOpen.addEventListener('click', ()=>{
   const text = rnShareInput.value.trim();
   if(!text){ showToast('Chưa dán nội dung chia sẻ RedNote'); return; }
   const url = extractFirstUrl(text);
   if(!url){ showToast('Không tìm thấy đường link trong nội dung đã dán'); return; }
-  btnRnOpen.disabled = true;
-  rnTitleWrap.style.display = 'none';
-  rnVideoWrap.innerHTML = '<div class="hint" style="margin:0">Đang thử lấy video xem trước, vui lòng chờ...</div>';
-  try{
-    // Thử lấy trực tiếp nội dung trang RedNote qua 1 CORS proxy công khai (allorigins),
-    // sau đó tìm đường dẫn video gốc được nhúng sẵn trong dữ liệu trang. Đây là cách
-    // làm không chính thức (giống nguyên lý các trình tải RedNote khác) nên có thể
-    // ngừng hoạt động bất cứ lúc nào — hễ có lỗi ở bất kỳ bước nào bên dưới, sẽ tự
-    // động rơi vào khối catch và MỞ LINK TRONG TAB MỚI, giống hệt cách xử lý khi
-    // TikTok ở trên không lấy được video.
-    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-    const resp = await fetch(proxyUrl);
-    if(!resp.ok) throw new Error('HTTP ' + resp.status);
-    const html = await resp.text();
-    const videoMatch =
-      html.match(/"masterUrl"\s*:\s*"([^"]+)"/) ||
-      html.match(/"originVideoKey"\s*:\s*"([^"]+)"/) ||
-      html.match(/property="og:video(?::url)?"\s+content="([^"]+)"/i);
-    let videoUrl = videoMatch ? videoMatch[1] : null;
-    if(!videoUrl) throw new Error('Không tìm thấy link video trong trang');
-    videoUrl = videoUrl.replace(/\\u002F/g, '/').replace(/\\\//g, '/');
-    rnVideoWrap.innerHTML = `<video controls playsinline style="width:100%;border-radius:var(--radius-md);background:#000" src="${escapeHtml(videoUrl)}"></video>`;
-    const titleMatch = html.match(/property="og:title"\s+content="([^"]*)"/i);
-    if(titleMatch && titleMatch[1]){
-      rnTitleWrap.style.display = 'block';
-      setAutoTitleText(rnTitleText, titleMatch[1]);
-    }
-    showToast('Đã lấy được video xem trước');
-  }catch(err){
-    console.error('Không lấy được video RedNote để hiển thị, mở link trong tab mới thay thế:', err);
-    rnVideoWrap.innerHTML = '';
-    window.open(url, '_blank', 'noopener');
-  }finally{
-    btnRnOpen.disabled = false;
-  }
+  window.open(url, '_blank', 'noopener');
 });
 </script>
 </body>
