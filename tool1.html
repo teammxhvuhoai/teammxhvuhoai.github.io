@@ -2649,6 +2649,7 @@ btnDeleteAllMsgs.addEventListener('click', async ()=>{
       await gDb.ref('groupChat/privateClearedAt/' + currentUser.uid + '/' + activeTarget.uid)
         .set(firebase.database.ServerValue.TIMESTAMP);
       showToast('Đã xóa tin nhắn phía bạn');
+      selectTarget(null); // cuộc trò chuyện riêng giờ trống phía mình -> đóng lại, quay về nhóm chung
     }catch(err){
       console.error(err);
       showToast('Xóa thất bại: ' + describeStorageError(err));
