@@ -1079,7 +1079,7 @@
         <textarea id="shoppeModalTextarea" style="min-height:140px" placeholder="Tiêu đề sản phẩm | https://s.shopee.vn/...&#10;hoặc chỉ dán link: https://s.shopee.vn/..."></textarea>
       </div>
       <div class="switch-row" id="shoppeAutoTitleRow">
-        <span class="switch-label">🏷️ Tự động tìm tiêu đề cho dòng chỉ có link<br><span style="font-weight:400;color:var(--muted)">Dò theo link rút gọn → trang sản phẩm → đọc thẻ OG, giống cách Facebook lấy tiêu đề khi dán link. Chạy ngầm, không làm treo trang. Nếu không tìm được, tự dùng câu "Mỗi lượt click là một lần ủng hộ page".</span></span>
+        <span class="switch-label">🏷️ Tự động tìm tiêu đề cho dòng chỉ có link<br><span style="font-weight:400;color:var(--muted)">Dò theo link rút gọn → trang sản phẩm → đọc thẻ OG, giống cách Facebook lấy tiêu đề khi dán link. Tự thử qua nhiều dịch vụ đọc trang khác nhau nếu 1 dịch vụ bị lỗi/quá tải. Chạy ngầm, không làm treo trang. Nếu vẫn không tìm được, tự dùng câu "Mỗi lượt click là một lần ủng hộ page" — bấm nút ↻ cạnh link đó trong danh sách để thử tìm lại bất cứ lúc nào.</span></span>
         <label class="switch">
           <input type="checkbox" id="shoppeAutoTitleToggle" checked>
           <span class="slider"></span>
@@ -1677,6 +1677,11 @@ document.getElementById('btnClearShare').addEventListener('click', ()=>{
 ========================================================= */
 const shoppeLinksInput = document.getElementById('shoppeLinksInput');
 const shoppeListbox = document.getElementById('shoppeListbox');
+// Khai báo sớm 2 hằng số này (dùng lại ở nhiều nơi bên dưới, kể cả trong renderShoppeList
+// vốn được gọi ngay sau khi định nghĩa) để tránh lỗi "chưa khởi tạo" do khai báo const
+// nằm sau điểm sử dụng đầu tiên.
+const SHOPPE_FALLBACK_TITLE = 'Mỗi lượt click là một lần ủng hộ page';
+const SHOPPE_TITLE_PLACEHOLDER = 'Đang tìm tiêu đề...';
 const DEFAULT_LINKS = [
   'Tấm pin mặt trời loại A 185W Tấm pin mặt trời silicon đơn tinh thể công suất đầy đủ Mô-đun PV | https://s.shopee.vn/6L1mJUYpt2',
   'Combo 20 Tấm pin năng lượng mặt trời LONGi 445W | https://s.shopee.vn/2g8TwoJxIv',
@@ -1742,17 +1747,23 @@ function getShoppeLinks(){
 }
 function renderShoppeList(pickedIndex = -1){
   const items = getShoppeLinks();
-  shoppeListbox.innerHTML = items.map((item, i) => `
+  shoppeListbox.innerHTML = items.map((item, i) => {
+    const isFallbackTitle = item.title === SHOPPE_FALLBACK_TITLE || item.title === SHOPPE_TITLE_PLACEHOLDER;
+    return `
     <div class="listbox-item ${i===pickedIndex?'picked':''}" data-index="${i}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <div style="min-width:0;flex:1">
           <span class="item-title">${escapeHtml(item.title)}</span>
           <span class="item-link">${escapeHtml(item.link)}</span>
         </div>
-        <button type="button" class="edit-pin" data-edit-index="${i}" title="Sửa link này" style="position:static;flex-shrink:0">✎</button>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          ${isFallbackTitle ? `<button type="button" class="edit-pin" data-retry-title-index="${i}" title="Thử tìm lại tiêu đề" style="position:static">↻</button>` : ''}
+          <button type="button" class="edit-pin" data-edit-index="${i}" title="Sửa link này" style="position:static">✎</button>
+        </div>
       </div>
     </div>
-  `).join('') || '<div class="listbox-item">Chưa có link nào</div>';
+  `;
+  }).join('') || '<div class="listbox-item">Chưa có link nào</div>';
 }
 renderShoppeList();
 shoppeLinksInput.addEventListener('input', ()=>{ renderShoppeList(); saveShoppeLinks(); });
@@ -1801,7 +1812,34 @@ function closeShoppeModal(){ shoppeModalOverlay.classList.remove('show'); }
 btnAddShoppeLink.addEventListener('click', ()=> openShoppeModal('add'));
 btnCloseShoppeModal.addEventListener('click', closeShoppeModal);
 shoppeModalOverlay.addEventListener('click', e=>{ if(e.target === shoppeModalOverlay) closeShoppeModal(); });
-shoppeListbox.addEventListener('click', e=>{
+shoppeListbox.addEventListener('click', async e=>{
+  const retryBtn = e.target.closest('[data-retry-title-index]');
+  if(retryBtn){
+    const i = Number(retryBtn.dataset.retryTitleIndex);
+    const items = getShoppeLinks();
+    const item = items[i];
+    if(!item) return;
+    const original = retryBtn.textContent;
+    retryBtn.textContent = '…';
+    retryBtn.disabled = true;
+    try{
+      const title = await fetchShopeeTitle(item.link);
+      const { rawLines, targetIdx } = mapShoppeIndexToRawLine(i);
+      if(targetIdx != null){
+        rawLines[targetIdx] = `${title} | ${item.link}`;
+        shoppeLinksInput.value = rawLines.join('\n');
+        saveShoppeLinks();
+        renderShoppeList();
+        showToast('Đã tìm được tiêu đề mới');
+      }
+    }catch(err){
+      console.error('Thử lại tiêu đề Shopee vẫn thất bại:', err);
+      retryBtn.textContent = original;
+      retryBtn.disabled = false;
+      showToast('Vẫn không tìm được tiêu đề — link có thể riêng tư hoặc Shopee đang chặn proxy. Bạn có thể tự nhập tiêu đề qua nút ✎');
+    }
+    return;
+  }
   const editBtn = e.target.closest('[data-edit-index]');
   if(!editBtn) return;
   openShoppeModal('edit', Number(editBtn.dataset.editIndex));
@@ -1821,23 +1859,56 @@ function mapShoppeIndexToRawLine(index){
    Vì Shopee không cho phép trang khác gọi fetch() thẳng vào tên miền của họ
    (chặn CORS), phải đi qua 1 dịch vụ proxy đọc HTML công khai — dịch vụ này
    tự follow redirect rồi trả về HTML của trang đích để đọc thẻ OG.
+   Dùng NHIỀU proxy dự phòng (thử lần lượt) vì từng dịch vụ proxy miễn phí
+   hay bị quá tải/ngừng hoạt động bất chợt — nếu proxy này lỗi hoặc trả về
+   nội dung không hợp lệ, tự động thử proxy kế tiếp trước khi báo thất bại.
    Luôn chạy NGẦM (không await trước khi đóng modal) để không làm treo giao
    diện: link được thêm vào danh sách ngay với tiêu đề tạm, sau đó tự cập
    nhật lại đúng dòng đó khi tra cứu xong (nhiều link tra cứu song song). */
-const SHOPPE_FALLBACK_TITLE = 'Mỗi lượt click là một lần ủng hộ page';
-const SHOPPE_TITLE_PLACEHOLDER = 'Đang tìm tiêu đề...';
-async function fetchShopeeTitle(url){
-  const proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-  const resp = await fetch(proxied);
-  if(!resp.ok) throw new Error('HTTP ' + resp.status);
-  const html = await resp.text();
+// Danh sách proxy đọc HTML công khai, thử lần lượt cho tới khi có 1 cái thành công.
+// Mỗi hàm nhận link Shopee gốc, trả về URL đã được bọc qua proxy tương ứng.
+const SHOPPE_TITLE_PROXIES = [
+  url => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
+  url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+  url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+  url => 'https://thingproxy.freeboard.io/fetch/' + url
+];
+function fetchWithTimeout(url, ms){
+  const controller = new AbortController();
+  const timer = setTimeout(()=> controller.abort(), ms);
+  return fetch(url, { signal: controller.signal }).finally(()=> clearTimeout(timer));
+}
+function extractTitleFromHtml(html){
   const doc = new DOMParser().parseFromString(html, 'text/html');
   let title = doc.querySelector('meta[property="og:title"]')?.getAttribute('content')
+    || doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content')
     || doc.querySelector('title')?.textContent
     || '';
-  title = title.trim();
-  if(!title) throw new Error('Không tìm thấy tiêu đề trên trang đích');
+  // Shopee thường gắn thêm hậu tố kiểu "| Shopee Việt Nam" vào cuối <title> — bỏ đi cho gọn.
+  title = title.replace(/\s*[|\-–]\s*Shopee.*$/i, '').trim();
   return title;
+}
+async function fetchShopeeTitle(url){
+  let lastErr = null;
+  for(const buildProxy of SHOPPE_TITLE_PROXIES){
+    try{
+      const resp = await fetchWithTimeout(buildProxy(url), 9000);
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+      const html = await resp.text();
+      const title = extractTitleFromHtml(html);
+      // Bỏ qua nếu tiêu đề rỗng hoặc chỉ là tên chung chung của trang chủ Shopee
+      // (dấu hiệu proxy không lấy được đúng trang sản phẩm sau khi chuyển hướng).
+      const normalized = title.toLowerCase();
+      if(title && normalized !== 'shopee' && !normalized.startsWith('shopee việt nam') && !normalized.startsWith('shopee.vn')){
+        return title;
+      }
+      lastErr = new Error('Proxy không trả về đúng tiêu đề trang sản phẩm');
+    }catch(err){
+      lastErr = err;
+      console.error('Một proxy tra cứu tiêu đề Shopee thất bại, thử proxy kế tiếp:', err);
+    }
+  }
+  throw lastErr || new Error('Không tìm thấy tiêu đề trên trang đích');
 }
 // Tra cứu tiêu đề thật cho 1 link Shopee ở chế độ nền, rồi thay đúng dòng
 // placeholder (khớp theo nội dung dòng) bằng dòng đã có tiêu đề thật/dự phòng.
