@@ -686,6 +686,8 @@
       <div class="btnrow">
         <button class="btn btn-ghost btn-full" id="btnClearContent">Xóa nội dung</button>
       </div>
+      <div class="section-label">Lịch sử nội dung hôm nay (bấm để chọn lại)</div>
+      <div id="contentHistoryList" class="listbox"></div>
     </div>
   </section>
   <!-- ================= TAB 2: SHARE ================= -->
@@ -733,7 +735,7 @@
     <div class="card">
       <h2 class="title">Nhóm Auto Comment (hàng đợi bình luận)</h2>
       <p class="hint">
-        Chuẩn bị sẵn nội dung bình luận (random 1 link Shopee trong danh sách ở trên) cho từng bài viết Facebook, cách nhau theo khoảng thời gian bạn đặt. Đến giờ, công cụ tự <strong>copy sẵn nội dung vào clipboard</strong> và <strong>mở bài viết đó trong tab mới</strong> — bạn chỉ cần dán (Ctrl+V) rồi bấm Đăng. Bạn vẫn là người bấm gửi bình luận thật trên Facebook — công cụ không tự đăng nhập, không tự điền/gửi thay bạn, nên không vi phạm điều khoản Facebook về tự động hoá tài khoản.
+        Chuẩn bị sẵn nội dung bình luận (random 1 link Shopee trong danh sách ở trên) cho từng bài viết Facebook, cách nhau theo khoảng thời gian bạn đặt. Đến giờ, công cụ sẽ <strong>rung/báo cho bạn biết đã đến lượt</strong>; bạn bấm nút <strong>"Copy & Mở bài viết"</strong> để công cụ copy nội dung vào clipboard và mở đúng bài viết trong tab mới — sau đó bạn dán (Ctrl+V) rồi bấm Đăng. Cần bấm tay vì trình duyệt chặn việc tự mở tab/copy clipboard nếu không bắt nguồn từ 1 cú bấm thật. Bạn vẫn là người bấm gửi bình luận thật trên Facebook — công cụ không tự đăng nhập, không tự điền/gửi thay bạn, nên không vi phạm điều khoản Facebook về tự động hoá tài khoản.
       </p>
       <div class="field" style="margin-top:0">
         <label>Link các bài viết Facebook cần bình luận (mỗi dòng 1 link)</label>
@@ -1390,10 +1392,68 @@ contentInput.addEventListener('scroll', ()=>{
   backdrop.scrollLeft = contentInput.scrollLeft;
 });
 document.getElementById('btnClearContent').addEventListener('click', ()=>{
+  addContentToHistory(contentInput.value); // lưu lại nội dung trước khi xóa
   contentInput.value = '';
   refreshHighlight();
   saveContentInput();
 });
+/* ---------- Lịch sử nội dung trong ngày (chọn lại được) ---------- */
+const LS_KEY_CONTENT_HISTORY = 'contentTool_contentHistory';
+const contentHistoryList = document.getElementById('contentHistoryList');
+let contentHistory = [];
+function loadContentHistory(){
+  try{ contentHistory = JSON.parse(localStorage.getItem(LS_KEY_CONTENT_HISTORY) || '[]'); }
+  catch(e){ contentHistory = []; }
+}
+function saveContentHistoryToStorage(){
+  try{ localStorage.setItem(LS_KEY_CONTENT_HISTORY, JSON.stringify(contentHistory)); }catch(e){}
+}
+function isSameDay(ts1, ts2){
+  const d1 = new Date(ts1), d2 = new Date(ts2);
+  return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+}
+function addContentToHistory(text){
+  text = (text || '').trim();
+  if(!text) return;
+  if(contentHistory.length > 0 && contentHistory[0].text === text) return; // tránh lưu trùng liên tiếp
+  contentHistory.unshift({
+    id: 'h_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    text,
+    timestamp: Date.now()
+  });
+  if(contentHistory.length > 100) contentHistory = contentHistory.slice(0, 100); // giới hạn để không phình localStorage
+  saveContentHistoryToStorage();
+  renderContentHistory();
+}
+function renderContentHistory(){
+  const now = Date.now();
+  const todayItems = contentHistory.filter(h => isSameDay(h.timestamp, now));
+  if(todayItems.length === 0){
+    contentHistoryList.innerHTML = '<div class="listbox-item">Chưa có nội dung nào trong hôm nay</div>';
+    return;
+  }
+  contentHistoryList.innerHTML = todayItems.map(h => {
+    const time = new Date(h.timestamp).toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit' });
+    const preview = h.text.length > 90 ? h.text.slice(0, 90) + '…' : h.text;
+    return `<div class="listbox-item" data-hist-id="${h.id}" style="cursor:pointer">
+      <span class="item-title">${time}</span>
+      <span class="item-link" style="white-space:pre-wrap">${escapeHtml(preview)}</span>
+    </div>`;
+  }).join('');
+}
+contentHistoryList.addEventListener('click', (e)=>{
+  const row = e.target.closest('[data-hist-id]');
+  if(!row) return;
+  const item = contentHistory.find(h => h.id === row.dataset.histId);
+  if(!item) return;
+  contentInput.value = item.text;
+  refreshHighlight();
+  saveContentInput();
+  showToast('Đã chọn lại nội dung từ lịch sử');
+  contentInput.focus();
+});
+loadContentHistory();
+renderContentHistory();
 /* =========================================================
    LƯỚI NÚT HASTAG ĐÁNH SỐ (1..9) — có thể sửa cả TÊN NHÃN và 5 HASTAG
    qua popup riêng (thay vì prompt() cũ chỉ sửa được hastag).
@@ -1516,6 +1576,7 @@ hashtagGrid.addEventListener('click', async (e)=>{
   if(!card) return;
   const content = contentInput.value.trim();
   if(!content){ showToast('Chưa có nội dung để copy'); return; }
+  addContentToHistory(content);
   const n = card.dataset.n;
   const now = new Date();
   const dd = String(now.getDate()).padStart(2,'0');
@@ -1958,8 +2019,14 @@ function renderAcQueue(){
       statusHtml = `<span class="ac-status pending">⏳ Chờ đến ${fmtAcTime(item.scheduledAt)}</span>`;
       actionsHtml = `<button type="button" class="btn btn-danger" data-ac-cancel="${item.id}">Hủy</button>`;
     }else if(item.status === 'firing'){
-      statusHtml = `<span class="ac-status ready">⏳ Đang copy &amp; mở bài viết...</span>`;
+      statusHtml = `<span class="ac-status ready">⏳ Đang xử lý...</span>`;
       actionsHtml = '';
+    }else if(item.status === 'due'){
+      statusHtml = `<span class="ac-status ready">🔔 Đến giờ — bấm để copy &amp; mở bài viết</span>`;
+      actionsHtml = `
+        <button type="button" class="btn btn-primary" data-ac-fire="${item.id}">📋 Copy &amp; Mở bài viết</button>
+        <button type="button" class="btn btn-danger" data-ac-cancel="${item.id}">Hủy</button>
+      `;
     }else if(item.status === 'ready'){
       statusHtml = `<span class="ac-status ready">✅ Đã copy — dán vào Facebook</span>`;
       actionsHtml = `
@@ -1989,6 +2056,9 @@ function renderAcQueue(){
   }).join('');
 }
 
+// Mở tab TRƯỚC (đồng bộ, ngay trong lượt xử lý sự kiện bấm của người dùng) rồi mới
+// copy clipboard — vì trình duyệt chỉ cho window.open()/clipboard chạy đáng tin cậy
+// khi bắt nguồn trực tiếp từ 1 cú bấm thật, không phải từ setInterval/timer.
 async function fireAcItem(item){
   const text = buildAcComment();
   if(!text){
@@ -1998,23 +2068,26 @@ async function fireAcItem(item){
     return;
   }
   item.commentText = text;
-  await copyText(text);
   window.open(item.fbLink, '_blank', 'noopener');
+  await copyText(text);
+  item.status = 'ready';
+  showToast('Đã copy bình luận & mở bài viết — dán (Ctrl+V) rồi bấm Đăng trên Facebook');
+  saveAcQueue();
+  renderAcQueue();
+}
+function notifyAcDue(item){
   if(acNotifToggle.checked){
     triggerVibration();
     if(acNotifPermissionGranted && 'Notification' in window){
       try{
         const n = new Notification('Đến lượt bình luận Shopee', {
-          body: 'Đã copy nội dung — dán vào bài viết Facebook vừa mở rồi bấm Đăng.'
+          body: 'Bấm vào ứng dụng rồi bấm nút "Copy & Mở bài viết" bên dưới (trình duyệt yêu cầu bấm tay để mở tab & copy).'
         });
         n.onclick = ()=>{ window.focus(); n.close(); };
       }catch(e){}
     }
   }
-  item.status = 'ready';
-  showToast('Đã copy bình luận & mở bài viết — dán (Ctrl+V) rồi bấm Đăng trên Facebook');
-  saveAcQueue();
-  renderAcQueue();
+  showToast('Đến lượt 1 bài viết — bấm "Copy & Mở bài viết" trong danh sách bên dưới');
 }
 
 function tickAcQueue(){
@@ -2023,9 +2096,11 @@ function tickAcQueue(){
   let changed = false;
   acQueue.forEach(item=>{
     if(item.status === 'pending' && now >= item.scheduledAt){
-      item.status = 'firing'; // đánh dấu ngay để tránh bị kích hoạt trùng ở lượt tick kế tiếp
+      // Không tự mở tab/copy ở đây (bị trình duyệt chặn vì không phải cú bấm thật).
+      // Chỉ đánh dấu "đến giờ" + báo rung/thông báo — người dùng bấm nút để kích hoạt thật.
+      item.status = 'due';
       changed = true;
-      fireAcItem(item);
+      notifyAcDue(item);
     }
   });
   if(changed){ saveAcQueue(); renderAcQueue(); }
@@ -2114,6 +2189,7 @@ acQueueList.addEventListener('click', async (e)=>{
   const cancelBtn = e.target.closest('[data-ac-cancel]');
   const doneBtn   = e.target.closest('[data-ac-done]');
   const reopenBtn = e.target.closest('[data-ac-reopen]');
+  const fireBtn   = e.target.closest('[data-ac-fire]');
   const removeBtn = e.target.closest('[data-ac-remove]');
   if(cancelBtn){
     const item = acQueue.find(i => i.id === cancelBtn.dataset.acCancel);
@@ -2121,11 +2197,14 @@ acQueueList.addEventListener('click', async (e)=>{
   }else if(doneBtn){
     const item = acQueue.find(i => i.id === doneBtn.dataset.acDone);
     if(item){ item.status = 'done'; saveAcQueue(); renderAcQueue(); showToast('Đã đánh dấu hoàn thành'); }
+  }else if(fireBtn){
+    const item = acQueue.find(i => i.id === fireBtn.dataset.acFire);
+    if(item) await fireAcItem(item); // bấm trực tiếp -> cú bấm thật, mở tab/copy sẽ không bị chặn
   }else if(reopenBtn){
     const item = acQueue.find(i => i.id === reopenBtn.dataset.acReopen);
     if(item){
-      await copyText(item.commentText);
       window.open(item.fbLink, '_blank', 'noopener');
+      await copyText(item.commentText);
       showToast('Đã copy lại nội dung & mở bài viết');
     }
   }else if(removeBtn){
