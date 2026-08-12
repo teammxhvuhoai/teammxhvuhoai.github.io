@@ -773,7 +773,51 @@
         <button class="btn btn-danger" id="btnAcCancelAll">Hủy toàn bộ</button>
       </div>
       <div class="section-label">Tiến trình thực thi</div>
+      <div id="acDueBanner" style="display:none;background:var(--primary-light);border:1px solid var(--primary);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span id="acDueBannerText" style="font-size:13px;font-weight:700;color:var(--primary-text)"></span>
+        <button type="button" class="btn btn-primary" id="btnAcFireNext" style="flex:none;padding:8px 14px;font-size:12.5px;min-height:auto">📋 Xử lý bài sớm nhất</button>
+      </div>
       <div id="acQueueList" class="listbox"></div>
+    </div>
+    <div class="card">
+      <h2 class="title">Đăng tự động lên Trang Facebook của bạn</h2>
+      <p class="hint">
+        Khác với nhóm bên trên (bình luận vào bài người khác — luôn cần bạn bấm tay), mục này <strong>tự động đăng bài thật sự</strong> lên chính Trang (Page) Facebook do bạn quản lý, thông qua Graph API chính thức của Meta — hợp lệ vì đây là nội dung của bạn đăng lên tài sản của bạn, không cần xác nhận từng lượt.
+      </p>
+      <div class="field" style="margin-top:0">
+        <label>Page ID (Trang Facebook cần đăng lên)</label>
+        <input type="text" id="fbPagePostPageId" placeholder="Vd: 123456789012345">
+      </div>
+      <div class="field">
+        <label>Page Access Token (cấp quyền pages_manage_posts, nên dùng token dài hạn)</label>
+        <input type="password" id="fbPagePostToken" placeholder="Dán Page Access Token...">
+        <div class="checkrow" style="margin-top:8px">
+          <label><input type="checkbox" id="fbPagePostRemember"> Ghi nhớ token trên máy này</label>
+        </div>
+        <p class="hint" style="margin:8px 0 0;color:var(--red)">⚠️ Token cho phép đăng bài thay bạn — chỉ dùng trên máy riêng, không chia sẻ file này hoặc để lộ máy cho người khác. Tick "Ghi nhớ" sẽ lưu token vào trình duyệt (localStorage) của máy này.</p>
+      </div>
+      <div class="field">
+        <label>Mẫu nội dung bài đăng — {title} và {link} tự thay bằng 1 link Shopee ngẫu nhiên</label>
+        <textarea id="fbPagePostTemplate" style="min-height:60px"></textarea>
+      </div>
+      <div class="field">
+        <label>Số bài muốn đăng &amp; khoảng cách (giây) giữa mỗi bài</label>
+        <div class="checkrow">
+          <input type="text" id="fbPagePostCount" inputmode="numeric" style="width:64px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:var(--radius-sm);padding:8px 10px" value="3">
+          <span style="align-self:center;color:var(--muted)">bài, cách nhau</span>
+          <input type="text" id="fbPagePostDelayMin" inputmode="numeric" style="width:70px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:var(--radius-sm);padding:8px 10px" value="300">
+          <span style="align-self:center;color:var(--muted)">đến</span>
+          <input type="text" id="fbPagePostDelayMax" inputmode="numeric" style="width:70px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:var(--radius-sm);padding:8px 10px" value="900">
+          <span style="align-self:center;color:var(--muted)">giây</span>
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="btn btn-primary" id="btnFbPagePostStart">▶ Bắt đầu đăng tự động</button>
+        <button class="btn btn-ghost" id="btnFbPagePostPause">⏸ Tạm dừng</button>
+        <button class="btn btn-danger" id="btnFbPagePostCancelAll">Hủy toàn bộ</button>
+      </div>
+      <div class="section-label">Tiến trình đăng bài</div>
+      <div id="fbPagePostQueueList" class="listbox"></div>
     </div>
   </section>
   <!-- ================= TAB 4: VIETSUB ================= -->
@@ -2074,6 +2118,27 @@ const btnAcStart      = document.getElementById('btnAcStart');
 const btnAcPause      = document.getElementById('btnAcPause');
 const btnAcCancelAll  = document.getElementById('btnAcCancelAll');
 const acQueueList     = document.getElementById('acQueueList');
+const acDueBanner     = document.getElementById('acDueBanner');
+const acDueBannerText = document.getElementById('acDueBannerText');
+const btnAcFireNext   = document.getElementById('btnAcFireNext');
+
+// Tiếng "ting" ngắn phát khi có bài đến giờ (bên cạnh rung/thông báo hệ thống) —
+// dùng Web Audio API, không cần file âm thanh riêng.
+function playAcBeep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.36);
+  }catch(e){}
+}
 
 const DEFAULT_AC_TEMPLATE = '{title}\n👉 {link}';
 const LS_KEY_AC_SETTINGS = 'contentTool_acSettings';
@@ -2135,7 +2200,19 @@ function buildAcComment(){
   return template.replace(/\{title\}/g, picked.title).replace(/\{link\}/g, picked.link);
 }
 
+function updateAcDueBanner(){
+  const dueItems = acQueue.filter(i => i.status === 'due').sort((a,b)=> a.scheduledAt - b.scheduledAt);
+  if(dueItems.length === 0){
+    acDueBanner.style.display = 'none';
+    return;
+  }
+  acDueBanner.style.display = 'flex';
+  acDueBannerText.textContent = dueItems.length === 1
+    ? '🔔 1 bài đang chờ bạn xử lý'
+    : `🔔 ${dueItems.length} bài đang chờ bạn xử lý`;
+}
 function renderAcQueue(){
+  updateAcDueBanner();
   if(acQueue.length === 0){
     acQueueList.innerHTML = '<div class="listbox-item">Chưa có tiến trình nào — nhập link bài viết rồi bấm "Bắt đầu hàng đợi".</div>';
     return;
@@ -2205,6 +2282,7 @@ async function fireAcItem(item){
 function notifyAcDue(item){
   if(acNotifToggle.checked){
     triggerVibration();
+    playAcBeep();
     if(acNotifPermissionGranted && 'Notification' in window){
       try{
         const n = new Notification('Đến lượt bình luận Shopee', {
@@ -2239,6 +2317,12 @@ function startAcTicker(){
 function stopAcTicker(){
   if(acTickInterval){ clearInterval(acTickInterval); acTickInterval = null; }
 }
+
+btnAcFireNext.addEventListener('click', async ()=>{
+  const dueItems = acQueue.filter(i => i.status === 'due').sort((a,b)=> a.scheduledAt - b.scheduledAt);
+  if(dueItems.length === 0) return;
+  await fireAcItem(dueItems[0]); // bấm trực tiếp -> cú bấm thật, không bị chặn popup/clipboard
+});
 
 btnAcStart.addEventListener('click', async ()=>{
   const links = acFbLinksInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -2355,6 +2439,285 @@ if(acQueue.some(i => i.status === 'pending')){
   acRunning = true;
   acNotifPermissionGranted = ('Notification' in window) && Notification.permission === 'granted';
   startAcTicker();
+}
+
+/* =========================================================
+   ĐĂNG TỰ ĐỘNG LÊN TRANG FACEBOOK CỦA BẠN (Graph API chính thức)
+   -------------------------------------------------------------
+   KHÁC HẲN nhóm Auto Comment ở trên: đây là đăng bài MỚI lên chính Trang
+   (Page) do bạn quản lý, dùng Graph API thật (POST /{page-id}/feed) với
+   Page Access Token có quyền pages_manage_posts. Vì là tài sản của chính
+   bạn, việc này KHÔNG cần xác nhận/bấm tay từng lượt như bình luận vào
+   bài người khác — hàng đợi tự chạy bằng fetch() từ trình duyệt, miễn
+   tab này còn mở.
+   LƯU Ý BẢO MẬT: Page Access Token cho phép đăng bài thay bạn. Token chỉ
+   được lưu vào localStorage của MÁY NÀY khi bạn tick "Ghi nhớ token" —
+   không gửi lên bất kỳ máy chủ nào khác ngoài graph.facebook.com. Không
+   chia sẻ file này hoặc để lộ máy cho người khác khi đã ghi nhớ token.
+========================================================= */
+const fbPagePostPageId    = document.getElementById('fbPagePostPageId');
+const fbPagePostToken     = document.getElementById('fbPagePostToken');
+const fbPagePostRemember  = document.getElementById('fbPagePostRemember');
+const fbPagePostTemplate  = document.getElementById('fbPagePostTemplate');
+const fbPagePostCount     = document.getElementById('fbPagePostCount');
+const fbPagePostDelayMin  = document.getElementById('fbPagePostDelayMin');
+const fbPagePostDelayMax  = document.getElementById('fbPagePostDelayMax');
+const btnFbPagePostStart     = document.getElementById('btnFbPagePostStart');
+const btnFbPagePostPause     = document.getElementById('btnFbPagePostPause');
+const btnFbPagePostCancelAll = document.getElementById('btnFbPagePostCancelAll');
+const fbPagePostQueueList    = document.getElementById('fbPagePostQueueList');
+
+const DEFAULT_PAGE_POST_TEMPLATE = '{title}\n👉 {link}';
+const GRAPH_API_VERSION = 'v19.0';
+const LS_KEY_PAGE_POST_SETTINGS = 'contentTool_fbPagePostSettings';
+const LS_KEY_PAGE_POST_TOKEN    = 'contentTool_fbPagePostToken';
+const LS_KEY_PAGE_POST_QUEUE    = 'contentTool_fbPagePostQueue';
+
+let fbPagePostQueue = []; // [{id, scheduledAt, status:'pending'|'posting'|'posted'|'failed'|'canceled', message, postId, permalink, errorMsg}]
+let fbPagePostRunning = false;
+let fbPagePostTickInterval = null;
+
+function loadFbPagePostSettings(){
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem(LS_KEY_PAGE_POST_SETTINGS) || 'null'); }catch(e){}
+  fbPagePostPageId.value = (saved && saved.pageId) || '';
+  fbPagePostTemplate.value = (saved && saved.template) || DEFAULT_PAGE_POST_TEMPLATE;
+  fbPagePostCount.value = (saved && saved.count) || 3;
+  fbPagePostDelayMin.value = (saved && saved.delayMin) || 300;
+  fbPagePostDelayMax.value = (saved && saved.delayMax) || 900;
+  let rememberedToken = null;
+  try{ rememberedToken = localStorage.getItem(LS_KEY_PAGE_POST_TOKEN); }catch(e){}
+  if(rememberedToken){
+    fbPagePostToken.value = rememberedToken;
+    fbPagePostRemember.checked = true;
+  }
+}
+function saveFbPagePostSettings(){
+  try{
+    localStorage.setItem(LS_KEY_PAGE_POST_SETTINGS, JSON.stringify({
+      pageId: fbPagePostPageId.value,
+      template: fbPagePostTemplate.value,
+      count: fbPagePostCount.value,
+      delayMin: fbPagePostDelayMin.value,
+      delayMax: fbPagePostDelayMax.value
+    }));
+  }catch(e){}
+  try{
+    if(fbPagePostRemember.checked){
+      localStorage.setItem(LS_KEY_PAGE_POST_TOKEN, fbPagePostToken.value);
+    }else{
+      localStorage.removeItem(LS_KEY_PAGE_POST_TOKEN);
+    }
+  }catch(e){}
+}
+function loadFbPagePostQueue(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(LS_KEY_PAGE_POST_QUEUE) || 'null');
+    // Mục còn kẹt "posting" (tab bị đóng giữa chừng) đưa về "pending" để tự thử lại.
+    fbPagePostQueue = Array.isArray(saved) ? saved.map(i => i.status === 'posting' ? { ...i, status: 'pending' } : i) : [];
+  }catch(e){ fbPagePostQueue = []; }
+}
+function saveFbPagePostQueue(){
+  try{ localStorage.setItem(LS_KEY_PAGE_POST_QUEUE, JSON.stringify(fbPagePostQueue)); }catch(e){}
+}
+
+function buildPagePostMessage(){
+  const picked = pickRandomShoppeItem();
+  if(!picked) return null;
+  const template = fbPagePostTemplate.value.trim() || DEFAULT_PAGE_POST_TEMPLATE;
+  return template.replace(/\{title\}/g, picked.title).replace(/\{link\}/g, picked.link);
+}
+
+function renderFbPagePostQueue(){
+  if(fbPagePostQueue.length === 0){
+    fbPagePostQueueList.innerHTML = '<div class="listbox-item">Chưa có bài nào — nhập Page ID/Token rồi bấm "Bắt đầu đăng tự động".</div>';
+    return;
+  }
+  fbPagePostQueueList.innerHTML = fbPagePostQueue.map((item, i)=>{
+    let statusHtml, actionsHtml;
+    if(item.status === 'pending'){
+      statusHtml = `<span class="ac-status pending">⏳ Sẽ đăng lúc ${fmtAcTime(item.scheduledAt)}</span>`;
+      actionsHtml = `<button type="button" class="btn btn-danger" data-pp-cancel="${item.id}">Hủy</button>`;
+    }else if(item.status === 'posting'){
+      statusHtml = `<span class="ac-status ready">⏳ Đang đăng lên Facebook...</span>`;
+      actionsHtml = '';
+    }else if(item.status === 'posted'){
+      statusHtml = `<span class="ac-status done">✅ Đã đăng thành công</span>`;
+      actionsHtml = item.permalink
+        ? `<a class="btn btn-ghost" href="${escapeHtml(item.permalink)}" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Xem bài</a>`
+        : '';
+    }else if(item.status === 'failed'){
+      statusHtml = `<span class="ac-status canceled">✕ Lỗi: ${escapeHtml(item.errorMsg || 'không xác định')}</span>`;
+      actionsHtml = `
+        <button type="button" class="btn btn-primary" data-pp-retry="${item.id}">↻ Thử lại</button>
+        <button type="button" class="btn btn-ghost" data-pp-remove="${item.id}">Xóa</button>
+      `;
+    }else{
+      statusHtml = `<span class="ac-status canceled">✕ Đã hủy</span>`;
+      actionsHtml = `<button type="button" class="btn btn-ghost" data-pp-remove="${item.id}">Xóa</button>`;
+    }
+    return `
+      <div class="listbox-item">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div style="min-width:0;flex:1">
+            <span class="item-title">Bài ${i+1}</span>
+            <div style="margin:4px 0">${statusHtml}</div>
+            ${item.message ? `<div style="font-size:11.5px;color:var(--ink);white-space:pre-wrap;line-height:1.5">${escapeHtml(item.message)}</div>` : ''}
+          </div>
+          <div class="ac-item-actions">${actionsHtml}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function postToFacebookPage(item){
+  const message = buildPagePostMessage();
+  if(!message){
+    item.status = 'failed';
+    item.errorMsg = 'Danh sách link Shopee đang trống';
+    saveFbPagePostQueue(); renderFbPagePostQueue();
+    return;
+  }
+  item.message = message;
+  item.status = 'posting';
+  saveFbPagePostQueue(); renderFbPagePostQueue();
+
+  const pageId = fbPagePostPageId.value.trim();
+  const token = fbPagePostToken.value.trim();
+  try{
+    const resp = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${encodeURIComponent(pageId)}/feed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ message, access_token: token }).toString()
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error){
+      throw new Error((data.error && data.error.message) || ('HTTP ' + resp.status));
+    }
+    item.status = 'posted';
+    item.postId = data.id;
+    item.permalink = data.id ? `https://www.facebook.com/${data.id}` : null;
+    showToast('Đã đăng bài thành công lên Trang Facebook');
+  }catch(err){
+    console.error('Đăng bài lên Facebook Page thất bại:', err);
+    item.status = 'failed';
+    item.errorMsg = err && err.message ? err.message : 'Lỗi không xác định';
+    showToast('Đăng bài thất bại: ' + item.errorMsg);
+  }
+  saveFbPagePostQueue();
+  renderFbPagePostQueue();
+}
+
+function tickFbPagePostQueue(){
+  if(!fbPagePostRunning) return;
+  const now = Date.now();
+  fbPagePostQueue.forEach(item=>{
+    if(item.status === 'pending' && now >= item.scheduledAt){
+      item.status = 'posting'; // đánh dấu ngay để không bị kích hoạt trùng ở lượt tick kế tiếp
+      postToFacebookPage(item);
+    }
+  });
+}
+function startFbPagePostTicker(){
+  if(fbPagePostTickInterval) return;
+  fbPagePostTickInterval = setInterval(tickFbPagePostQueue, 1000);
+}
+function stopFbPagePostTicker(){
+  if(fbPagePostTickInterval){ clearInterval(fbPagePostTickInterval); fbPagePostTickInterval = null; }
+}
+
+btnFbPagePostStart.addEventListener('click', ()=>{
+  const pageId = fbPagePostPageId.value.trim();
+  const token = fbPagePostToken.value.trim();
+  if(!pageId){ showToast('Chưa nhập Page ID'); return; }
+  if(!token){ showToast('Chưa nhập Page Access Token'); return; }
+  if(getShoppeLinks().length === 0){ showToast('Danh sách link Shopee ở trên đang trống'); return; }
+  const count = Math.max(1, Math.min(50, parseInt(fbPagePostCount.value, 10) || 1));
+  const min = Math.max(5, parseInt(fbPagePostDelayMin.value, 10) || 300);
+  const max = Math.max(min, parseInt(fbPagePostDelayMax.value, 10) || 900);
+  saveFbPagePostSettings();
+
+  let cursor = Date.now();
+  for(let i = 0; i < count; i++){
+    const delaySec = min + Math.random() * (max - min);
+    cursor += delaySec * 1000;
+    fbPagePostQueue.push({
+      id: 'pp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      scheduledAt: cursor,
+      status: 'pending',
+      message: '', postId: null, permalink: null, errorMsg: null
+    });
+  }
+  fbPagePostRunning = true;
+  btnFbPagePostPause.textContent = '⏸ Tạm dừng';
+  saveFbPagePostQueue();
+  renderFbPagePostQueue();
+  startFbPagePostTicker();
+  showToast(`Đã lên lịch ${count} bài — sẽ tự đăng lên Trang, không cần bấm tay.`);
+});
+
+btnFbPagePostPause.addEventListener('click', ()=>{
+  if(fbPagePostRunning){
+    fbPagePostRunning = false;
+    stopFbPagePostTicker();
+    btnFbPagePostPause.textContent = '▶ Tiếp tục';
+    showToast('Đã tạm dừng đăng bài tự động');
+  }else{
+    fbPagePostRunning = true;
+    startFbPagePostTicker();
+    btnFbPagePostPause.textContent = '⏸ Tạm dừng';
+    showToast('Đã tiếp tục đăng bài tự động');
+  }
+});
+
+btnFbPagePostCancelAll.addEventListener('click', async ()=>{
+  const activeItems = fbPagePostQueue.filter(i => i.status === 'pending' || i.status === 'posting');
+  if(activeItems.length === 0){ showToast('Không có bài nào đang chờ đăng'); return; }
+  const ok = await showConfirmDialog(
+    'Hủy toàn bộ lịch đăng bài?',
+    'Mọi bài đang chờ đăng sẽ bị hủy. Các bài đã đăng thành công vẫn giữ nguyên trên Trang.',
+    'Hủy tất cả'
+  );
+  if(!ok) return;
+  fbPagePostQueue.forEach(item=>{
+    if(item.status === 'pending' || item.status === 'posting') item.status = 'canceled';
+  });
+  saveFbPagePostQueue();
+  renderFbPagePostQueue();
+  showToast('Đã hủy toàn bộ lịch đăng bài');
+});
+
+fbPagePostQueueList.addEventListener('click', (e)=>{
+  const cancelBtn = e.target.closest('[data-pp-cancel]');
+  const retryBtn  = e.target.closest('[data-pp-retry]');
+  const removeBtn = e.target.closest('[data-pp-remove]');
+  if(cancelBtn){
+    const item = fbPagePostQueue.find(i => i.id === cancelBtn.dataset.ppCancel);
+    if(item){ item.status = 'canceled'; saveFbPagePostQueue(); renderFbPagePostQueue(); showToast('Đã hủy bài này'); }
+  }else if(retryBtn){
+    const item = fbPagePostQueue.find(i => i.id === retryBtn.dataset.ppRetry);
+    if(item){ item.status = 'pending'; item.scheduledAt = Date.now(); item.errorMsg = null; saveFbPagePostQueue(); renderFbPagePostQueue(); fbPagePostRunning = true; startFbPagePostTicker(); }
+  }else if(removeBtn){
+    fbPagePostQueue = fbPagePostQueue.filter(i => i.id !== removeBtn.dataset.ppRemove);
+    saveFbPagePostQueue(); renderFbPagePostQueue();
+  }
+});
+
+fbPagePostPageId.addEventListener('input', saveFbPagePostSettings);
+fbPagePostToken.addEventListener('input', saveFbPagePostSettings);
+fbPagePostRemember.addEventListener('change', saveFbPagePostSettings);
+fbPagePostTemplate.addEventListener('input', saveFbPagePostSettings);
+fbPagePostCount.addEventListener('input', saveFbPagePostSettings);
+fbPagePostDelayMin.addEventListener('input', saveFbPagePostSettings);
+fbPagePostDelayMax.addEventListener('input', saveFbPagePostSettings);
+
+loadFbPagePostSettings();
+loadFbPagePostQueue();
+renderFbPagePostQueue();
+if(fbPagePostQueue.some(i => i.status === 'pending')){
+  fbPagePostRunning = true;
+  startFbPagePostTicker();
 }
 
 /* =========================================================
