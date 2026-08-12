@@ -976,27 +976,26 @@
   <section id="page-admin" class="page">
     <div class="card" id="adminLoginCard">
       <h2 class="title">Quản trị</h2>
-      <p class="hint">Đăng nhập bằng tài khoản quản trị viên được cấp quyền cấu hình trên Firebase Realtime Database, không nằm cố định trong mã nguồn — xem hướng dẫn bên dưới nếu chưa đăng nhập được.</p>
-      <div class="field" style="margin-top:0">
-        <label>Tên đăng nhập</label>
-        <input type="text" id="adminUserInput" placeholder="Tên đăng nhập" autocomplete="username">
-      </div>
-      <div class="field">
-        <label>Mật khẩu</label>
-        <input type="password" id="adminPassInput" placeholder="Mật khẩu" autocomplete="current-password">
-      </div>
+      <p class="hint">Quyền quản trị được cấp theo tài khoản Google (không dùng mật khẩu riêng — mật khẩu lưu trong Firebase có thể bị đọc trực tiếp từ trình duyệt, không an toàn). Đăng nhập Google ở tab Group trước, rồi quay lại đây.</p>
       <div id="adminLoginError" class="hint" style="color:var(--red);display:none;margin-top:8px"></div>
       <div class="btnrow">
-        <button class="btn btn-primary btn-full" id="btnAdminLogin">Đăng nhập</button>
+        <button class="btn btn-primary btn-full" id="btnAdminCheckAccess">Kiểm tra quyền quản trị</button>
       </div>
       <p class="hint" style="margin-top:14px">
-        <strong>Cách thiết lập tài khoản quản trị trên Firebase:</strong><br>
-        1. Mở Firebase Console → chọn project → mục <strong>Realtime Database</strong>.<br>
-        2. Tạo (hoặc sửa) node <strong>groupChat/adminConfig</strong> với 2 trường:
-        <strong>username</strong> (tên đăng nhập) và <strong>password</strong> (mật khẩu).<br>
-        3. Lưu lại — trang này sẽ đọc trực tiếp 2 giá trị đó mỗi lần đăng nhập, không cần sửa mã nguồn.<br>
-        Lưu ý: đây vẫn là kiểm tra phía trình duyệt, chỉ phù hợp hạn chế truy cập nội bộ; nếu cần bảo mật chặt hơn nên chuyển sang Firebase Auth + Security Rules.
+        <strong>Cách cấp quyền quản trị cho 1 tài khoản Google:</strong><br>
+        1. Người đó đăng nhập Google ở tab Group ít nhất 1 lần (để tài khoản có UID trên Firebase).<br>
+        2. Mở Firebase Console → Realtime Database → tìm UID của họ trong node <strong>groupChat/presence</strong> hoặc <strong>groupChat/userProfiles</strong>.<br>
+        3. Tạo node <strong>groupChat/adminUids/&lt;UID&gt;</strong> với giá trị <strong>true</strong>.<br>
+        4. Không lưu mật khẩu nào ở đây — chỉ UID, nên không có gì để "lộ" ngoài việc ai được cấp quyền.<br>
+        Quan trọng: bước này chỉ ẩn nút trên giao diện. Để chặn thật sự ở tầng dữ liệu, hãy thêm Security Rules giới hạn đọc <code>userLocations</code>/<code>userLocationHistory</code> theo đúng UID trong <code>adminUids</code> (xem ghi chú trong mã nguồn).
       </p>
+    </div>
+    <div class="card" id="adminAccessDeniedCard" style="display:none">
+      <h2 class="title">Quản trị</h2>
+      <p class="hint">Tài khoản Google hiện tại (<span id="adminDeniedEmail"></span>) chưa được cấp quyền quản trị. Nhờ người đang có quyền thêm UID của bạn vào <strong>groupChat/adminUids</strong> trên Firebase Console, rồi bấm kiểm tra lại.</p>
+      <div class="btnrow">
+        <button class="btn btn-primary btn-full" id="btnAdminRecheck">Kiểm tra lại</button>
+      </div>
     </div>
     <div class="card" id="adminMapCard" style="display:none">
       <div class="chat-header-row">
@@ -1219,7 +1218,7 @@ async function copyText(text){
   }
 }
 function escapeHtml(str){
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 /* ---------- Tự động co giãn chiều cao textarea theo đúng nội dung (không thừa/thiếu
    khoảng trống) + bấm đúp (double click) để copy toàn bộ nội dung bên trong. Dùng
@@ -3688,7 +3687,7 @@ function renderOnlineUsers(data){
       const isMe = currentUser && uid === currentUser.uid;
       return `<div class="online-chip">
         <span class="online-dot"></span>
-        <img class="online-avatar" src="${u.photoURL || ''}" onerror="this.style.display='none'">
+        <img class="online-avatar" src="${escapeHtml(u.photoURL || '')}" onerror="this.style.display='none'">
         <span>${escapeHtml(u.name || 'Ẩn danh')}${isMe ? ' (Bạn)' : ''}</span>
       </div>`;
     }).join('');
@@ -3727,7 +3726,7 @@ function renderTargetRow(){
       (t.lastTimestamp || 0) > (privateReadsData[u.uid] || 0);
     return `<div class="target-chip ${isOpen?'active':''}" data-target="${u.uid}" data-name="${escapeHtml(u.name||'Ẩn danh')}" data-photo="${escapeHtml(u.photoURL||'')}">
       ${u.online ? '<span class="t-dot"></span>' : ''}
-      <img src="${u.photoURL||''}" onerror="this.style.display='none'">
+      <img src="${escapeHtml(u.photoURL||'')}" onerror="this.style.display='none'">
       <span>${escapeHtml(u.name || 'Ẩn danh')}</span>
       ${hasUnread && !isOpen ? '<span class="t-unread"></span>' : ''}
     </div>`;
@@ -3857,7 +3856,7 @@ function renderMessages(){
     const isMe = currentUser && m.uid === currentUser.uid;
     const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) : '';
     return `<div class="chat-msg ${isMe ? 'me' : 'other'}">
-      ${!isMe ? `<img class="chat-avatar" src="${m.photoURL || ''}" onerror="this.style.display='none'">` : ''}
+      ${!isMe ? `<img class="chat-avatar" src="${escapeHtml(m.photoURL || '')}" onerror="this.style.display='none'">` : ''}
       <div class="chat-bubble-wrap">
         ${!isMe ? `<div class="chat-name">${escapeHtml(m.name || 'Ẩn danh')}</div>` : ''}
         <div class="chat-bubble">
@@ -4336,7 +4335,7 @@ function renderFloatingMessages(state){
       const isMe = currentUser && m.uid === currentUser.uid;
       const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) : '';
       return `<div class="chat-msg ${isMe ? 'me' : 'other'}">
-        ${!isMe ? `<img class="chat-avatar" src="${m.photoURL || ''}" onerror="this.style.display='none'">` : ''}
+        ${!isMe ? `<img class="chat-avatar" src="${escapeHtml(m.photoURL || '')}" onerror="this.style.display='none'">` : ''}
         <div class="chat-bubble-wrap">
           <div class="chat-bubble">
             ${buildAttachmentsHtml(m, m.id)}
