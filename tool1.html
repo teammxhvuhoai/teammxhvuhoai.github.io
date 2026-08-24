@@ -34,7 +34,8 @@
     --safe-r: env(safe-area-inset-right, 0px);
   }
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html, body{ height:100%; }
+  html{ height:100%; }
+  body{ min-height:100%; overflow-x:hidden; }
   body{
     margin:0;
     font-family:'Inter', system-ui, sans-serif;
@@ -48,11 +49,31 @@
   }
   .app{
     max-width:430px;
-
     margin:0 auto;
     min-height:100vh;
     min-height:100dvh;
     padding:calc(18px + var(--safe-t)) calc(16px + var(--safe-r)) calc(28px + var(--safe-b)) calc(16px + var(--safe-l));
+  }
+  /* ===== Màn hình rộng (PC / tablet ngang): hiện dạng thẻ (card) cân đối giữa trang thay vì
+     kéo dài hết chiều rộng trình duyệt — bố cục bên trong vẫn giữ nguyên như trên điện thoại,
+     chỉ đổi cách trình bày khung ngoài cho phù hợp màn hình lớn. ===== */
+  @media (min-width: 720px){
+    body{
+      display:flex;
+      justify-content:center;
+      padding:40px 20px;
+    }
+    .app{
+      max-width:480px;
+      min-height:auto;
+      background:var(--surface);
+      border-radius:28px;
+      border:1px solid var(--border);
+      box-shadow:0 30px 80px rgba(76,29,149,.16), 0 6px 18px rgba(24,17,60,.08);
+      padding-top:26px;
+      padding-bottom:32px;
+    }
+    .tabbar{ top:14px; }
   }
   .brand{ margin-bottom:16px; padding:0 2px; }
   .brand-eyebrow{
@@ -61,7 +82,7 @@
   }
   .brand-title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
-    font-size:24px; letter-spacing:-.01em; color:var(--navy);
+    font-size:clamp(20px, 5.6vw, 24px); letter-spacing:-.01em; color:var(--navy);
   }
   .tabbar{
     display:flex;
@@ -261,7 +282,7 @@
   a.btn{ display:flex; align-items:center; justify-content:center; text-decoration:none; }
   .listbox{
     background:#fbfbfe; border:1px solid var(--border); border-radius:var(--radius-md);
-    max-height:240px; overflow-y:auto;
+    max-height:min(240px, 38vh); overflow-y:auto;
     -webkit-overflow-scrolling:touch;
   }
   .listbox-item{
@@ -315,7 +336,7 @@
   .online-avatar{ width:18px; height:18px; border-radius:50%; object-fit:cover; background:var(--border); }
   .seen-status{ font-size:11px; color:var(--muted); text-align:right; margin-bottom:6px; font-weight:600; min-height:14px; }
   .chat-messages{
-    display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding:6px 2px;
+    display:flex; flex-direction:column; gap:10px; max-height:min(420px, 52dvh); overflow-y:auto; padding:6px 2px;
     -webkit-overflow-scrolling:touch;
   }
   .chat-empty{ text-align:center; color:var(--muted); font-size:12.5px; padding:24px 8px; }
@@ -429,7 +450,8 @@
   .modal-overlay.show{ display:flex; }
   .modal-card{
     background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-md);
-    width:100%; max-width:320px; padding:22px 20px 20px; position:relative;
+    width:100%; max-width:320px; max-height:90vh; overflow-y:auto;
+    padding:22px 20px 20px; position:relative;
     animation:modalPop .18s ease;
   }
   @keyframes modalPop{ from{opacity:0; transform:scale(.92) translateY(6px);} to{opacity:1; transform:none;} }
@@ -537,7 +559,6 @@
   .preset-avatar-btn:active{ transform:scale(.92); }
   .preset-avatar-btn.selected{ border-color:var(--primary); box-shadow:0 0 0 2px var(--primary-light); }
   @media (max-width: 400px){
-    .brand-title{ font-size:22px; }
     .tabbtn{ font-size:9px; }
     .hashtag-btn{ padding:12px 4px; }
     .hashtag-btn .num{ font-size:17px; }
@@ -1426,7 +1447,7 @@ function renderContentHistory(){
     return;
   }
   contentHistoryBtnRow.style.display = 'flex';
-  contentHistoryWrap.innerHTML = '<div class="listbox" style="max-height:280px">' +
+  contentHistoryWrap.innerHTML = '<div class="listbox" style="max-height:min(280px, 42vh)">' +
     contentHistoryData.map(item => `
       <div class="listbox-item" data-content-history-id="${escapeHtml(item.id)}" style="cursor:pointer">
         <span class="item-title">${escapeHtml(formatContentPreview(item.text))}</span>
@@ -3245,10 +3266,10 @@ async function sendGroupMessage(){
    TAB QUẢN TRỊ (ADMIN)
    - Đăng nhập bằng tài khoản quản trị viên được CẤU HÌNH TRÊN
      FIREBASE (không hardcode trong mã nguồn nữa). Khi bấm "Đăng
-     nhập", trang sẽ đọc node groupChat/adminConfig (gồm 2 trường
+     nhập", trang sẽ đọc node groupChat/userProfiles (gồm 2 trường
      "username" và "password") trên Realtime Database rồi so khớp
      với ô nhập. Cách tạo/sửa tài khoản quản trị: vào Firebase
-     Console → Realtime Database → tạo/sửa node groupChat/adminConfig
+     Console → Realtime Database → tạo/sửa node groupChat/userProfiles
      với 2 trường username, password.
      LƯU Ý BẢO MẬT: đây vẫn là xác thực phía trình duyệt (client-side)
      — giá trị mật khẩu vẫn được tải về và so sánh ngay trên máy
@@ -3268,7 +3289,7 @@ async function sendGroupMessage(){
      mỗi dòng trong danh sách lịch sử có thể bấm vào để mở/định tâm
      vị trí đó ngay trên bản đồ.
 ========================================================= */
-const ADMIN_CONFIG_PATH = 'groupChat/adminConfig'; // node Firebase chứa {username, password}
+const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
 const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
 
 const adminLoginCard   = document.getElementById('adminLoginCard');
@@ -3359,6 +3380,13 @@ function initAdminMap(){
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(adminMap);
   setTimeout(()=> adminMap.invalidateSize(), 100);
+  // Leaflet không tự phát hiện khi khung chứa đổi kích thước (thu/phóng cửa sổ trình duyệt,
+  // xoay màn hình...) nên cần chủ động gọi invalidateSize() mỗi khi kích thước thay đổi,
+  // nếu không bản đồ sẽ hiển thị sai/thiếu vùng cho tới khi người dùng chuyển tab qua lại.
+  if(typeof ResizeObserver !== 'undefined'){
+    const ro = new ResizeObserver(()=>{ if(adminMap) adminMap.invalidateSize(); });
+    ro.observe(document.getElementById('adminMap'));
+  }
 }
 function subscribeAdminData(){
   adminLocationsRef = gDb.ref('groupChat/userLocations');
@@ -3546,7 +3574,7 @@ btnFbFetch.addEventListener('click', async ()=>{
   // chủ của họ bên trong khung nhúng nên vẫn hoạt động bình thường.
   const embedSrc = 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(link) + '&show_text=false';
   fbVideoWrap.innerHTML = `
-    <div style="width:100%;height:480px;border-radius:var(--radius-md);overflow:hidden;background:#000">
+    <div style="width:100%;aspect-ratio:9/16;max-height:75vh;border-radius:var(--radius-md);overflow:hidden;background:#000">
       <iframe src="${escapeHtml(embedSrc)}" style="width:100%;height:100%;border:0" scrolling="no" frameborder="0"
         allowfullscreen allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
     </div>
@@ -3819,7 +3847,7 @@ function renderYtPlaylist(items){
   const currentIndex = ytPlayer && ytPlayer.getPlaylistIndex ? ytPlayer.getPlaylistIndex() : 0;
   ytPlaylistWrap.innerHTML =
     `<div class="section-label" style="margin-top:0">Danh sách phát (${items.length} video)</div>` +
-    '<div class="listbox" style="max-height:300px">' +
+    '<div class="listbox" style="max-height:min(300px, 45vh)">' +
     items.map(it => `
       <div class="listbox-item ${it.index === currentIndex ? 'picked' : ''}" data-yt-index="${it.index}" style="display:flex;gap:10px;align-items:center;cursor:pointer">
         ${it.thumb ? `<img src="${escapeHtml(it.thumb)}" style="width:64px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0" alt="">` : ''}
@@ -3970,7 +3998,7 @@ function renderYtHistory(){
     return;
   }
   ytHistoryBtnRow.style.display = 'flex';
-  ytHistoryWrap.innerHTML = '<div class="listbox" style="max-height:300px">' +
+  ytHistoryWrap.innerHTML = '<div class="listbox" style="max-height:min(300px, 45vh)">' +
     ids.map(id=>{
       const h = ytHistoryData[id];
       return `
