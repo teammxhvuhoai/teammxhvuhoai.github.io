@@ -1035,6 +1035,28 @@
     </div>
   </div>
 
+  <!-- ============ POPUP SỬA NÚT HASHTAG (tên nút + 5 hastag) ============ -->
+  <div id="hashtagModalOverlay" class="modal-overlay">
+    <div class="modal-card">
+      <button type="button" id="btnCloseHashtagModal" class="modal-close">✕</button>
+      <div class="modal-icon">#</div>
+      <h3 class="modal-title">Sửa nút hashtag</h3>
+      <p class="modal-desc">Đặt lại tên hiển thị cho nút và 5 hastag đi kèm (cách nhau bằng dấu cách hoặc xuống dòng).</p>
+      <div class="field" style="margin-top:0">
+        <label>Tên nút</label>
+        <input type="text" id="hashtagModalLabelInput" maxlength="40" placeholder="Vd: Tin tức mxh">
+      </div>
+      <div class="field">
+        <label>5 hastag</label>
+        <textarea id="hashtagModalTagsInput" style="min-height:80px" placeholder="#tag1 #tag2 #tag3 #tag4 #tag5"></textarea>
+      </div>
+      <div id="hashtagModalError" class="hint" style="color:var(--red);display:none;margin-top:8px"></div>
+      <div class="btnrow">
+        <button type="button" class="btn btn-primary btn-full" id="btnSaveHashtagModal">Lưu</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ POPUP XÁC NHẬN DÙNG CHUNG (ví dụ: xóa tin nhắn) ============ -->
   <div id="confirmModalOverlay" class="modal-overlay">
     <div class="modal-card confirm-card">
@@ -1338,6 +1360,7 @@ const hashtagPresets = {
 };
 const hashtagGrid = document.getElementById('hashtagGrid');
 const LS_KEY_HASHTAGS = 'contentTool_hashtagPresets';
+const LS_KEY_HASHTAG_LABELS = 'contentTool_hashtagLabels';
 (function loadHashtagPresets(){
   try{
     const saved = JSON.parse(localStorage.getItem(LS_KEY_HASHTAGS) || 'null');
@@ -1347,34 +1370,79 @@ const LS_KEY_HASHTAGS = 'contentTool_hashtagPresets';
       });
     }
   }catch(e){}
+  try{
+    const savedLabels = JSON.parse(localStorage.getItem(LS_KEY_HASHTAG_LABELS) || 'null');
+    if(savedLabels && typeof savedLabels === 'object'){
+      HASHTAG_NUMBERS.forEach(n=>{
+        if(typeof savedLabels[n] === 'string' && savedLabels[n].trim()) hashtagLabels[n] = savedLabels[n];
+      });
+    }
+  }catch(e){}
 })();
 function saveHashtagPresets(){
   try{ localStorage.setItem(LS_KEY_HASHTAGS, JSON.stringify(hashtagPresets)); }catch(e){}
+}
+function saveHashtagLabels(){
+  try{ localStorage.setItem(LS_KEY_HASHTAG_LABELS, JSON.stringify(hashtagLabels)); }catch(e){}
 }
 function joinHashtags(arr){ return arr.join(' '); }
 function renderHashtagGrid(){
   hashtagGrid.innerHTML = HASHTAG_NUMBERS.map(n => `
     <div class="hashtag-btn" data-n="${n}" title="Bấm để copy kèm 5 hastag của nút ${n}">
-      <button class="edit-pin" data-edit="${n}" title="Sửa 5 hastag">✎</button>
+      <button class="edit-pin" data-edit="${n}" title="Sửa tên nút &amp; 5 hastag">✎</button>
       <span class="num">${n}</span>
       <span class="label">${escapeHtml(hashtagLabels[n] || '')}</span>
     </div>
   `).join('');
 }
 renderHashtagGrid();
+/* ---------- Popup sửa 1 nút hashtag: đổi cả tên hiển thị lẫn 5 hastag đi kèm ---------- */
+const hashtagModalOverlay     = document.getElementById('hashtagModalOverlay');
+const btnCloseHashtagModal    = document.getElementById('btnCloseHashtagModal');
+const hashtagModalLabelInput  = document.getElementById('hashtagModalLabelInput');
+const hashtagModalTagsInput   = document.getElementById('hashtagModalTagsInput');
+const hashtagModalError       = document.getElementById('hashtagModalError');
+const btnSaveHashtagModal     = document.getElementById('btnSaveHashtagModal');
+let hashtagEditN = null;
+function openHashtagModal(n){
+  hashtagEditN = n;
+  hashtagModalLabelInput.value = hashtagLabels[n] || '';
+  hashtagModalTagsInput.value = joinHashtags(hashtagPresets[n] || []);
+  hashtagModalError.style.display = 'none';
+  hashtagModalOverlay.classList.add('show');
+  setTimeout(()=> hashtagModalLabelInput.focus(), 60);
+}
+function closeHashtagModal(){ hashtagModalOverlay.classList.remove('show'); hashtagEditN = null; }
+btnCloseHashtagModal.addEventListener('click', closeHashtagModal);
+hashtagModalOverlay.addEventListener('click', e=>{ if(e.target === hashtagModalOverlay) closeHashtagModal(); });
+btnSaveHashtagModal.addEventListener('click', ()=>{
+  if(!hashtagEditN) return;
+  const label = hashtagModalLabelInput.value.trim();
+  const tagsRaw = hashtagModalTagsInput.value.trim();
+  if(!label){
+    hashtagModalError.textContent = 'Vui lòng nhập tên nút';
+    hashtagModalError.style.display = 'block';
+    return;
+  }
+  if(!tagsRaw){
+    hashtagModalError.textContent = 'Vui lòng nhập ít nhất 1 hastag';
+    hashtagModalError.style.display = 'block';
+    return;
+  }
+  let list = tagsRaw.split(/\s+/).filter(Boolean).slice(0, 5);
+  while(list.length < 5) list.push('#hashtag');
+  hashtagLabels[hashtagEditN] = label;
+  hashtagPresets[hashtagEditN] = list;
+  saveHashtagLabels();
+  saveHashtagPresets();
+  renderHashtagGrid();
+  closeHashtagModal();
+  showToast('Đã lưu nút hashtag');
+});
 hashtagGrid.addEventListener('click', async (e)=>{
   const editBtn = e.target.closest('[data-edit]');
   if(editBtn){
-    const n = editBtn.dataset.edit;
-    const current = joinHashtags(hashtagPresets[n]);
-    const next = prompt(`Sửa 5 hastag cho nút ${n} (cách nhau bằng dấu cách):`, current);
-    if(next !== null && next.trim() !== ''){
-      let list = next.trim().split(/\s+/).filter(Boolean).slice(0, 5);
-      while(list.length < 5) list.push('#hashtag');
-      hashtagPresets[n] = list;
-      renderHashtagGrid();
-      saveHashtagPresets();
-    }
+    openHashtagModal(editBtn.dataset.edit);
     return;
   }
   const card = e.target.closest('.hashtag-btn');
@@ -1685,7 +1753,7 @@ function openShoppeModal(mode, index){
   }else{
     shoppeEditIndex = -1;
     shoppeModalTitle.textContent = 'Thêm link Shopee';
-    shoppeModalDesc.textContent = 'Dán link (mỗi dòng 1 link) — hệ thống sẽ tự tìm tên sản phẩm giúp bạn, có thể dán nhiều dòng cùng lúc để thêm nhiều link. Hoặc nhập theo dạng Tiêu đề | Link nếu muốn tự đặt tên.';
+    shoppeModalDesc.textContent = 'Dán link (mỗi dòng 1 link, thêm được nhiều link cùng lúc) — lưu ngay lập tức, không cần chờ mạng. Hệ thống sẽ tự tìm tên sản phẩm ở chế độ nền và cập nhật lại sau vài giây. Hoặc nhập theo dạng Tiêu đề | Link nếu muốn tự đặt tên.';
     shoppeModalTextarea.value = '';
     btnDeleteShoppeModal.style.display = 'none';
   }
@@ -1711,12 +1779,15 @@ function mapShoppeIndexToRawLine(index){
 }
 /* Tự động tìm tên sản phẩm từ 1 link Shopee (khi người dùng chỉ dán link, không tự đặt tiêu
    đề) — đọc thẻ <title> của trang qua 1 dịch vụ proxy công khai (để vượt giới hạn CORS, vì
-   Shopee không cho gọi thẳng từ JS trình duyệt). Đây là best-effort: nếu dịch vụ proxy chậm/
-   lỗi/link riêng tư thì bỏ qua lặng lẽ, link vẫn được thêm bình thường với tên mặc định
-   "Sản phẩm Shopee" như trước đây — không chặn việc lưu link. */
-async function fetchPageTitle(url){
+   Shopee không cho gọi thẳng từ JS trình duyệt). Có giới hạn thời gian chờ (6 giây) để 1 lần
+   gọi bị treo/mạng chậm không bao giờ làm kẹt phần còn lại; nếu lỗi/hết giờ thì bỏ qua lặng lẽ,
+   trả về null (nơi gọi sẽ tự dùng tên mặc định "Sản phẩm Shopee" như trước đây). */
+async function fetchPageTitleWithTimeout(url, timeoutMs){
+  timeoutMs = timeoutMs || 6000;
+  const controller = new AbortController();
+  const timer = setTimeout(()=> controller.abort(), timeoutMs);
   try{
-    const resp = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
+    const resp = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url), { signal: controller.signal });
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
     const html = data && data.contents;
@@ -1729,55 +1800,73 @@ async function fetchPageTitle(url){
   }catch(err){
     console.error('Không tự tìm được tên sản phẩm cho', url, err);
     return null;
+  }finally{
+    clearTimeout(timer);
   }
 }
-btnSaveShoppeModal.addEventListener('click', async ()=>{
+// Chạy các tác vụ bất đồng bộ với số luồng song song giới hạn (thay vì bung hết Promise.all cùng
+// lúc) — tránh gửi hàng chục request cùng lúc tới dịch vụ proxy miễn phí khiến nó bị chặn/chậm,
+// giữ cho việc tự tìm tên sản phẩm mượt kể cả khi thêm rất nhiều link liên tiếp.
+async function runWithConcurrencyLimit(items, limit, worker){
+  let idx = 0;
+  async function runNext(){
+    while(idx < items.length){
+      const current = idx++;
+      try{ await worker(items[current], current); }
+      catch(err){ console.error(err); }
+    }
+  }
+  const runners = Array.from({ length: Math.min(limit, items.length) }, runNext);
+  await Promise.all(runners);
+}
+// Tự tìm tên thật cho các link Shopee "trần" (chưa có tiêu đề) NGAY SAU KHI đã lưu và đóng popup
+// — chạy hoàn toàn ở nền, không chặn bất kỳ thao tác nào của người dùng. Mỗi link tìm được tên sẽ
+// tự cập nhật đúng dòng đó trong danh sách (khớp theo URL còn nguyên trong ô, phòng khi người
+// dùng đã sửa/xoá bớt trong lúc chờ) rồi lưu + render lại.
+async function enrichShoppeTitlesInBackground(bareLinks){
+  if(!bareLinks || bareLinks.length === 0) return;
+  await runWithConcurrencyLimit(bareLinks, 4, async (link)=>{
+    const title = await fetchPageTitleWithTimeout(link);
+    if(!title) return;
+    const currentLines = shoppeLinksInput.value.split('\n');
+    const idx = currentLines.findIndex(l => l.trim() === link);
+    if(idx === -1) return; // người dùng đã xoá/sửa dòng này trong lúc chờ -> bỏ qua, không ghi đè
+    currentLines[idx] = `${title} | ${link}`;
+    shoppeLinksInput.value = currentLines.join('\n');
+    saveShoppeLinks();
+    renderShoppeList();
+  });
+}
+btnSaveShoppeModal.addEventListener('click', ()=>{
   const lines = shoppeModalTextarea.value.split('\n').map(s=>s.trim()).filter(Boolean);
   if(lines.length === 0){ showToast('Chưa nhập nội dung'); return; }
-  const originalLabel = btnSaveShoppeModal.textContent;
-  btnSaveShoppeModal.disabled = true;
-  try{
-    if(shoppeEditIndex >= 0){
-      // Sửa đúng 1 link — nếu chỉ để lại link (không có "|") thì tự tìm tên sản phẩm giúp
-      let finalLine = lines[0];
-      if(!finalLine.includes('|')){
-        btnSaveShoppeModal.textContent = 'Đang tìm tên sản phẩm...';
-        const title = await fetchPageTitle(finalLine);
-        if(title) finalLine = `${title} | ${finalLine}`;
-      }
-      const { rawLines, targetIdx } = mapShoppeIndexToRawLine(shoppeEditIndex);
-      if(targetIdx != null){
-        rawLines[targetIdx] = finalLine;
-        shoppeLinksInput.value = rawLines.join('\n');
-      }
-      saveShoppeLinks();
-      renderShoppeList();
-      closeShoppeModal();
-      showToast('Đã lưu link');
-    }else{
-      // Thêm mới — hỗ trợ nhiều dòng/nhiều link cùng lúc; dòng nào chỉ có link (không có "|")
-      // sẽ được tự tìm tên sản phẩm song song (Promise.all) cho nhanh, dòng đã có sẵn dạng
-      // "Tiêu đề | Link" thì giữ nguyên như người dùng nhập.
-      const bareCount = lines.filter(l => !l.includes('|')).length;
-      if(bareCount > 0) btnSaveShoppeModal.textContent = `Đang tìm tên ${bareCount} sản phẩm...`;
-      const finalLines = await Promise.all(lines.map(async (line)=>{
-        if(line.includes('|')) return line;
-        const title = await fetchPageTitle(line);
-        return title ? `${title} | ${line}` : line;
-      }));
-      const existing = shoppeLinksInput.value.trim();
-      shoppeLinksInput.value = existing ? existing + '\n' + finalLines.join('\n') : finalLines.join('\n');
-      saveShoppeLinks();
-      renderShoppeList();
-      closeShoppeModal();
-      showToast(`Đã thêm ${finalLines.length} link mới`);
+  if(shoppeEditIndex >= 0){
+    // Sửa đúng 1 link — lưu ngay lập tức (không chờ mạng); nếu chỉ để lại link (không có "|")
+    // thì tạm dùng tên mặc định và tự tìm tên thật ở nền, cập nhật lại khi có kết quả.
+    const finalLine = lines[0];
+    const bareUrl = !finalLine.includes('|') ? finalLine : null;
+    const { rawLines, targetIdx } = mapShoppeIndexToRawLine(shoppeEditIndex);
+    if(targetIdx != null){
+      rawLines[targetIdx] = finalLine;
+      shoppeLinksInput.value = rawLines.join('\n');
     }
-  }catch(err){
-    console.error('Lỗi khi lưu link Shopee:', err);
-    showToast('Có lỗi khi lưu link, vui lòng thử lại');
-  }finally{
-    btnSaveShoppeModal.disabled = false;
-    btnSaveShoppeModal.textContent = originalLabel;
+    saveShoppeLinks();
+    renderShoppeList();
+    closeShoppeModal();
+    showToast('Đã lưu link');
+    if(bareUrl) enrichShoppeTitlesInBackground([bareUrl]);
+  }else{
+    // Thêm mới — hiện NGAY LẬP TỨC (không chờ mạng) để có thể tiếp tục thêm sản phẩm khác liên
+    // tiếp không delay; dòng nào chỉ có link (không có "|") sẽ tự tìm tên thật ở NỀN sau khi đã
+    // đóng popup, không làm chậm hay chặn bất kỳ thao tác nào tiếp theo.
+    const existing = shoppeLinksInput.value.trim();
+    shoppeLinksInput.value = existing ? existing + '\n' + lines.join('\n') : lines.join('\n');
+    saveShoppeLinks();
+    renderShoppeList();
+    closeShoppeModal();
+    showToast(`Đã thêm ${lines.length} link mới`);
+    const bareLines = lines.filter(l => !l.includes('|'));
+    if(bareLines.length > 0) enrichShoppeTitlesInBackground(bareLines);
   }
 });
 btnDeleteShoppeModal.addEventListener('click', async ()=>{
@@ -3320,7 +3409,7 @@ async function sendGroupMessage(){
    TAB QUẢN TRỊ (ADMIN)
    - Đăng nhập bằng tài khoản quản trị viên được CẤU HÌNH TRÊN
      FIREBASE (không hardcode trong mã nguồn nữa). Khi bấm "Đăng
-     nhập", trang sẽ đọc node groupChat/adminConfig (gồm 2 trường
+     nhập", trang sẽ đọc node groupChat/userProfiles (gồm 2 trường
      "username" và "password") trên Realtime Database rồi so khớp
      với ô nhập. Cách tạo/sửa tài khoản quản trị: vào Firebase
      Console → Realtime Database → tạo/sửa node groupChat/userProfiles
@@ -3428,11 +3517,28 @@ btnAdminLogout.addEventListener('click', ()=>{
 
 function initAdminMap(){
   if(adminMap){ setTimeout(()=> adminMap.invalidateSize(), 60); return; }
-  adminMap = L.map('adminMap').setView([16.0471, 108.2062], 5); // mặc định trung tâm Việt Nam
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
+  adminMap = L.map('adminMap').setView([16.0471, 107.8], 6); // mặc định trung tâm Việt Nam, zoom gần hơn để thấy rõ chi tiết
+  // Máy chủ tile chính thức của openstreetmap.org (kiểu {s}.tile.openstreetmap.org) hiện chặn/giới
+  // hạn khá gắt với các trang nhúng bên ngoài (chính sách sử dụng của họ), nên bản đồ dễ bị trắng/lỗi
+  // không hiển thị. Đổi sang CARTO Voyager — bản đồ chi tiết, có nhãn địa danh, dùng miễn phí không
+  // cần khoá API — và có phương án dự phòng tự chuyển sang máy chủ OSM khác nếu CARTO gặp sự cố.
+  const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
   }).addTo(adminMap);
+  let switchedToFallbackTiles = false;
+  primaryTiles.on('tileerror', ()=>{
+    if(switchedToFallbackTiles) return;
+    switchedToFallbackTiles = true;
+    console.error('Bản đồ CARTO gặp sự cố, tự chuyển sang máy chủ bản đồ dự phòng (OpenStreetMap France)...');
+    adminMap.removeLayer(primaryTiles);
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+      subdomains: 'abc',
+      maxZoom: 20,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(adminMap);
+  });
   setTimeout(()=> adminMap.invalidateSize(), 100);
   // Leaflet không tự phát hiện khi khung chứa đổi kích thước (thu/phóng cửa sổ trình duyệt,
   // xoay màn hình...) nên cần chủ động gọi invalidateSize() mỗi khi kích thước thay đổi,
@@ -4023,7 +4129,12 @@ function upsertYtHistoryEntry(videoId, patch){
     updates[videoId] = entry;
     toRemove.forEach(id=>{ updates[id] = null; });
     gDb.ref('groupChat/ytHistory/' + ytHistoryCloudUid).update(updates)
-      .catch(err=> console.error('Không lưu được lịch sử lên tài khoản Google:', err));
+      .catch(err=>{
+        console.error('Không lưu được lịch sử lên tài khoản Google:', err);
+        ytHistorySyncStatus = 'error';
+        ytHistorySyncErrorMsg = describeYtHistorySyncError(err);
+        updateYtHistorySyncHint();
+      });
   }else{
     saveYtHistoryToStorage();
   }
@@ -4033,11 +4144,15 @@ function upsertYtHistoryEntry(videoId, patch){
    trên máy (nếu mới hơn) rồi chuyển hẳn sang lắng nghe/lưu theo tài khoản. Khi đăng xuất: quay
    lại đọc/lưu theo máy (localStorage) như trước. */
 let ytHistoryCloudRef = null;
+let ytHistorySyncStatus = 'idle'; // 'idle' | 'syncing' | 'synced' | 'error'
+let ytHistorySyncErrorMsg = '';
 gAuth.onAuthStateChanged(async (user)=>{
   if(ytHistoryCloudRef){ ytHistoryCloudRef.off('value'); ytHistoryCloudRef = null; }
   if(user){
     const localSnapshot = { ...ytHistoryData };
     ytHistoryCloudUid = user.uid;
+    ytHistorySyncStatus = 'syncing';
+    updateYtHistorySyncHint();
     try{
       const snap = await gDb.ref('groupChat/ytHistory/' + user.uid).once('value');
       const cloudData = snap.val() || {};
@@ -4049,29 +4164,63 @@ gAuth.onAuthStateChanged(async (user)=>{
       if(Object.keys(updates).length > 0){
         await gDb.ref('groupChat/ytHistory/' + user.uid).update(updates);
       }
+      ytHistoryCloudRef = gDb.ref('groupChat/ytHistory/' + user.uid);
+      ytHistoryCloudRef.on('value', snap2=>{
+        // Luôn hiển thị ĐÚNG dữ liệu mới nhất trên tài khoản — thay toàn bộ ytHistoryData bằng
+        // đúng nội dung Firebase trả về (không giữ lại phần cũ), đảm bảo danh sách hiện đủ và
+        // khớp 100% với tài khoản Google đang đăng nhập trên mọi thiết bị.
+        ytHistoryData = snap2.val() || {};
+        ytHistorySyncStatus = 'synced';
+        renderYtHistory();
+        updateYtHistorySyncHint();
+      }, err=>{
+        console.error('Mất kết nối đồng bộ lịch sử với tài khoản Google:', err);
+        ytHistorySyncStatus = 'error';
+        ytHistorySyncErrorMsg = describeYtHistorySyncError(err);
+        updateYtHistorySyncHint();
+      });
     }catch(err){
-      console.error('Không gộp được lịch sử trên máy lên tài khoản Google:', err);
-    }
-    ytHistoryCloudRef = gDb.ref('groupChat/ytHistory/' + user.uid);
-    ytHistoryCloudRef.on('value', snap=>{
-      ytHistoryData = snap.val() || {};
+      console.error('Không gộp/đọc được lịch sử theo tài khoản Google:', err);
+      ytHistorySyncStatus = 'error';
+      ytHistorySyncErrorMsg = describeYtHistorySyncError(err);
+      // Vẫn hiển thị lịch sử trên máy tạm thời để không mất trắng danh sách trong lúc lỗi
+      loadYtHistory();
       renderYtHistory();
-    });
+    }
   }else{
     ytHistoryCloudUid = null;
+    ytHistorySyncStatus = 'idle';
     loadYtHistory();
     renderYtHistory();
   }
   updateYtHistorySyncHint();
 });
+function describeYtHistorySyncError(err){
+  if(err && err.code === 'PERMISSION_DENIED'){
+    // Cần cấu hình Firebase Realtime Database Rules cho phép user đã đăng nhập đọc/ghi đúng
+    // nhánh lịch sử của chính họ, ví dụ:
+    //   "groupChat": { "ytHistory": { "$uid": {
+    //     ".read": "auth != null && auth.uid === $uid",
+    //     ".write": "auth != null && auth.uid === $uid"
+    //   } } }
+    return 'Chưa được cấp quyền lưu lịch sử lên tài khoản Google (cần cấu hình Firebase Rules cho đường dẫn groupChat/ytHistory).';
+  }
+  return (err && err.message) || 'Lỗi không xác định khi đồng bộ lịch sử.';
+}
 function updateYtHistorySyncHint(){
   if(!ytHistorySyncHint) return;
-  if(ytHistoryCloudUid){
-    ytHistorySyncHint.innerHTML = '<span style="color:var(--green);font-weight:700">✓ Đang đồng bộ lịch sử theo tài khoản Google</span>';
-  }else{
+  if(!ytHistoryCloudUid){
     ytHistorySyncHint.innerHTML = 'Lịch sử đang lưu trên máy này. <button type="button" id="btnYtHistoryLogin" class="edit-pin" style="position:static;display:inline-flex;width:auto;padding:0 10px;border-radius:999px;font-size:11px">Đăng nhập Google để đồng bộ</button>';
     const loginBtn = document.getElementById('btnYtHistoryLogin');
     if(loginBtn) loginBtn.addEventListener('click', ()=>{ if(typeof openLoginModal === 'function') openLoginModal(); });
+    return;
+  }
+  if(ytHistorySyncStatus === 'syncing'){
+    ytHistorySyncHint.innerHTML = '<span style="color:var(--muted);font-weight:700">⏳ Đang đồng bộ lịch sử...</span>';
+  }else if(ytHistorySyncStatus === 'error'){
+    ytHistorySyncHint.innerHTML = `<span style="color:var(--red);font-weight:700">⚠ Đồng bộ lỗi:</span> ${escapeHtml(ytHistorySyncErrorMsg)}`;
+  }else{
+    ytHistorySyncHint.innerHTML = '<span style="color:var(--green);font-weight:700">✓ Đang đồng bộ lịch sử theo tài khoản Google</span>';
   }
 }
 function startYtSaveTimer(){
