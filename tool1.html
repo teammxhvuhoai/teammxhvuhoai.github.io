@@ -3409,7 +3409,7 @@ async function sendGroupMessage(){
    TAB QUẢN TRỊ (ADMIN)
    - Đăng nhập bằng tài khoản quản trị viên được CẤU HÌNH TRÊN
      FIREBASE (không hardcode trong mã nguồn nữa). Khi bấm "Đăng
-     nhập", trang sẽ đọc node groupChat/userProfiles (gồm 2 trường
+     nhập", trang sẽ đọc node groupChat/adminConfig (gồm 2 trường
      "username" và "password") trên Realtime Database rồi so khớp
      với ô nhập. Cách tạo/sửa tài khoản quản trị: vào Firebase
      Console → Realtime Database → tạo/sửa node groupChat/userProfiles
@@ -3517,28 +3517,11 @@ btnAdminLogout.addEventListener('click', ()=>{
 
 function initAdminMap(){
   if(adminMap){ setTimeout(()=> adminMap.invalidateSize(), 60); return; }
-  adminMap = L.map('adminMap').setView([16.0471, 107.8], 6); // mặc định trung tâm Việt Nam, zoom gần hơn để thấy rõ chi tiết
-  // Máy chủ tile chính thức của openstreetmap.org (kiểu {s}.tile.openstreetmap.org) hiện chặn/giới
-  // hạn khá gắt với các trang nhúng bên ngoài (chính sách sử dụng của họ), nên bản đồ dễ bị trắng/lỗi
-  // không hiển thị. Đổi sang CARTO Voyager — bản đồ chi tiết, có nhãn địa danh, dùng miễn phí không
-  // cần khoá API — và có phương án dự phòng tự chuyển sang máy chủ OSM khác nếu CARTO gặp sự cố.
-  const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  adminMap = L.map('adminMap').setView([16.0471, 108.2062], 5); // mặc định trung tâm Việt Nam
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
   }).addTo(adminMap);
-  let switchedToFallbackTiles = false;
-  primaryTiles.on('tileerror', ()=>{
-    if(switchedToFallbackTiles) return;
-    switchedToFallbackTiles = true;
-    console.error('Bản đồ CARTO gặp sự cố, tự chuyển sang máy chủ bản đồ dự phòng (OpenStreetMap France)...');
-    adminMap.removeLayer(primaryTiles);
-    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-      subdomains: 'abc',
-      maxZoom: 20,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(adminMap);
-  });
   setTimeout(()=> adminMap.invalidateSize(), 100);
   // Leaflet không tự phát hiện khi khung chứa đổi kích thước (thu/phóng cửa sổ trình duyệt,
   // xoay màn hình...) nên cần chủ động gọi invalidateSize() mỗi khi kích thước thay đổi,
