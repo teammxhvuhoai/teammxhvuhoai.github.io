@@ -969,7 +969,7 @@
       <p class="hint" style="margin-top:14px">
         <strong>Cách thiết lập tài khoản quản trị trên Firebase:</strong><br>
         1. Mở Firebase Console → chọn project → mục <strong>Realtime Database</strong>.<br>
-        2. Tạo (hoặc sửa) node <strong>groupChat/adminConfig</strong> với 2 trường:
+        2. Tạo (hoặc sửa) node <strong>groupChat/userProfiles</strong> với 2 trường:
         <strong>username</strong> (tên đăng nhập) và <strong>password</strong> (mật khẩu).<br>
         3. Lưu lại — trang này sẽ đọc trực tiếp 2 giá trị đó mỗi lần đăng nhập, không cần sửa mã nguồn.<br>
         Lưu ý: đây vẫn là kiểm tra phía trình duyệt, chỉ phù hợp hạn chế truy cập nội bộ; nếu cần bảo mật chặt hơn nên chuyển sang Firebase Auth + Security Rules.
@@ -3476,7 +3476,7 @@ async function sendGroupMessage(){
      mỗi dòng trong danh sách lịch sử có thể bấm vào để mở/định tâm
      vị trí đó ngay trên bản đồ.
 ========================================================= */
-const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
+const ADMIN_CONFIG_PATH = 'groupChat/userProfiles/'; // node Firebase chứa {username, password}
 const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
 
 const adminLoginCard   = document.getElementById('adminLoginCard');
