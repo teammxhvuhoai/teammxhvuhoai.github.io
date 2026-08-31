@@ -3438,7 +3438,7 @@ async function sendGroupMessage(){
 
 /* =========================================================
 ========================================================= */
-const ADMIN_CONFIG_PATH = 'groupChat/adminConfig'; // node Firebase chứa {username, password}
+const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
 async function ensureAdminConfigExists(){
   try{
     const ref = gDb.ref(ADMIN_CONFIG_PATH);
