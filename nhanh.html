@@ -8,72 +8,57 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --primary: #6D28D9;
+    --primary: #6D4AFF;
     --primary-dark: #4C1D95;
-    --primary-light: #F1ECFE;
-    --accent: #0EA5B7;
+    --primary-light: #F1EDFF;
+    --primary-text: #5B21B6;
+    --accent: #0891B2;
     --accent-light: #E3F8FA;
-    --navy: #0B1023;
-    --bg-top: #EEF0FF;
-    --bg-bot: #F8F8FC;
-    --surface: #ffffff;
-    --border: #E7E5F3;
-    --ink: #191A2E;
-    --muted: #8A8AA3;
-    --red: #EF4444;
-    --green: #16A34A;
-    --amber: #F59E0B;
+    --navy: #242A46;
+    --heading: #14162B;
+    --bg-top: #FAFAFD;
+    --bg-bot: #EFF0F7;
+    --surface: #FFFFFF;
+    --surface-2: #F4F5FA;
+    --border: #E3E4EE;
+    --ink: #20223D;
+    --muted: #676C8C;
+    --red: #E11D48;
+    --red-bg: #FDE7EC;
+    --green: #059669;
+    --green-bg: #DCFCE9;
+    --amber: #D97706;
     --radius-lg: 22px;
     --radius-md: 15px;
     --radius-sm: 11px;
-    --shadow-sm: 0 1px 2px rgba(24,17,60,.06);
-    --shadow-md: 0 12px 32px rgba(76,29,149,.14);
+    --shadow-sm: 0 1px 3px rgba(16,24,40,.08);
+    --shadow-md: 0 20px 45px rgba(16,24,40,.16);
     --safe-t: env(safe-area-inset-top, 0px);
     --safe-b: env(safe-area-inset-bottom, 0px);
     --safe-l: env(safe-area-inset-left, 0px);
     --safe-r: env(safe-area-inset-right, 0px);
   }
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html{ height:100%; }
-  body{ min-height:100%; overflow-x:hidden; }
+  html, body{ height:100%; }
   body{
     margin:0;
     font-family:'Inter', system-ui, sans-serif;
     color:var(--ink);
+    font-weight:500;
     background:
-      radial-gradient(720px 320px at 100% -8%, rgba(14,165,183,.10), transparent 60%),
-      radial-gradient(720px 360px at -10% 0%, rgba(109,40,217,.12), transparent 55%),
+      radial-gradient(720px 320px at 100% -8%, rgba(45,212,224,.09), transparent 60%),
+      radial-gradient(720px 360px at -10% 0%, rgba(155,124,250,.16), transparent 55%),
       linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 340px);
     -webkit-font-smoothing:antialiased;
     overscroll-behavior-y:none;
   }
   .app{
     max-width:430px;
+
     margin:0 auto;
     min-height:100vh;
     min-height:100dvh;
     padding:calc(18px + var(--safe-t)) calc(16px + var(--safe-r)) calc(28px + var(--safe-b)) calc(16px + var(--safe-l));
-  }
-  /* ===== Màn hình rộng (PC / tablet ngang): hiện dạng thẻ (card) cân đối giữa trang thay vì
-     kéo dài hết chiều rộng trình duyệt — bố cục bên trong vẫn giữ nguyên như trên điện thoại,
-     chỉ đổi cách trình bày khung ngoài cho phù hợp màn hình lớn. ===== */
-  @media (min-width: 720px){
-    body{
-      display:flex;
-      justify-content:center;
-      padding:40px 20px;
-    }
-    .app{
-      max-width:480px;
-      min-height:auto;
-      background:var(--surface);
-      border-radius:28px;
-      border:1px solid var(--border);
-      box-shadow:0 30px 80px rgba(76,29,149,.16), 0 6px 18px rgba(24,17,60,.08);
-      padding-top:26px;
-      padding-bottom:32px;
-    }
-    .tabbar{ top:14px; }
   }
   .brand{ margin-bottom:16px; padding:0 2px; }
   .brand-eyebrow{
@@ -82,7 +67,7 @@
   }
   .brand-title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
-    font-size:clamp(20px, 5.6vw, 24px); letter-spacing:-.01em; color:var(--navy);
+    font-size:24px; letter-spacing:-.01em; color:var(--heading);
   }
   .tabbar{
     display:flex;
@@ -144,7 +129,7 @@
   }
   h2.title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:600;
-    font-size:18px; margin:0 0 6px; color:var(--navy);
+    font-size:18px; margin:0 0 6px; color:var(--heading);
   }
   .hint{ font-size:12px; color:var(--muted); margin:0 0 14px; line-height:1.55; }
   .section-label{
@@ -156,7 +141,7 @@
     width:100%;
     min-height:180px;
     border-radius:var(--radius-md);
-    background:#fbfbfe;
+    background:var(--surface-2);
     border:1px solid var(--border);
     overflow:hidden;
   }
@@ -178,7 +163,7 @@
   .field{ margin-top:12px; }
   .field label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
   .field input[type=text], .field input[type=password], .field textarea{
-    width:100%; border:1px solid var(--border); background:#fbfbfe;
+    width:100%; border:1px solid var(--border); background:var(--surface-2);
     border-radius:var(--radius-sm); padding:11px 12px;
     font-size:16px; font-family:inherit; color:var(--ink);
   }
@@ -186,17 +171,18 @@
     outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light);
   }
   .field textarea{ resize:vertical; min-height:80px; line-height:1.5; -webkit-appearance:none; }
+  .field textarea.autosize{ resize:none; overflow:hidden; white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere; cursor:default; }
   .checkrow{ display:flex; gap:16px; font-size:13px; color:var(--ink); flex-wrap:wrap; }
   .checkrow label{ display:flex; align-items:center; gap:6px; font-weight:500; }
   .hashtag-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(84px, 1fr));
+    grid-template-columns:repeat(3, 1fr);
     gap:9px;
   }
   .hashtag-btn{
     position:relative;
     border:1px solid var(--border);
-    background:#fbfbfe;
+    background:var(--surface-2);
     border-radius:var(--radius-md);
     padding:14px 6px;
     text-align:center;
@@ -211,7 +197,7 @@
   }
   .hashtag-btn .label{
     display:block; margin-top:4px; font-size:10px; font-weight:700;
-    letter-spacing:.03em; color:var(--navy); text-transform:uppercase;
+    letter-spacing:.03em; color:var(--heading); text-transform:uppercase;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .hashtag-btn .edit-pin{
@@ -224,11 +210,11 @@
   .dropzone{
     display:flex; align-items:center; justify-content:center; gap:8px;
     border:1.5px dashed var(--border); border-radius:var(--radius-md);
-    background:#fbfbfe; color:var(--muted); font-size:13px; font-weight:600;
+    background:var(--surface-2); color:var(--muted); font-size:13px; font-weight:600;
     padding:16px 12px; cursor:pointer; transition:border-color .15s ease, color .15s ease, background .15s ease;
   }
   .dropzone svg{ width:19px; height:19px; stroke:currentColor; flex-shrink:0; }
-  .dropzone:hover{ border-color:var(--primary); color:var(--primary-dark); background:var(--primary-light); }
+  .dropzone:hover{ border-color:var(--primary); color:var(--primary-text); background:var(--primary-light); }
   .video-preview{
     margin-top:10px; border:1px solid var(--border); border-radius:var(--radius-md);
     overflow:hidden; background:#000;
@@ -240,12 +226,12 @@
   }
   .video-meta span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .remove-video{
-    flex-shrink:0; border:none; background:#fde8ea; color:var(--red);
+    flex-shrink:0; border:none; background:#3B1620; color:var(--red);
     width:22px; height:22px; border-radius:50%; font-size:12px; cursor:pointer;
   }
   /* ===== Lưới xem trước nhiều file ảnh/video (tab Share) ===== */
   .media-list{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(84px, 1fr)); gap:8px; margin-top:10px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:10px;
   }
   .media-item{
     position:relative; border:1px solid var(--border); border-radius:var(--radius-sm);
@@ -276,13 +262,13 @@
     box-shadow:0 8px 18px rgba(79,70,229,.28);
   }
   .btn-dark{ background:var(--navy); color:#fff; }
-  .btn-ghost{ background:var(--primary-light); color:var(--primary-dark); }
-  .btn-danger{ background:#fde8ea; color:var(--red); }
+  .btn-ghost{ background:var(--primary-light); color:var(--primary-text); }
+  .btn-danger{ background:#3B1620; color:var(--red); }
   .btn-full{ width:100%; }
   a.btn{ display:flex; align-items:center; justify-content:center; text-decoration:none; }
   .listbox{
-    background:#fbfbfe; border:1px solid var(--border); border-radius:var(--radius-md);
-    max-height:min(240px, 38vh); overflow-y:auto;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md);
+    max-height:240px; overflow-y:auto;
     -webkit-overflow-scrolling:touch;
   }
   .listbox-item{
@@ -293,22 +279,30 @@
   .listbox-item.picked{
     background:var(--primary-light); border-left:3px solid var(--primary); font-weight:600;
   }
-  .listbox-item .item-title{ display:block; font-weight:700; color:var(--navy); margin-bottom:2px; }
+  .listbox-item .item-title{ display:block; font-weight:700; color:var(--heading); margin-bottom:2px; }
   .listbox-item .item-link{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; }
+  /* ===== Nhóm Auto Comment: badge trạng thái + nút hành động theo từng dòng ===== */
+  .ac-status{ font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px; display:inline-block; white-space:nowrap; }
+  .ac-status.pending{ background:var(--surface-2); color:var(--muted); }
+  .ac-status.ready{ background:var(--primary-light); color:var(--primary-text); }
+  .ac-status.done{ background:#123821; color:var(--green); }
+  .ac-status.canceled{ background:var(--red-bg); color:var(--red); }
+  .ac-item-actions{ display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
+  .ac-item-actions .btn{ padding:6px 9px; font-size:10.5px; min-height:auto; flex:none; white-space:nowrap; }
   .cue-card{
     margin-top:10px; padding:11px; border:1px solid var(--border); border-radius:var(--radius-sm);
-    background:#fbfbfe;
+    background:var(--surface-2);
   }
   .cue-time{ font-size:11.5px; font-weight:700; color:var(--primary); }
   .cue-orig{ font-size:11.5px; color:var(--muted); margin:4px 0 8px; line-height:1.4; word-break:break-word; }
   .cue-orig b{ color:var(--ink); font-weight:600; }
   .cue-input{
-    width:100%; border:1px solid var(--border); background:#fff; border-radius:var(--radius-sm);
+    width:100%; border:1px solid var(--border); background:var(--surface-2); border-radius:var(--radius-sm);
     padding:9px 10px; font-size:14.5px; font-family:inherit; min-height:44px; resize:vertical;
   }
   .cue-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
   #vsStatus{
-    background:var(--primary-light); color:var(--primary-dark); border-radius:var(--radius-sm);
+    background:var(--primary-light); color:var(--primary-text); border-radius:var(--radius-sm);
     padding:10px 12px; font-weight:600;
   }
   #toast{
@@ -329,14 +323,14 @@
   /* ===== TAB GROUP CHAT ===== */
   .online-users{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
   .online-chip{
-    display:flex; align-items:center; gap:5px; background:#fbfbfe; border:1px solid var(--border);
+    display:flex; align-items:center; gap:5px; background:var(--surface-2); border:1px solid var(--border);
     border-radius:999px; padding:4px 10px 4px 6px; font-size:11.5px; font-weight:600; color:var(--ink);
   }
   .online-dot{ width:8px; height:8px; border-radius:50%; background:var(--green); flex-shrink:0; box-shadow:0 0 0 2px rgba(22,163,74,.18); }
   .online-avatar{ width:18px; height:18px; border-radius:50%; object-fit:cover; background:var(--border); }
   .seen-status{ font-size:11px; color:var(--muted); text-align:right; margin-bottom:6px; font-weight:600; min-height:14px; }
   .chat-messages{
-    display:flex; flex-direction:column; gap:10px; max-height:min(420px, 52dvh); overflow-y:auto; padding:6px 2px;
+    display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding:6px 2px;
     -webkit-overflow-scrolling:touch;
   }
   .chat-empty{ text-align:center; color:var(--muted); font-size:12.5px; padding:24px 8px; }
@@ -347,14 +341,14 @@
   .chat-msg.me .chat-bubble-wrap{ align-items:flex-end; }
   .chat-name{ font-size:10.5px; font-weight:700; color:var(--primary); margin-bottom:2px; }
   .chat-bubble{
-    background:#fbfbfe; border:1px solid var(--border); border-radius:14px; padding:8px 11px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:14px; padding:8px 11px;
   }
   .chat-msg.me .chat-bubble{ background:var(--primary); border-color:var(--primary); color:#fff; }
   .chat-text{ font-size:14px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
   .chat-media{ max-width:100%; border-radius:10px; display:block; margin-bottom:4px; max-height:220px; object-fit:cover; }
   .chat-time{ font-size:9.5px; color:var(--muted); margin-top:2px; }
   .chat-media-preview{
-    display:flex; align-items:center; gap:8px; background:#fbfbfe; border:1px solid var(--border); border-radius:var(--radius-sm);
+    display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm);
     padding:8px; margin-bottom:8px;
   }
   .chat-media-preview img, .chat-media-preview video{ width:40px; height:40px; object-fit:cover; border-radius:8px; flex-shrink:0; }
@@ -366,14 +360,15 @@
     transition:transform .12s ease, opacity .12s ease;
   }
   .chat-attach-btn:active, .chat-send-btn:active{ transform:scale(.92); }
-  .chat-attach-btn{ background:var(--primary-light); color:var(--primary-dark); }
+  .chat-attach-btn{ background:var(--primary-light); color:var(--primary-text); }
   .chat-send-btn{ background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; }
   .chat-send-btn:disabled{ opacity:.5; pointer-events:none; }
-  #groupMsgInput{
-    flex:1; border:1px solid var(--border); background:#fbfbfe; border-radius:20px; padding:10px 14px;
+  .chat-text-input{
+    flex:1; border:1px solid var(--border); background:#FFFFFF; color:#191A2E; border-radius:20px; padding:10px 14px;
     font-size:15px; font-family:inherit; resize:none; max-height:100px; min-height:42px; line-height:1.4;
   }
-  #groupMsgInput:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
+  .chat-text-input::placeholder{ color:#6B6E85; }
+  .chat-text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
   .group-user-badge{
     display:flex; align-items:center; gap:8px; background:var(--primary-light); border-radius:var(--radius-sm);
     padding:8px 10px; margin-bottom:10px;
@@ -383,11 +378,11 @@
     background:var(--accent-light); border:1px solid var(--border); border-radius:var(--radius-sm);
     padding:10px 12px; margin-bottom:10px;
   }
-  .switch-row .switch-label{ font-size:12px; font-weight:700; color:var(--ink); line-height:1.4; flex:1; min-width:0; }
+  .switch-row .switch-label{ font-size:12px; font-weight:700; color:var(--ink); line-height:1.4; }
   .switch{ position:relative; display:inline-block; width:44px; height:26px; flex-shrink:0; }
   .switch input{ opacity:0; width:0; height:0; position:absolute; }
   .switch .slider{
-    position:absolute; inset:0; cursor:pointer; background:#d6d5e6; border-radius:999px; transition:background .18s ease;
+    position:absolute; inset:0; cursor:pointer; background:#3A3F5C; border-radius:999px; transition:background .18s ease;
   }
   .switch .slider:before{
     position:absolute; content:""; height:20px; width:20px; left:3px; top:3px;
@@ -395,79 +390,34 @@
   }
   .switch input:checked + .slider{ background:linear-gradient(135deg, var(--primary), var(--primary-dark)); }
   .switch input:checked + .slider:before{ transform:translateX(18px); }
-  /* ===== Tab YouTube: chế độ chỉ phát âm thanh + màn hình khoá tối tiết kiệm pin ===== */
-  .yt-player-wrap{
-    margin-top:14px; width:100%; aspect-ratio:16/9; background:#000;
-    border-radius:var(--radius-md); overflow:hidden; transition:height .2s ease, opacity .2s ease;
-  }
-  .yt-player-wrap.audio-only{
-    aspect-ratio:auto; height:2px; opacity:0; pointer-events:none; margin-top:0;
-  }
-  .yt-compact-bar{
-    display:flex; align-items:center; gap:10px; background:var(--navy); color:#fff;
-    border-radius:var(--radius-md); padding:10px 12px; margin-top:14px;
-  }
-  .yt-compact-bar img{ width:44px; height:44px; border-radius:8px; object-fit:cover; flex-shrink:0; background:#333; }
-  .yt-compact-info{ min-width:0; flex:1; }
-  .yt-compact-title{ font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .yt-compact-sub{ font-size:11px; color:#c7c7de; margin-top:2px; }
-  .yt-compact-playpause{
-    flex-shrink:0; width:38px; height:38px; border-radius:50%; border:none;
-    background:rgba(255,255,255,.14); color:#fff; font-size:16px; cursor:pointer;
-  }
-  .yt-lock-overlay{
-    position:fixed; inset:0; background:#000; z-index:200;
-    display:none; flex-direction:column; align-items:center; justify-content:center; padding:24px;
-    overflow-y:auto;
-  }
-  .yt-lock-overlay.show{ display:flex; }
-  .yt-lock-content{ display:flex; flex-direction:column; align-items:center; max-width:340px; width:100%; margin:auto; }
-  .yt-lock-content img{
-    width:clamp(110px, 42vw, 180px); height:clamp(110px, 42vw, 180px);
-    border-radius:20px; object-fit:cover; background:#111;
-    box-shadow:0 20px 50px rgba(0,0,0,.6);
-  }
-  .yt-lock-title{ color:#fff; font-weight:700; font-size:15px; text-align:center; margin-top:18px; line-height:1.4; }
-  .yt-lock-controls{ display:flex; align-items:center; gap:clamp(14px, 5vw, 22px); margin-top:26px; }
-  .yt-lock-btn{
-    border:none; background:rgba(255,255,255,.08); color:#fff;
-    width:clamp(44px, 13vw, 52px); height:clamp(44px, 13vw, 52px); border-radius:50%;
-    font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .yt-lock-btn-main{
-    width:clamp(56px, 16vw, 66px); height:clamp(56px, 16vw, 66px); font-size:26px;
-    background:linear-gradient(135deg, var(--primary), var(--primary-dark));
-  }
-  .yt-lock-note{ color:#8a8aa3; text-align:center; margin-top:16px; font-size:11.5px; line-height:1.5; }
   .group-user-badge img{ width:28px; height:28px; border-radius:50%; object-fit:cover; }
-  .group-user-badge .name{ font-size:12.5px; font-weight:700; color:var(--navy); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .group-user-badge .name{ font-size:12.5px; font-weight:700; color:var(--heading); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   /* ===== Popup đăng nhập nhỏ & popup xác nhận dùng chung ===== */
   .modal-overlay{
-    position:fixed; inset:0; background:rgba(20,22,44,.55);
+    position:fixed; inset:0; background:rgba(4,5,10,.72);
     display:none; align-items:center; justify-content:center; z-index:100;
     padding:20px; backdrop-filter:blur(2px);
   }
   .modal-overlay.show{ display:flex; }
   .modal-card{
     background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-md);
-    width:100%; max-width:320px; max-height:90vh; overflow-y:auto;
-    padding:22px 20px 20px; position:relative;
+    width:100%; max-width:320px; padding:22px 20px 20px; position:relative;
     animation:modalPop .18s ease;
   }
   @keyframes modalPop{ from{opacity:0; transform:scale(.92) translateY(6px);} to{opacity:1; transform:none;} }
   .modal-close{
     position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%;
-    border:none; background:var(--primary-light); color:var(--primary-dark); font-size:13px; cursor:pointer;
+    border:none; background:var(--primary-light); color:var(--primary-text); font-size:13px; cursor:pointer;
   }
   .modal-icon{
     width:46px; height:46px; border-radius:14px; background:linear-gradient(135deg, var(--primary), var(--primary-dark));
     display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; font-weight:800; margin-bottom:12px;
   }
-  .modal-title{ font-family:'Fraunces', serif; font-style:italic; font-weight:600; font-size:17px; color:var(--navy); margin:0 0 6px; }
+  .modal-title{ font-family:'Fraunces', serif; font-style:italic; font-weight:600; font-size:17px; color:var(--heading); margin:0 0 6px; }
   .modal-desc{ font-size:12.5px; color:var(--muted); line-height:1.55; margin:0 0 16px; }
   .google-btn{
     display:flex; align-items:center; justify-content:center; gap:9px;
-    width:100%; border:1px solid var(--border); background:#fff; color:var(--ink);
+    width:100%; border:1px solid var(--border); background:#fff; color:#191A2E;
     padding:12px 14px; border-radius:var(--radius-sm); font-weight:700; font-size:14px; cursor:pointer;
   }
   .google-btn:active{ transform:scale(.98); }
@@ -476,10 +426,10 @@
   .modal-note{ font-size:11px; color:var(--muted); margin-top:12px; line-height:1.5; text-align:center; }
   .confirm-card{ max-width:300px; text-align:center; }
   .confirm-icon{
-    width:44px; height:44px; border-radius:50%; background:#fde8ea; color:var(--red);
+    width:44px; height:44px; border-radius:50%; background:#3B1620; color:var(--red);
     display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px;
   }
-  .confirm-title{ font-weight:800; font-size:15px; color:var(--navy); margin:0 0 6px; }
+  .confirm-title{ font-weight:800; font-size:15px; color:var(--heading); margin:0 0 6px; }
   .confirm-desc{ font-size:12.5px; color:var(--muted); line-height:1.55; margin:0 0 18px; }
   .confirm-btnrow{ display:flex; gap:8px; }
   /* ===== Chọn đối tượng nhắn tin (cả nhóm / nhắn riêng) ===== */
@@ -489,7 +439,7 @@
   .target-row::-webkit-scrollbar{ display:none; }
   .target-chip{
     flex-shrink:0; display:flex; align-items:center; gap:6px; border:1px solid var(--border);
-    background:#fbfbfe; border-radius:999px; padding:6px 12px 6px 6px; font-size:12px; font-weight:700;
+    background:var(--surface-2); border-radius:999px; padding:6px 12px 6px 6px; font-size:12px; font-weight:700;
     color:var(--ink); cursor:pointer; position:relative; white-space:nowrap;
   }
   .target-chip.everyone{ padding-left:12px; }
@@ -501,8 +451,40 @@
     background:var(--red); border:1.5px solid #fff;
   }
   .chat-header-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+  /* ===== Cửa sổ chat riêng nổi, kéo-thả được (kiểu Messenger) ===== */
+  #floatingChatsContainer{ position:fixed; inset:0; pointer-events:none; z-index:90; }
+  .floating-chat{
+    position:fixed;
+    width:min(320px, calc(100vw - 24px));
+    max-height:min(460px, calc(100vh - 24px));
+    display:flex; flex-direction:column;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-md);
+    pointer-events:auto;
+    overflow:hidden;
+  }
+  .floating-chat.dragging{ opacity:.94; box-shadow:0 26px 52px rgba(0,0,0,.6); }
+  .floating-chat-header{
+    display:flex; align-items:center; gap:8px; padding:9px 8px 9px 12px;
+    background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff;
+    cursor:grab; touch-action:none; user-select:none; flex-shrink:0;
+  }
+  .floating-chat-header:active{ cursor:grabbing; }
+  .floating-chat-avatar{ width:28px; height:28px; border-radius:50%; object-fit:cover; background:rgba(255,255,255,.3); flex-shrink:0; }
+  .floating-chat-title{ flex:1; min-width:0; }
+  .floating-chat-name{ font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .floating-chat-seen{ font-size:10px; opacity:.85; }
+  .floating-chat-header button{
+    flex-shrink:0; border:none; background:rgba(255,255,255,.18); color:#fff;
+    width:25px; height:25px; border-radius:50%; cursor:pointer; font-size:11.5px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .floating-chat-header button:hover{ background:rgba(255,255,255,.32); }
+  .floating-chat-messages{ background:var(--bg-bot); max-height:280px; min-height:160px; padding:10px; }
+  .floating-chat-inputbar{ border-top:1px solid var(--border); padding:8px 10px; margin-top:0; flex-shrink:0; }
+  .floating-chat-media-grid{ padding:0 10px 8px; flex-shrink:0; }
   /* ===== Xem trước nhiều file đính kèm khi chat + tiến trình % upload + huỷ tải ===== */
-  .attach-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(64px, 1fr)); gap:8px; margin-bottom:8px; }
+  .attach-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:8px; }
   .attach-item{
     position:relative; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;
     background:#000; aspect-ratio:1/1;
@@ -542,14 +524,14 @@
   .chat-att-download:active{ transform:scale(.92); }
   .chat-att-download.downloading{ opacity:.6; pointer-events:none; }
   /* ===== TAB QUẢN TRỊ (Admin) ===== */
-  #adminMap{ background:#e5e7ef; }
+  #adminMap{ background:#12142a; }
   .leaflet-popup-content{ font-family:'Inter', system-ui, sans-serif; font-size:12.5px; line-height:1.5; }
   .admin-legend{ display:flex; gap:14px; margin-top:10px; font-size:11.5px; color:var(--muted); font-weight:600; }
   .admin-legend span{ display:flex; align-items:center; gap:6px; }
   .admin-dot{ width:10px; height:10px; border-radius:50%; display:inline-block; }
   /* ===== Chọn avatar ngộ nghĩnh có sẵn (popup hồ sơ) ===== */
   .preset-avatar-grid{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(42px, 1fr)); gap:8px; margin-top:8px;
+    display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin-top:8px;
   }
   .preset-avatar-btn{
     position:relative; border:2px solid transparent; border-radius:50%; aspect-ratio:1/1;
@@ -559,9 +541,71 @@
   .preset-avatar-btn:active{ transform:scale(.92); }
   .preset-avatar-btn.selected{ border-color:var(--primary); box-shadow:0 0 0 2px var(--primary-light); }
   @media (max-width: 400px){
+    .brand-title{ font-size:22px; }
     .tabbtn{ font-size:9px; }
     .hashtag-btn{ padding:12px 4px; }
     .hashtag-btn .num{ font-size:17px; }
+    .preset-avatar-grid{ grid-template-columns:repeat(5, 1fr); }
+  }
+  /* =========================================================
+     RESPONSIVE NÂNG CAO: MÁY TÍNH BẢNG / MÁY TÍNH ĐỂ BÀN
+     Thiết kế gốc là mobile-first (cột đơn, rộng tối đa 430px).
+     Từ đây trở xuống, các mốc breakpoint mở rộng bố cục một
+     cách có kiểm soát: tăng max-width, tăng khoảng đệm, tăng số
+     cột lưới, tăng cỡ chữ nhẹ nhàng — giữ đúng ngôn ngữ thiết kế
+     gốc (card bo tròn, tông tím-ngọc) nhưng thoáng và cân đối
+     hơn khi xem trên màn hình lớn, đúng chuẩn UI/UX quốc tế
+     (rộng rãi có kiểm soát, không kéo giãn nội dung vô hạn).
+  ========================================================= */
+  @media (min-width: 640px){
+    .app{ max-width:640px; padding-left:28px; padding-right:28px; }
+    .brand-title{ font-size:26px; }
+    .card{ padding:20px 22px; }
+    .hashtag-grid{ grid-template-columns:repeat(4, 1fr); gap:11px; }
+    .media-list{ grid-template-columns:repeat(4, 1fr); }
+    .attach-grid{ grid-template-columns:repeat(5, 1fr); }
+    .preset-avatar-grid{ grid-template-columns:repeat(6, 1fr); }
+  }
+  @media (min-width: 900px){
+    .app{ max-width:900px; padding-top:calc(28px + var(--safe-t)); }
+    .brand{ margin-bottom:22px; }
+    .brand-title{ font-size:30px; }
+    .brand-eyebrow{ font-size:12px; }
+    .tabbar{ padding:8px; gap:8px; border-radius:calc(var(--radius-lg) + 4px); overflow-x:visible; flex-wrap:wrap; justify-content:center; }
+    .tabbtn{ min-width:92px; font-size:12px; padding:12px 12px 11px; }
+    .tabbtn svg{ width:20px; height:20px; }
+    .card{ padding:26px 28px; border-radius:calc(var(--radius-lg) + 4px); margin-bottom:18px; }
+    h2.title{ font-size:21px; }
+    .hint{ font-size:13px; }
+    .hashtag-grid{ grid-template-columns:repeat(5, 1fr); gap:14px; }
+    .hashtag-btn{ padding:18px 8px; border-radius:calc(var(--radius-md) + 3px); }
+    .hashtag-btn .num{ font-size:22px; }
+    .hashtag-btn .label{ font-size:10.5px; }
+    .media-list{ grid-template-columns:repeat(6, 1fr); }
+    .attach-grid{ grid-template-columns:repeat(6, 1fr); }
+    .editor-wrap{ min-height:230px; }
+    .chat-messages{ max-height:520px; }
+    .btn{ font-size:15px; }
+    .modal-card{ max-width:400px; padding:26px 26px 24px; }
+    .confirm-card{ max-width:360px; }
+    /* Bố cục 2 cột cho các thẻ chỉ có 1 khối nội dung độc lập (Facebook/TikTok/RedNote)
+       để tận dụng không gian ngang rộng, vẫn giữ thứ tự đọc tự nhiên trên di động */
+    #page-download{ display:grid; grid-template-columns:1fr; gap:0; }
+  }
+  @media (min-width: 1180px){
+    .app{ max-width:1080px; }
+    .hashtag-grid{ grid-template-columns:repeat(6, 1fr); }
+  }
+  /* Chỉ bật hiệu ứng hover cho thiết bị có chuột thật (tránh trạng thái hover
+     bị "dính" trên cảm ứng — vấn đề UX phổ biến khi copy CSS desktop sang mobile) */
+  @media (hover:hover) and (pointer:fine){
+    .btn-primary:hover{ filter:brightness(1.06); box-shadow:0 10px 22px rgba(79,70,229,.34); }
+    .btn-dark:hover{ filter:brightness(1.15); }
+    .btn-ghost:hover{ filter:brightness(0.97); }
+    .btn-danger:hover{ filter:brightness(0.97); }
+    .hashtag-btn:hover{ transform:translateY(-2px); }
+    .tabbtn:not(.active):hover{ background:var(--primary-light); color:var(--primary-text); }
+    .target-chip:not(.active):hover{ border-color:var(--primary); }
   }
 </style>
 </head>
@@ -928,6 +972,9 @@
         2. Tạo (hoặc sửa) node <strong>groupChat/adminConfig</strong> với 2 trường:
         <strong>username</strong> (tên đăng nhập) và <strong>password</strong> (mật khẩu).<br>
         3. Lưu lại — trang này sẽ đọc trực tiếp 2 giá trị đó mỗi lần đăng nhập, không cần sửa mã nguồn.<br>
+        <strong>Lưu ý:</strong> nếu node này chưa từng tồn tại, trang sẽ TỰ ĐỘNG tạo sẵn cấu trúc rỗng
+        (username/password để trống) ngay khi tải trang — bạn chỉ cần vào Firebase Console điền giá trị
+        thật vào, không cần tự gõ tay cấu trúc node.<br>
         Lưu ý: đây vẫn là kiểm tra phía trình duyệt, chỉ phù hợp hạn chế truy cập nội bộ; nếu cần bảo mật chặt hơn nên chuyển sang Firebase Auth + Security Rules.
       </p>
     </div>
@@ -3408,20 +3455,25 @@ async function sendGroupMessage(){
 /* =========================================================
    TAB QUẢN TRỊ (ADMIN)
    - Đăng nhập bằng tài khoản quản trị viên được CẤU HÌNH TRÊN
-     FIREBASE (không hardcode trong mã nguồn nữa). Khi bấm "Đăng
-     nhập", trang sẽ đọc node groupChat/userProfiles (gồm 2 trường
+     FIREBASE (không hardcode trong mã nguồn). Khi bấm "Đăng
+     nhập", trang sẽ đọc node groupChat/adminConfig (gồm 2 trường
      "username" và "password") trên Realtime Database rồi so khớp
      với ô nhập. Cách tạo/sửa tài khoản quản trị: vào Firebase
-     Console → Realtime Database → tạo/sửa node groupChat/userProfiles
+     Console → Realtime Database → tạo/sửa node groupChat/adminConfig
      với 2 trường username, password.
+     Nếu node này CHƯA TỪNG tồn tại trên Firebase, trang sẽ TỰ ĐỘNG
+     khởi tạo cấu trúc rỗng (ensureAdminConfigExists() bên dưới) ngay
+     khi tải trang — bạn chỉ cần vào Firebase Console điền username/
+     password thật vào, không cần tự tạo node bằng tay.
      LƯU Ý BẢO MẬT: đây vẫn là xác thực phía trình duyệt (client-side)
      — giá trị mật khẩu vẫn được tải về và so sánh ngay trên máy
      người dùng, nên chỉ phù hợp để hạn chế truy cập thông thường
      trong nội bộ nhóm, KHÔNG đủ an toàn để bảo vệ dữ liệu nhạy cảm.
      Nếu cần bảo mật chặt hơn, nên chuyển sang xác thực quản trị
      viên bằng Firebase Auth (ví dụ: gán custom claim "admin" cho 1
-     tài khoản Gmail cụ thể) kết hợp Firebase Security Rules để
-     chặn đọc dữ liệu vị trí từ phía server thay vì chỉ ẩn ở giao diện.
+     tài khoản Gmail cụ thể qua Cloud Functions) kết hợp Firebase
+     Security Rules để chặn đọc dữ liệu vị trí từ phía server thay
+     vì chỉ ẩn ở giao diện.
    - Sau khi đăng nhập, hiển thị bản đồ (Leaflet + OpenStreetMap,
      không cần API key) với các chấm vị trí của mọi thành viên đã
      từng đồng ý chia sẻ vị trí trong groupChat/userLocations/{uid}:
@@ -3432,7 +3484,10 @@ async function sendGroupMessage(){
      mỗi dòng trong danh sách lịch sử có thể bấm vào để mở/định tâm
      vị trí đó ngay trên bản đồ.
 ========================================================= */
-const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
+// SỬA LỖI: trước đây đường dẫn này trỏ nhầm sang 'groupChat/userProfiles' (node lưu hồ sơ
+// hiển thị theo uid của từng user, không có username/password) khiến đăng nhập quản trị
+// luôn thất bại. Đường dẫn đúng phải khớp với node hướng dẫn ở phần giao diện đăng nhập.
+const ADMIN_CONFIG_PATH = 'groupChat/adminConfig'; // node Firebase chứa {username, password}
 const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
 
 const adminLoginCard   = document.getElementById('adminLoginCard');
@@ -3445,6 +3500,26 @@ const btnAdminLogout   = document.getElementById('btnAdminLogout');
 const adminUserListEl  = document.getElementById('adminUserList');
 const adminHistoryListEl  = document.getElementById('adminHistoryList');
 const adminHistoryLabelEl = document.getElementById('adminHistoryLabel');
+
+/* Tự khởi tạo node cấu hình admin trên Firebase nếu CHƯA TỪNG tồn tại — chỉ tạo cấu
+   trúc rỗng (username/password để trống) để admin có thể vào thẳng Firebase Console
+   điền giá trị thật vào sau, không cần tự tạo node bằng tay. Dùng kiểu "chỉ set nếu
+   null" để không bao giờ vô tình ghi đè username/password đã cấu hình trước đó. */
+async function ensureAdminConfigExists(){
+  try{
+    const ref = gDb.ref(ADMIN_CONFIG_PATH);
+    const snap = await ref.once('value');
+    if(snap.val() === null){
+      await ref.set({ username: '', password: '' });
+      console.log('Đã khởi tạo node ' + ADMIN_CONFIG_PATH + ' (rỗng) — vào Firebase Console để điền tên đăng nhập/mật khẩu quản trị.');
+    }
+  }catch(err){
+    // Không chặn luồng chính của trang nếu việc này thất bại (vd: chưa có quyền ghi) —
+    // admin vẫn có thể tự tạo node thủ công theo hướng dẫn hiển thị trên giao diện.
+    console.error('Không tự khởi tạo được node cấu hình admin:', err);
+  }
+}
+ensureAdminConfigExists();
 
 let adminMap = null;
 let adminMarkers = {};          // {uid: L.marker}
@@ -3481,7 +3556,7 @@ btnAdminLogin.addEventListener('click', async ()=>{
     const snap = await gDb.ref(ADMIN_CONFIG_PATH).once('value');
     const cfg = snap.val();
     if(!cfg || !cfg.username || !cfg.password){
-      adminLoginError.textContent = 'Chưa cấu hình tài khoản quản trị trên Firebase. Vào Firebase Console → Realtime Database → tạo node "' + ADMIN_CONFIG_PATH + '" gồm 2 trường "username" và "password" rồi thử lại.';
+      adminLoginError.textContent = 'Chưa cấu hình tài khoản quản trị trên Firebase. Vào Firebase Console → Realtime Database → node "' + ADMIN_CONFIG_PATH + '" (đã được tự tạo sẵn dạng rỗng) rồi điền "username" và "password" thật vào, sau đó thử lại.';
       adminLoginError.style.display = 'block';
       return;
     }
