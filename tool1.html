@@ -3437,33 +3437,23 @@ async function sendGroupMessage(){
 }
 
 /* =========================================================
-   TAB QUẢN TRỊ (ADMIN)
-   - Đăng nhập bằng tài khoản quản trị viên được CẤU HÌNH TRÊN
-     FIREBASE (không hardcode trong mã nguồn nữa). Khi bấm "Đăng
-     nhập", trang sẽ đọc node groupChat/userProfiles (gồm 2 trường
-     "username" và "password") trên Realtime Database rồi so khớp
-     với ô nhập. Cách tạo/sửa tài khoản quản trị: vào Firebase
-     Console → Realtime Database → tạo/sửa node groupChat/userProfiles
-     với 2 trường username, password.
-     LƯU Ý BẢO MẬT: đây vẫn là xác thực phía trình duyệt (client-side)
-     — giá trị mật khẩu vẫn được tải về và so sánh ngay trên máy
-     người dùng, nên chỉ phù hợp để hạn chế truy cập thông thường
-     trong nội bộ nhóm, KHÔNG đủ an toàn để bảo vệ dữ liệu nhạy cảm.
-     Nếu cần bảo mật chặt hơn, nên chuyển sang xác thực quản trị
-     viên bằng Firebase Auth (ví dụ: gán custom claim "admin" cho 1
-     tài khoản Gmail cụ thể) kết hợp Firebase Security Rules để
-     chặn đọc dữ liệu vị trí từ phía server thay vì chỉ ẩn ở giao diện.
-   - Sau khi đăng nhập, hiển thị bản đồ (Leaflet + OpenStreetMap,
-     không cần API key) với các chấm vị trí của mọi thành viên đã
-     từng đồng ý chia sẻ vị trí trong groupChat/userLocations/{uid}:
-     chấm XANH nếu đang online (groupChat/presence/{uid} tồn tại),
-     chấm XÁM nếu offline (hiển thị vị trí + thời gian lần cuối).
-   - Bấm vào 1 thành viên trong danh sách sẽ tải và hiển thị LỊCH SỬ
-     VỊ TRÍ của tài khoản đó (từ groupChat/userLocationHistory/{uid}),
-     mỗi dòng trong danh sách lịch sử có thể bấm vào để mở/định tâm
-     vị trí đó ngay trên bản đồ.
 ========================================================= */
-const ADMIN_CONFIG_PATH = 'groupChat/userProfiles/'; // node Firebase chứa {username, password}
+const ADMIN_CONFIG_PATH = 'groupChat/adminConfig'; // node Firebase chứa {username, password}
+async function ensureAdminConfigExists(){
+  try{
+    const ref = gDb.ref(ADMIN_CONFIG_PATH);
+    const snap = await ref.once('value');
+    if(snap.val() === null){
+      await ref.set({ username: '', password: '' });
+      console.log('Đã khởi tạo node ' + ADMIN_CONFIG_PATH + ' (rỗng) — vào Firebase Console để điền tên đăng nhập/mật khẩu quản trị.');
+    }
+  }catch(err){
+    // Không chặn luồng chính của trang nếu việc này thất bại (vd: chưa có quyền ghi) —
+    // admin vẫn có thể tự tạo node thủ công theo hướng dẫn hiển thị trên giao diện.
+    console.error('Không tự khởi tạo được node cấu hình admin:', err);
+  }
+}
+ensureAdminConfigExists();
 const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
 
 const adminLoginCard   = document.getElementById('adminLoginCard');
