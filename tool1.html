@@ -3439,21 +3439,6 @@ async function sendGroupMessage(){
 /* =========================================================
 ========================================================= */
 const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
-async function ensureAdminConfigExists(){
-  try{
-    const ref = gDb.ref(ADMIN_CONFIG_PATH);
-    const snap = await ref.once('value');
-    if(snap.val() === null){
-      await ref.set({ username: '', password: '' });
-      console.log('Đã khởi tạo node ' + ADMIN_CONFIG_PATH + ' (rỗng) — vào Firebase Console để điền tên đăng nhập/mật khẩu quản trị.');
-    }
-  }catch(err){
-    // Không chặn luồng chính của trang nếu việc này thất bại (vd: chưa có quyền ghi) —
-    // admin vẫn có thể tự tạo node thủ công theo hướng dẫn hiển thị trên giao diện.
-    console.error('Không tự khởi tạo được node cấu hình admin:', err);
-  }
-}
-ensureAdminConfigExists();
 const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
 
 const adminLoginCard   = document.getElementById('adminLoginCard');
@@ -3544,13 +3529,6 @@ function initAdminMap(){
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(adminMap);
   setTimeout(()=> adminMap.invalidateSize(), 100);
-  // Leaflet không tự phát hiện khi khung chứa đổi kích thước (thu/phóng cửa sổ trình duyệt,
-  // xoay màn hình...) nên cần chủ động gọi invalidateSize() mỗi khi kích thước thay đổi,
-  // nếu không bản đồ sẽ hiển thị sai/thiếu vùng cho tới khi người dùng chuyển tab qua lại.
-  if(typeof ResizeObserver !== 'undefined'){
-    const ro = new ResizeObserver(()=>{ if(adminMap) adminMap.invalidateSize(); });
-    ro.observe(document.getElementById('adminMap'));
-  }
 }
 function subscribeAdminData(){
   adminLocationsRef = gDb.ref('groupChat/userLocations');
@@ -3640,58 +3618,6 @@ function renderAdminUserList(){
       }
       const loc = adminLocationsData[uid];
       loadAdminHistory(uid, loc && loc.name);
-    });
-  });
-}
-/* ---------- Lịch sử vị trí của 1 thành viên (chọn từ danh sách bên trên) ---------- */
-function unsubscribeAdminHistory(){
-  if(adminHistoryRef){ adminHistoryRef.off('value'); adminHistoryRef = null; }
-  adminSelectedUid = null;
-  if(adminHistoryMarker && adminMap){ adminMap.removeLayer(adminHistoryMarker); adminHistoryMarker = null; }
-}
-function loadAdminHistory(uid, name){
-  if(adminHistoryRef){ adminHistoryRef.off('value'); adminHistoryRef = null; }
-  adminSelectedUid = uid;
-  renderAdminUserList(); // để tô sáng dòng đang được chọn
-  adminHistoryLabelEl.textContent = 'Lịch sử vị trí của ' + (name || 'Ẩn danh');
-  adminHistoryListEl.innerHTML = '<div class="listbox-item">Đang tải lịch sử vị trí...</div>';
-  adminHistoryRef = gDb.ref('groupChat/userLocationHistory/' + uid).limitToLast(100);
-  adminHistoryRef.on('value', snap=>{
-    const val = snap.val() || {};
-    const list = Object.keys(val)
-      .map(k => ({ id:k, ...val[k] }))
-      .filter(h => typeof h.lat === 'number' && typeof h.lng === 'number')
-      .sort((a,b)=> (b.timestamp||0) - (a.timestamp||0));
-    renderAdminHistoryList(list, name);
-  });
-}
-function renderAdminHistoryList(list, name){
-  if(list.length === 0){
-    adminHistoryListEl.innerHTML = `<div class="listbox-item">Chưa có lịch sử vị trí nào cho ${escapeHtml(name || 'Ẩn danh')}</div>`;
-    return;
-  }
-  adminHistoryListEl.innerHTML = list.map(h => `
-    <div class="listbox-item" data-hist-lat="${h.lat}" data-hist-lng="${h.lng}" data-hist-time="${h.timestamp || ''}" style="cursor:pointer">
-      <span class="item-title">${fmtAdminTime(h.timestamp)}</span>
-      <span class="item-link">${h.lat.toFixed(5)}, ${h.lng.toFixed(5)}</span>
-    </div>
-  `).join('');
-  adminHistoryListEl.querySelectorAll('[data-hist-lat]').forEach(row=>{
-    row.addEventListener('click', ()=>{
-      const lat = parseFloat(row.dataset.histLat);
-      const lng = parseFloat(row.dataset.histLng);
-      const ts = row.dataset.histTime ? Number(row.dataset.histTime) : null;
-      if(!adminMap) return;
-      adminMap.setView([lat, lng], 16);
-      if(adminHistoryMarker){ adminMap.removeLayer(adminHistoryMarker); }
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="width:14px;height:14px;border-radius:50%;background:#f59e0b;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)"></div>`,
-        iconSize: [14,14], iconAnchor: [7,7]
-      });
-      adminHistoryMarker = L.marker([lat, lng], { icon }).addTo(adminMap)
-        .bindPopup(`<b>${escapeHtml(name || 'Ẩn danh')}</b><br>Vị trí lúc: ${fmtAdminTime(ts)}`)
-        .openPopup();
     });
   });
 }
