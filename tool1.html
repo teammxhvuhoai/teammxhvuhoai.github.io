@@ -281,7 +281,6 @@
   }
   .listbox-item .item-title{ display:block; font-weight:700; color:var(--heading); margin-bottom:2px; }
   .listbox-item .item-link{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; }
-  /* ===== Nhóm Auto Comment: badge trạng thái + nút hành động theo từng dòng ===== */
   .ac-status{ font-size:10px; font-weight:800; padding:2px 8px; border-radius:999px; display:inline-block; white-space:nowrap; }
   .ac-status.pending{ background:var(--surface-2); color:var(--muted); }
   .ac-status.ready{ background:var(--primary-light); color:var(--primary-text); }
@@ -320,7 +319,6 @@
     padding:7px 12px; border-radius:999px; max-width:100%;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; border:none;
   }
-  /* ===== TAB GROUP CHAT ===== */
   .online-users{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
   .online-chip{
     display:flex; align-items:center; gap:5px; background:var(--surface-2); border:1px solid var(--border);
@@ -392,7 +390,6 @@
   .switch input:checked + .slider:before{ transform:translateX(18px); }
   .group-user-badge img{ width:28px; height:28px; border-radius:50%; object-fit:cover; }
   .group-user-badge .name{ font-size:12.5px; font-weight:700; color:var(--heading); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  /* ===== Popup đăng nhập nhỏ & popup xác nhận dùng chung ===== */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(4,5,10,.72);
     display:none; align-items:center; justify-content:center; z-index:100;
@@ -432,7 +429,6 @@
   .confirm-title{ font-weight:800; font-size:15px; color:var(--heading); margin:0 0 6px; }
   .confirm-desc{ font-size:12.5px; color:var(--muted); line-height:1.55; margin:0 0 18px; }
   .confirm-btnrow{ display:flex; gap:8px; }
-  /* ===== Chọn đối tượng nhắn tin (cả nhóm / nhắn riêng) ===== */
   .target-row{
     display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; -webkit-overflow-scrolling:touch;
   }
@@ -451,7 +447,6 @@
     background:var(--red); border:1.5px solid #fff;
   }
   .chat-header-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
-  /* ===== Cửa sổ chat riêng nổi, kéo-thả được (kiểu Messenger) ===== */
   #floatingChatsContainer{ position:fixed; inset:0; pointer-events:none; z-index:90; }
   .floating-chat{
     position:fixed;
@@ -483,7 +478,6 @@
   .floating-chat-messages{ background:var(--bg-bot); max-height:280px; min-height:160px; padding:10px; }
   .floating-chat-inputbar{ border-top:1px solid var(--border); padding:8px 10px; margin-top:0; flex-shrink:0; }
   .floating-chat-media-grid{ padding:0 10px 8px; flex-shrink:0; }
-  /* ===== Xem trước nhiều file đính kèm khi chat + tiến trình % upload + huỷ tải ===== */
   .attach-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:8px; }
   .attach-item{
     position:relative; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;
@@ -523,13 +517,11 @@
   }
   .chat-att-download:active{ transform:scale(.92); }
   .chat-att-download.downloading{ opacity:.6; pointer-events:none; }
-  /* ===== TAB QUẢN TRỊ (Admin) ===== */
   #adminMap{ background:#12142a; }
   .leaflet-popup-content{ font-family:'Inter', system-ui, sans-serif; font-size:12.5px; line-height:1.5; }
   .admin-legend{ display:flex; gap:14px; margin-top:10px; font-size:11.5px; color:var(--muted); font-weight:600; }
   .admin-legend span{ display:flex; align-items:center; gap:6px; }
   .admin-dot{ width:10px; height:10px; border-radius:50%; display:inline-block; }
-  /* ===== Chọn avatar ngộ nghĩnh có sẵn (popup hồ sơ) ===== */
   .preset-avatar-grid{
     display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin-top:8px;
   }
@@ -547,16 +539,6 @@
     .hashtag-btn .num{ font-size:17px; }
     .preset-avatar-grid{ grid-template-columns:repeat(5, 1fr); }
   }
-  /* =========================================================
-     RESPONSIVE NÂNG CAO: MÁY TÍNH BẢNG / MÁY TÍNH ĐỂ BÀN
-     Thiết kế gốc là mobile-first (cột đơn, rộng tối đa 430px).
-     Từ đây trở xuống, các mốc breakpoint mở rộng bố cục một
-     cách có kiểm soát: tăng max-width, tăng khoảng đệm, tăng số
-     cột lưới, tăng cỡ chữ nhẹ nhàng — giữ đúng ngôn ngữ thiết kế
-     gốc (card bo tròn, tông tím-ngọc) nhưng thoáng và cân đối
-     hơn khi xem trên màn hình lớn, đúng chuẩn UI/UX quốc tế
-     (rộng rãi có kiểm soát, không kéo giãn nội dung vô hạn).
-  ========================================================= */
   @media (min-width: 640px){
     .app{ max-width:640px; padding-left:28px; padding-right:28px; }
     .brand-title{ font-size:26px; }
@@ -588,16 +570,12 @@
     .btn{ font-size:15px; }
     .modal-card{ max-width:400px; padding:26px 26px 24px; }
     .confirm-card{ max-width:360px; }
-    /* Bố cục 2 cột cho các thẻ chỉ có 1 khối nội dung độc lập (Facebook/TikTok/RedNote)
-       để tận dụng không gian ngang rộng, vẫn giữ thứ tự đọc tự nhiên trên di động */
     #page-download{ display:grid; grid-template-columns:1fr; gap:0; }
   }
   @media (min-width: 1180px){
     .app{ max-width:1080px; }
     .hashtag-grid{ grid-template-columns:repeat(6, 1fr); }
   }
-  /* Chỉ bật hiệu ứng hover cho thiết bị có chuột thật (tránh trạng thái hover
-     bị "dính" trên cảm ứng — vấn đề UX phổ biến khi copy CSS desktop sang mobile) */
   @media (hover:hover) and (pointer:fine){
     .btn-primary:hover{ filter:brightness(1.06); box-shadow:0 10px 22px rgba(79,70,229,.34); }
     .btn-dark:hover{ filter:brightness(1.15); }
@@ -615,7 +593,6 @@
     <div class="brand-eyebrow">Bộ công cụ nội dung</div>
     <div class="brand-title">Content Studio</div>
   </div>
-  <!-- ================= THANH TAB ================= -->
   <div class="tabbar">
     <button class="tabbtn active" data-tab="content">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -680,7 +657,6 @@
       Quản trị
     </button>
   </div>
-  <!-- ================= TAB 1: CONTENT ================= -->
   <section id="page-content" class="page active">
     <div class="card">
       <h2 class="title">Tiêu Đề Nội Dung</h2>
@@ -704,7 +680,6 @@
       </div>
     </div>
   </section>
-  <!-- ================= TAB 2: SHARE ================= -->
   <section id="page-share" class="page">
     <div class="card">
       <h2 class="title">Chia sẻ nội dung</h2>
@@ -728,7 +703,6 @@
       </div>
     </div>
   </section>
-  <!-- ================= TAB 3: SHOPPE ================= -->
   <section id="page-shoppe" class="page">
     <div class="card">
       <h2 class="title">Link Shopee</h2>
@@ -747,7 +721,6 @@
       <div id="shoppeListbox" class="listbox"></div>
     </div>
   </section>
-  <!-- ================= TAB 4: VIETSUB ================= -->
   <section id="page-vietsub" class="page">
     <div class="card">
       <h2 class="title">Vietsub video (Trung / Anh → Việt)</h2>
@@ -807,7 +780,6 @@
       </div>
     </div>
   </section>
-  <!-- ================= TAB 5: GROUP CHAT ================= -->
   <section id="page-group" class="page">
     <div class="card" id="groupLoginCard">
       <h2 class="title">Hội Nhóm Group</h2>
@@ -852,7 +824,6 @@
       </div>
     </div>
   </section>
-  <!-- ================= TAB 6: TẢI VIDEO (FACEBOOK / TIKTOK / REDNOTE) ================= -->
   <section id="page-download" class="page">
     <div class="card">
       <h2 class="title">Facebook</h2>
@@ -895,7 +866,6 @@
       </div>
     </div>
   </section>
-  <!-- ================= TAB 7: VIDEO YOUTUBE ================= -->
   <section id="page-youtube" class="page">
     <div class="card">
       <h2 class="title">Video YouTube</h2>
@@ -949,31 +919,12 @@
       </div>
     </div>
   </section>
-  <!-- ================= TAB 6: QUẢN TRỊ (ADMIN) ================= -->
   <section id="page-admin" class="page">
     <div class="card" id="adminLoginCard">
       <h2 class="title">Quản trị</h2>
-      <p class="hint">Đăng nhập bằng tài khoản quản trị viên được cấp quyền để xem bản đồ vị trí các thành viên đã đăng nhập nhóm (đang online hoặc vị trí lần cuối nếu offline). Tài khoản quản trị được cấu hình trên Firebase Realtime Database, không nằm cố định trong mã nguồn — xem hướng dẫn bên dưới nếu chưa đăng nhập được.</p>
-      <div class="field" style="margin-top:0">
-        <label>Tên đăng nhập</label>
-        <input type="text" id="adminUserInput" placeholder="Tên đăng nhập" autocomplete="username">
-      </div>
-      <div class="field">
-        <label>Mật khẩu</label>
-        <input type="password" id="adminPassInput" placeholder="Mật khẩu" autocomplete="current-password">
-      </div>
-      <div id="adminLoginError" class="hint" style="color:var(--red);display:none;margin-top:8px"></div>
-      <div class="btnrow">
-        <button class="btn btn-primary btn-full" id="btnAdminLogin">Đăng nhập</button>
-      </div>
-      <p class="hint" style="margin-top:14px">
-        <strong>Cách thiết lập tài khoản quản trị trên Firebase:</strong><br>
-        1. Mở Firebase Console → chọn project → mục <strong>Realtime Database</strong>.<br>
-        2. Tạo (hoặc sửa) node <strong>groupChat/userProfiles</strong> với 2 trường:
-        <strong>username</strong> (tên đăng nhập) và <strong>password</strong> (mật khẩu).<br>
-        3. Lưu lại — trang này sẽ đọc trực tiếp 2 giá trị đó mỗi lần đăng nhập, không cần sửa mã nguồn.<br>
-        Lưu ý: đây vẫn là kiểm tra phía trình duyệt, chỉ phù hợp hạn chế truy cập nội bộ; nếu cần bảo mật chặt hơn nên chuyển sang Firebase Auth + Security Rules.
-      </p>
+      <p class="hint">Chỉ tài khoản Google được cấp quyền mới xem được bản đồ vị trí các thành viên đã đăng nhập nhóm (đang online hoặc vị trí lần cuối nếu offline). Đăng nhập bằng đúng tài khoản Gmail được cấp quyền để tiếp tục — dùng chung nút đăng nhập với tab Group.</p>
+      <button id="btnAdminGoogleLogin" class="btn btn-primary btn-full">Đăng nhập bằng Google</button>
+      <div id="adminLoginError" class="hint" style="color:var(--red);display:none;margin-top:10px"></div>
     </div>
     <div class="card" id="adminMapCard" style="display:none">
       <div class="chat-header-row">
@@ -995,7 +946,6 @@
     </div>
   </section>
 
-  <!-- ============ POPUP ĐĂNG NHẬP GOOGLE (nhỏ gọn) ============ -->
   <div id="loginModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <button type="button" id="btnCloseLoginModal" class="modal-close">✕</button>
@@ -1011,7 +961,6 @@
     </div>
   </div>
 
-  <!-- ============ POPUP HỒ SƠ NHÓM (tên hiển thị + ảnh đại diện) ============ -->
   <div id="profileModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <button type="button" id="btnCloseProfileModal" class="modal-close">✕</button>
@@ -1048,7 +997,6 @@
     </div>
   </div>
 
-  <!-- ============ POPUP XIN CHIA SẺ VỊ TRÍ ============ -->
   <div id="locationModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-icon">📍</div>
@@ -1062,7 +1010,6 @@
     </div>
   </div>
 
-  <!-- ============ POPUP QUẢN LÝ LINK SHOPEE (thêm/sửa 1 hoặc nhiều link) ============ -->
   <div id="shoppeModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <button type="button" id="btnCloseShoppeModal" class="modal-close">✕</button>
@@ -1079,7 +1026,6 @@
     </div>
   </div>
 
-  <!-- ============ POPUP SỬA NÚT HASHTAG (tên nút + 5 hastag) ============ -->
   <div id="hashtagModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <button type="button" id="btnCloseHashtagModal" class="modal-close">✕</button>
@@ -1101,7 +1047,6 @@
     </div>
   </div>
 
-  <!-- ============ POPUP XÁC NHẬN DÙNG CHUNG (ví dụ: xóa tin nhắn) ============ -->
   <div id="confirmModalOverlay" class="modal-overlay">
     <div class="modal-card confirm-card">
       <div class="confirm-icon">⚠️</div>
@@ -1114,7 +1059,6 @@
     </div>
   </div>
 
-  <!-- ============ MÀN HÌNH KHOÁ TỐI (tab YouTube — tiết kiệm pin, chỉ nghe âm thanh) ============ -->
   <div id="ytLockOverlay" class="yt-lock-overlay">
     <div class="yt-lock-content">
       <img id="ytLockThumb" src="" alt="">
@@ -1130,23 +1074,16 @@
   </div>
 </div>
 <div id="toast"></div>
-<!-- Thư viện OCR (nhận diện chữ trên khung hình) -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
-<!-- Thư viện xử lý video ngay trên trình duyệt (ghép phụ đề, xuất mp4) -->
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
-<!-- Firebase (Auth + Realtime Database + Storage) cho tab Group -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<!-- Leaflet (bản đồ OpenStreetMap, không cần API key) cho tab Quản trị -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* =========================================================
-   TIỆN ÍCH DÙNG CHUNG
-========================================================= */
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1175,14 +1112,6 @@ async function copyText(text){
 function escapeHtml(str){
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-/* Tải 1 file về máy từ 1 URL bất kỳ (kể cả URL khác domain như Firebase
-   Storage) — thuộc tính "download" trên thẻ <a> thường KHÔNG hoạt động với
-   URL khác domain (trình duyệt sẽ mở file thay vì tải về), nên ở đây tải nội
-   dung file về dưới dạng blob rồi tạo link blob CÙNG DOMAIN để tải về đúng
-   nghĩa (lưu vào máy / thư viện ảnh). Nếu vì lý do nào đó (mạng, CORS...)
-   không tải được blob, sẽ tự động mở file trong tab mới để người dùng có thể
-   tự lưu lại theo cách thủ công (vd: nhấn giữ ảnh > Lưu ảnh trên điện thoại).
-*/
 async function downloadFileFromUrl(url, filename){
   try{
     const resp = await fetch(url);
@@ -1203,9 +1132,6 @@ async function downloadFileFromUrl(url, filename){
     return false;
   }
 }
-/* Nén / thu nhỏ ảnh trước khi tải lên (không đụng vào video) — giúp giảm khả năng
-   tải lên thất bại do file quá nặng (ảnh chụp điện thoại hiện đại thường 5-15MB)
-   và giúp tải lên nhanh, ổn định hơn trên mạng di động. */
 function compressImageFile(file, maxDim, quality){
   maxDim = maxDim || 1600;
   quality = quality || 0.85;
@@ -1241,9 +1167,6 @@ function compressImageFile(file, maxDim, quality){
     img.src = url;
   });
 }
-/* Dịch mã lỗi Firebase Storage phổ biến sang câu tiếng Việt dễ hiểu, để khi
-   tải ảnh/video lên thất bại người dùng biết rõ nguyên nhân thay vì chỉ thấy
-   "thất bại" chung chung. */
 function describeStorageError(err){
   const code = err && err.code;
   const map = {
@@ -1253,15 +1176,13 @@ function describeStorageError(err){
     'storage/unauthenticated': 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
     'storage/retry-limit-exceeded': 'Mạng quá yếu/chập chờn, đã thử lại nhiều lần nhưng không thành công.',
     'storage/invalid-checksum': 'File bị lỗi trong lúc truyền, vui lòng thử lại.',
-    'storage/server-file-wrong-size': 'File bị lỗi trong lúc truyền, vui lòng thử lại.'
+    'storage/server-file-wrong-size': 'File bị lỗi trong lúc truyền, vui lòng thử lại.',
+    'PERMISSION_DENIED': 'Không có quyền đọc/ghi dữ liệu này (kiểm tra lại Firebase Rules hoặc đăng nhập lại).'
   };
   if(code && map[code]) return map[code];
   if(err && err.message) return err.message;
   return 'Lỗi không xác định';
 }
-/* =========================================================
-   CHUYỂN TAB
-========================================================= */
 document.querySelectorAll('.tabbtn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
@@ -1276,9 +1197,6 @@ document.querySelectorAll('.tabbtn').forEach(btn=>{
     }
   });
 });
-/* =========================================================
-   POPUP XÁC NHẬN DÙNG CHUNG (dùng lại cho nhiều tính năng: xóa tin nhắn, xóa link...)
-========================================================= */
 const confirmModalOverlay = document.getElementById('confirmModalOverlay');
 const confirmModalTitle   = document.getElementById('confirmModalTitle');
 const confirmModalDesc    = document.getElementById('confirmModalDesc');
@@ -1299,9 +1217,6 @@ function closeConfirmDialog(result){
 btnConfirmCancel.addEventListener('click', ()=> closeConfirmDialog(false));
 btnConfirmOk.addEventListener('click', ()=> closeConfirmDialog(true));
 confirmModalOverlay.addEventListener('click', e=>{ if(e.target === confirmModalOverlay) closeConfirmDialog(false); });
-/* =========================================================
-   TAB CONTENT: kiểm tra chính tả tiếng Việt cơ bản
-========================================================= */
 const VOWELS = "aàáảãạăằắẳẵặâầấẩẫậeèéẻẽẹêềếểễệiìíỉĩịoòóỏõọôồốổỗộơờớởỡợuùúủũụưừứửữựyỳýỷỹỵ";
 const ONSETS = ["ngh","ng","nh","ph","th","tr","ch","gi","kh","qu","b","c","d","đ","g","h","k","l","m","n","p","q","r","s","t","v","x"];
 const FINALS = ["ch","ng","nh","c","m","n","p","t"];
@@ -1345,9 +1260,6 @@ function buildHighlightedHtml(text){
 }
 const contentInput = document.getElementById('contentInput');
 const backdrop = document.getElementById('backdrop');
-/* =========================================================
-   LƯU TỰ ĐỘNG VÀO localStorage — dữ liệu không mất khi tắt trình duyệt
-========================================================= */
 const LS_KEY_CONTENT = 'contentTool_contentInput';
 function saveContentInput(){
   try{ localStorage.setItem(LS_KEY_CONTENT, contentInput.value); }catch(e){}
@@ -1376,9 +1288,6 @@ document.getElementById('btnClearContent').addEventListener('click', ()=>{
   refreshHighlight();
   saveContentInput();
 });
-/* =========================================================
-   LƯỚI NÚT HASTAG ĐÁNH SỐ (1..9)
-========================================================= */
 const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,9];
 const hashtagLabels = {
   1:  'Tin tức mxh',
@@ -1440,7 +1349,6 @@ function renderHashtagGrid(){
   `).join('');
 }
 renderHashtagGrid();
-/* ---------- Popup sửa 1 nút hashtag: đổi cả tên hiển thị lẫn 5 hastag đi kèm ---------- */
 const hashtagModalOverlay     = document.getElementById('hashtagModalOverlay');
 const btnCloseHashtagModal    = document.getElementById('btnCloseHashtagModal');
 const hashtagModalLabelInput  = document.getElementById('hashtagModalLabelInput');
@@ -1508,14 +1416,9 @@ ${hashtagLine}`;
   showToast(ok ? `Đã copy với 5 hastag: ${hashtagLine}` : 'Copy thất bại, vui lòng thử lại');
   addContentToHistory(content);
 });
-/* =========================================================
-   LỊCH SỬ NỘI DUNG (tab Content) — lưu lại các nội dung đã viết để chọn dùng lại
-   Tự lưu 1 mục mới khi: copy kèm hastag, hoặc bấm "Xóa nội dung" (để không mất nội dung
-   trước khi xoá); ngoài ra có nút "Lưu vào lịch sử" để chủ động lưu bất cứ lúc nào.
-========================================================= */
 const LS_KEY_CONTENT_HISTORY = 'contentTool_contentHistory';
 const CONTENT_HISTORY_LIMIT = 30;
-let contentHistoryData = []; // [{ id, text, updatedAt }], mới nhất ở đầu mảng
+let contentHistoryData = [];
 const contentHistoryWrap   = document.getElementById('contentHistoryWrap');
 const contentHistoryBtnRow = document.getElementById('contentHistoryBtnRow');
 
@@ -1529,7 +1432,7 @@ function saveContentHistoryToStorage(){
 function addContentToHistory(text){
   const trimmed = (text || '').trim();
   if(!trimmed) return;
-  if(contentHistoryData.length > 0 && contentHistoryData[0].text === trimmed) return; // tránh lưu trùng liên tiếp
+  if(contentHistoryData.length > 0 && contentHistoryData[0].text === trimmed) return;
   contentHistoryData.unshift({
     id: 'ch_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
     text: trimmed,
@@ -1599,21 +1502,18 @@ document.getElementById('btnClearContentHistory').addEventListener('click', asyn
 loadContentHistory();
 renderContentHistory();
 
-/* =========================================================
-   TAB SHARE
-========================================================= */
 const shareInput = document.getElementById('shareInput');
 const mediaInput = document.getElementById('mediaInput');
 const mediaDropzone = document.getElementById('mediaDropzone');
 const mediaList = document.getElementById('mediaList');
 const btnShareZalo = document.getElementById('btnShareZalo');
-let selectedFiles = []; // File[] — có thể trộn ảnh và video
+let selectedFiles = [];
 mediaDropzone.addEventListener('click', ()=> mediaInput.click());
 mediaInput.addEventListener('change', ()=>{
   const files = Array.from(mediaInput.files || []);
   if(files.length === 0) return;
   selectedFiles = selectedFiles.concat(files);
-  mediaInput.value = ''; // cho phép chọn lại đúng file đó ở lần sau nếu cần
+  mediaInput.value = '';
   renderMediaList();
 });
 function renderMediaList(){
@@ -1680,9 +1580,6 @@ document.getElementById('btnClearShare').addEventListener('click', ()=>{
   renderMediaList();
   shareInput.focus();
 });
-/* =========================================================
-   TAB SHOPPE
-========================================================= */
 const shoppeLinksInput = document.getElementById('shoppeLinksInput');
 const shoppeListbox = document.getElementById('shoppeListbox');
 const DEFAULT_LINKS = [
@@ -1761,7 +1658,6 @@ document.getElementById('btnRandomShoppe').addEventListener('click', async ()=>{
   const ok = await copyText(textToCopy);
   showToast(ok ? `Đã copy: ${picked.title}` : 'Copy thất bại');
 });
-/* ---------- Popup thêm/sửa link Shopee (1 hoặc nhiều link cùng lúc) ---------- */
 const shoppeModalOverlay = document.getElementById('shoppeModalOverlay');
 const btnCloseShoppeModal   = document.getElementById('btnCloseShoppeModal');
 const shoppeModalTitle      = document.getElementById('shoppeModalTitle');
@@ -1770,7 +1666,7 @@ const shoppeModalTextarea   = document.getElementById('shoppeModalTextarea');
 const btnSaveShoppeModal    = document.getElementById('btnSaveShoppeModal');
 const btnDeleteShoppeModal  = document.getElementById('btnDeleteShoppeModal');
 const btnAddShoppeLink      = document.getElementById('btnAddShoppeLink');
-let shoppeEditIndex = -1; // -1 = đang thêm mới (nhiều dòng), >=0 = đang sửa đúng 1 link ở vị trí này
+let shoppeEditIndex = -1;
 
 function openShoppeModal(mode, index){
   if(mode === 'edit'){
@@ -1800,19 +1696,12 @@ shoppeListbox.addEventListener('click', e=>{
   if(!editBtn) return;
   openShoppeModal('edit', Number(editBtn.dataset.editIndex));
 });
-// Vì getShoppeLinks() bỏ qua các dòng trống trong ô textarea gốc, cần map lại
-// đúng chỉ số dòng thật trong textarea ứng với 1 link đã lọc (dùng khi sửa/xóa).
 function mapShoppeIndexToRawLine(index){
   const rawLines = shoppeLinksInput.value.split('\n');
   const nonEmptyIdx = [];
   rawLines.forEach((l, idx)=>{ if(l.trim()) nonEmptyIdx.push(idx); });
   return { rawLines, targetIdx: nonEmptyIdx[index] };
 }
-/* Tự động tìm tên sản phẩm từ 1 link Shopee (khi người dùng chỉ dán link, không tự đặt tiêu
-   đề) — đọc thẻ <title> của trang qua 1 dịch vụ proxy công khai (để vượt giới hạn CORS, vì
-   Shopee không cho gọi thẳng từ JS trình duyệt). Có giới hạn thời gian chờ (6 giây) để 1 lần
-   gọi bị treo/mạng chậm không bao giờ làm kẹt phần còn lại; nếu lỗi/hết giờ thì bỏ qua lặng lẽ,
-   trả về null (nơi gọi sẽ tự dùng tên mặc định "Sản phẩm Shopee" như trước đây). */
 async function fetchPageTitleWithTimeout(url, timeoutMs){
   timeoutMs = timeoutMs || 6000;
   const controller = new AbortController();
@@ -1826,7 +1715,7 @@ async function fetchPageTitleWithTimeout(url, timeoutMs){
     const match = html.match(/<title[^>]*>([^<]*)<\/title>/i);
     if(!match) throw new Error('Không tìm thấy tiêu đề trang');
     let title = match[1].replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();
-    title = title.replace(/\s*[|\-–]\s*Shopee.*$/i, '').trim(); // bỏ đuôi "| Shopee Việt Nam" nếu có
+    title = title.replace(/\s*[|\-–]\s*Shopee.*$/i, '').trim();
     return title || null;
   }catch(err){
     console.error('Không tự tìm được tên sản phẩm cho', url, err);
@@ -1835,9 +1724,6 @@ async function fetchPageTitleWithTimeout(url, timeoutMs){
     clearTimeout(timer);
   }
 }
-// Chạy các tác vụ bất đồng bộ với số luồng song song giới hạn (thay vì bung hết Promise.all cùng
-// lúc) — tránh gửi hàng chục request cùng lúc tới dịch vụ proxy miễn phí khiến nó bị chặn/chậm,
-// giữ cho việc tự tìm tên sản phẩm mượt kể cả khi thêm rất nhiều link liên tiếp.
 async function runWithConcurrencyLimit(items, limit, worker){
   let idx = 0;
   async function runNext(){
@@ -1850,10 +1736,6 @@ async function runWithConcurrencyLimit(items, limit, worker){
   const runners = Array.from({ length: Math.min(limit, items.length) }, runNext);
   await Promise.all(runners);
 }
-// Tự tìm tên thật cho các link Shopee "trần" (chưa có tiêu đề) NGAY SAU KHI đã lưu và đóng popup
-// — chạy hoàn toàn ở nền, không chặn bất kỳ thao tác nào của người dùng. Mỗi link tìm được tên sẽ
-// tự cập nhật đúng dòng đó trong danh sách (khớp theo URL còn nguyên trong ô, phòng khi người
-// dùng đã sửa/xoá bớt trong lúc chờ) rồi lưu + render lại.
 async function enrichShoppeTitlesInBackground(bareLinks){
   if(!bareLinks || bareLinks.length === 0) return;
   await runWithConcurrencyLimit(bareLinks, 4, async (link)=>{
@@ -1861,7 +1743,7 @@ async function enrichShoppeTitlesInBackground(bareLinks){
     if(!title) return;
     const currentLines = shoppeLinksInput.value.split('\n');
     const idx = currentLines.findIndex(l => l.trim() === link);
-    if(idx === -1) return; // người dùng đã xoá/sửa dòng này trong lúc chờ -> bỏ qua, không ghi đè
+    if(idx === -1) return;
     currentLines[idx] = `${title} | ${link}`;
     shoppeLinksInput.value = currentLines.join('\n');
     saveShoppeLinks();
@@ -1872,8 +1754,6 @@ btnSaveShoppeModal.addEventListener('click', ()=>{
   const lines = shoppeModalTextarea.value.split('\n').map(s=>s.trim()).filter(Boolean);
   if(lines.length === 0){ showToast('Chưa nhập nội dung'); return; }
   if(shoppeEditIndex >= 0){
-    // Sửa đúng 1 link — lưu ngay lập tức (không chờ mạng); nếu chỉ để lại link (không có "|")
-    // thì tạm dùng tên mặc định và tự tìm tên thật ở nền, cập nhật lại khi có kết quả.
     const finalLine = lines[0];
     const bareUrl = !finalLine.includes('|') ? finalLine : null;
     const { rawLines, targetIdx } = mapShoppeIndexToRawLine(shoppeEditIndex);
@@ -1887,9 +1767,6 @@ btnSaveShoppeModal.addEventListener('click', ()=>{
     showToast('Đã lưu link');
     if(bareUrl) enrichShoppeTitlesInBackground([bareUrl]);
   }else{
-    // Thêm mới — hiện NGAY LẬP TỨC (không chờ mạng) để có thể tiếp tục thêm sản phẩm khác liên
-    // tiếp không delay; dòng nào chỉ có link (không có "|") sẽ tự tìm tên thật ở NỀN sau khi đã
-    // đóng popup, không làm chậm hay chặn bất kỳ thao tác nào tiếp theo.
     const existing = shoppeLinksInput.value.trim();
     shoppeLinksInput.value = existing ? existing + '\n' + lines.join('\n') : lines.join('\n');
     saveShoppeLinks();
@@ -1918,14 +1795,6 @@ btnDeleteShoppeModal.addEventListener('click', async ()=>{
   closeShoppeModal();
   showToast('Đã xóa link');
 });
-/* =========================================================
-   TAB VIETSUB
-   Quy trình: chọn video -> trích khung hình theo mốc thời gian ->
-   OCR (Tesseract.js, tiếng Trung/Anh) -> gom thành các đoạn phụ đề ->
-   gọi API Claude để dịch sang tiếng Việt -> người dùng xem/sửa lại ->
-   ghép chữ tiếng Việt đè lên video bằng ffmpeg.wasm (chạy ngay trong
-   trình duyệt) -> xuất file .mp4 để tải về.
-========================================================= */
 const vsVideoInput   = document.getElementById('vsVideoInput');
 const vsDropzone     = document.getElementById('vsDropzone');
 const vsVideoPlayer  = document.getElementById('vsVideoPlayer');
@@ -1946,8 +1815,8 @@ const vsResultWrap   = document.getElementById('vsResultWrap');
 const vsResultPlayer = document.getElementById('vsResultPlayer');
 const vsDownloadLink = document.getElementById('vsDownloadLink');
 let vsVideoFile = null;
-let vsCues = []; // { start, end, text, translated, source }
-let vsInputWritten = false; // đã ghi video vào bộ nhớ ffmpeg cho lần xử lý hiện tại chưa
+let vsCues = [];
+let vsInputWritten = false;
 function vsUpdateModeVisibility(){
   vsOcrLangWrap.style.display = vsModeOcr.checked ? 'block' : 'none';
   vsIntervalWrap.style.display = vsModeOcr.checked ? 'block' : 'none';
@@ -2008,7 +1877,6 @@ async function vsDetectOcr(duration, langs, interval){
     if(text) raw.push({ time: t, text });
   }
   await worker.terminate();
-  // Gom các khung liên tiếp có chữ giống nhau thành 1 câu phụ đề
   const grouped = [];
   let cur = null;
   for(const r of raw){
@@ -2105,7 +1973,6 @@ async function vsRunDetect(){
       vsSetStatus('Không tìm thấy chữ hoặc giọng nói nào. Thử đổi tuỳ chọn hoặc video khác.');
       return;
     }
-    // Giới hạn tổng số câu để việc dịch + ghép phụ đề không quá nặng cho điện thoại
     allCues = allCues.slice(0, 60);
     vsSetStatus(`Tìm thấy ${allCues.length} đoạn. Đang dịch sang tiếng Việt...`);
     try{
@@ -2162,7 +2029,6 @@ function vsRenderCues(){
   });
 }
 vsBtnDetect.addEventListener('click', vsRunDetect);
-// Xuất file .srt dự phòng — dùng được ngay trong CapCut hoặc trình dựng video khác
 function vsToSrtTime(t){
   const h = Math.floor(t/3600);
   const m = Math.floor((t%3600)/60);
@@ -2183,7 +2049,6 @@ vsBtnSrt.addEventListener('click', ()=>{
   setTimeout(()=> URL.revokeObjectURL(url), 4000);
   showToast('Đã tải file .srt');
 });
-// Ghép phụ đề đè lên video bằng ffmpeg.wasm, xuất .mp4
 let vsFFmpeg = null;
 function vsEscapeDrawtext(text){
   return text
@@ -2246,36 +2111,6 @@ vsBtnBurn.addEventListener('click', async ()=>{
     vsBtnBurn.disabled = false;
   }
 });
-/* =========================================================
-   TAB GROUP: Chat nhóm realtime bằng Firebase
-   - Đăng nhập Google qua popup nhỏ, có phương án dự phòng chuyển
-     sang redirect khi popup không hoạt động được trên trình duyệt
-     di động (Safari/Chrome iOS, WebView Android...) — đây là lý do
-     phổ biến khiến "đăng nhập xong nhưng không vào được chat" trên
-     điện thoại.
-   - Sau khi đăng nhập thành công, cho phép đặt TÊN HIỂN THỊ và ẢNH
-     ĐẠI DIỆN riêng cho nhóm (lưu ở groupChat/userProfiles/{uid}),
-     hoặc bấm "Dùng mặc định Gmail" để lấy tên/ảnh từ tài khoản Google.
-     Có thể mở lại bất cứ lúc nào bằng nút ✎ cạnh tên trong khung chat.
-   - Danh sách "đang tham gia" (Realtime Database + onDisconnect)
-   - Nhắn tin: gửi lên CẢ NHÓM (mặc định) hoặc chọn 1 người để
-     NHẮN RIÊNG (1-1), có thể gửi kèm NHIỀU ảnh/video CÙNG LÚC
-     (upload song song, hiển thị % từng file, có thể huỷ từng file)
-     cùng với nội dung chữ. Ảnh/video gửi lên đều có nút tải về cho
-     mọi người trong nhóm.
-   - Badge số tin/cuộc trò chuyện chưa đọc trên nút tab Group.
-   - Nút xóa toàn bộ tin nhắn của cuộc trò chuyện đang mở, có popup
-     xác nhận trước khi xóa.
-   - Sau khi đăng nhập/thiết lập hồ sơ xong, hỏi người dùng có đồng ý
-     chia sẻ vị trí hay không (CHỈ HỎI 1 LẦN MỖI LẦN ĐĂNG NHẬP nếu
-     trước đó chưa từng đồng ý — hễ đã đồng ý 1 lần thì từ nay không
-     hỏi lại nữa, tự động chia sẻ ngầm); nếu đồng ý sẽ liên tục cập
-     nhật vị trí hiện tại lên groupChat/userLocations/{uid} (vị trí
-     mới nhất) VÀ ghi thêm vào groupChat/userLocationHistory/{uid}
-     (lịch sử các vị trí theo thời gian, có throttle để không ghi
-     quá dày) để tab Quản trị hiển thị trên bản đồ và xem lại lịch sử
-     (xem thêm phần "CHIA SẺ VỊ TRÍ" bên dưới).
-========================================================= */
 const firebaseConfig = {
   apiKey: "AIzaSyDIo90Fw0iGUVp5WXXw9tjIm1VkxTChc9k",
   authDomain: "tintucmxh-groupchat.firebaseapp.com",
@@ -2319,25 +2154,8 @@ const btnCloseLoginModal = document.getElementById('btnCloseLoginModal');
 const btnGoogleLoginModal= document.getElementById('btnGoogleLoginModal');
 const loginModalError    = document.getElementById('loginModalError');
 
-/* =========================================================
-   THÔNG BÁO TIN NHẮN: RUNG MÁY + HIỆN THÔNG BÁO TRÊN MÀN HÌNH
-   Bật/tắt bằng nút gạt "Thông báo tin nhắn". Khi bật:
-   - Rung máy (Vibration API) mỗi khi có tin nhắn MỚI gửi đến (không phải do
-     chính mình gửi, không tính lịch sử tin nhắn cũ lúc mới đăng nhập).
-   - Hiện thông báo hệ thống kiểu Messenger (Notification API) với tên người
-     gửi + nội dung rút gọn, trừ khi đang mở đúng ngay cuộc trò chuyện đó và
-     tab đang hiển thị (vì lúc đó đã thấy tin nhắn ngay trong khung chat rồi).
-   LƯU Ý THỰC TẾ VỀ NỀN TẢNG (không phải lỗi của trang):
-   - Rung máy: Android (Chrome, Edge, Samsung Internet...) hỗ trợ tốt. Safari
-     trên iPhone/iPad KHÔNG hỗ trợ Vibration API ở bất kỳ hình thức nào —
-     đây là giới hạn của Safari/iOS, không cách nào bật được từ JavaScript.
-   - Thông báo trên màn hình: Android hỗ trợ tốt ngay trên tab trình duyệt.
-     Trên iPhone/iPad, Safari CHỈ hỗ trợ Notification API khi trang đã được
-     "Thêm vào Màn hình chính" (cài như PWA) và chạy từ iOS 16.4 trở lên —
-     mở bằng tab Safari thường sẽ không xin được quyền thông báo.
-========================================================= */
-let notifEnabled = false;          // người dùng đã bật nút gạt hay chưa (lưu trong localStorage)
-let notifPermissionGranted = false;// trình duyệt đã cấp quyền Notification hay chưa
+let notifEnabled = false;
+let notifPermissionGranted = false;
 const LS_KEY_NOTIF = 'contentTool_notifEnabled';
 function loadNotifPref(){
   try{ notifEnabled = localStorage.getItem(LS_KEY_NOTIF) === '1'; }catch(e){}
@@ -2349,8 +2167,6 @@ function triggerVibration(){
     try{ navigator.vibrate([200, 100, 200]); }catch(e){}
   }
 }
-// Không hiện thông báo hệ thống nếu người dùng đang mở đúng cuộc trò chuyện đó
-// và tab đang hiển thị trước mắt — vì tin nhắn đã hiện sẵn trong khung chat rồi.
 function isConversationCurrentlyVisible(isPrivate, fromUid){
   if(document.hidden) return false;
   const onGroupTab = document.getElementById('page-group').classList.contains('active');
@@ -2360,7 +2176,7 @@ function isConversationCurrentlyVisible(isPrivate, fromUid){
 }
 function handleIncomingMessage({ name, text, attachments, photoURL, isPrivate, fromUid }){
   if(!notifEnabled) return;
-  if(!currentUser || fromUid === currentUser.uid) return; // an toàn: không tự thông báo tin nhắn của chính mình
+  if(!currentUser || fromUid === currentUser.uid) return;
   triggerVibration();
   if(isConversationCurrentlyVisible(isPrivate, fromUid)) return;
   const bodyText = text || (attachments && attachments.length ? `Đã gửi ${attachments.length} ảnh/video` : 'Tin nhắn mới');
@@ -2400,7 +2216,6 @@ if(notifToggle){
 }
 loadNotifPref();
 
-/* ---------- Popup hồ sơ nhóm: tên hiển thị + ảnh đại diện riêng ---------- */
 const profileModalOverlay      = document.getElementById('profileModalOverlay');
 const btnCloseProfileModal     = document.getElementById('btnCloseProfileModal');
 const profileNameInput         = document.getElementById('profileNameInput');
@@ -2414,11 +2229,6 @@ const btnSaveProfile           = document.getElementById('btnSaveProfile');
 const btnUseDefaultProfile     = document.getElementById('btnUseDefaultProfile');
 const presetAvatarGrid         = document.getElementById('presetAvatarGrid');
 
-/* ---------- Bộ icon avatar ngộ nghĩnh có sẵn để chọn nhanh ----------
-   Mỗi icon là 1 emoji đặt trên nền màu tròn, được vẽ thành ảnh SVG dạng
-   data URI (không cần tải lên Storage) nên chọn xong là dùng ngay, không
-   tốn dung lượng lưu trữ và hiển thị y hệt ảnh đại diện bình thường ở
-   mọi nơi trong app (khung chat, danh sách online, bản đồ quản trị...). */
 const PRESET_AVATARS = [
   { emoji:'🐶', bg:'#FDE68A' }, { emoji:'🐱', bg:'#FBCFE8' }, { emoji:'🐻', bg:'#DDD6FE' },
   { emoji:'🐼', bg:'#BFDBFE' }, { emoji:'🦊', bg:'#FED7AA' }, { emoji:'🐯', bg:'#FCA5A5' },
@@ -2434,7 +2244,7 @@ function makePresetAvatarDataUrl(emoji, bg){
     + `</svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
-let profileSelectedPresetUrl = null; // dataURL của icon ngộ nghĩnh đang được chọn trong popup (nếu có)
+let profileSelectedPresetUrl = null;
 function renderPresetAvatarGrid(){
   presetAvatarGrid.innerHTML = PRESET_AVATARS.map((a, i)=>{
     const url = makePresetAvatarDataUrl(a.emoji, a.bg);
@@ -2448,7 +2258,7 @@ presetAvatarGrid.addEventListener('click', (e)=>{
   const a = PRESET_AVATARS[Number(btn.dataset.presetI)];
   const url = makePresetAvatarDataUrl(a.emoji, a.bg);
   profileSelectedPresetUrl = url;
-  profileAvatarFile = null; // ưu tiên icon vừa chọn, bỏ ảnh file (nếu trước đó có chọn)
+  profileAvatarFile = null;
   profileAvatarDropzoneLabel.textContent = 'Chọn ảnh đại diện mới (tùy chọn)';
   profileModalAvatarPreview.src = url;
   profileModalAvatarPreview.style.display = 'block';
@@ -2459,34 +2269,33 @@ presetAvatarGrid.addEventListener('click', (e)=>{
 let currentUser = null;
 let presenceRef = null;
 let connectedRef = null;
-let allMessages = [];          // tin nhắn của cuộc trò chuyện đang mở (nhóm chung hoặc riêng)
-let lastReadTimestamp = 0;     // mốc đã đọc của cuộc trò chuyện đang mở
+let allMessages = [];
+let lastReadTimestamp = 0;
 
-let activeTarget = null;       // null = Cả nhóm; hoặc {uid, name, photoURL} = đang nhắn riêng với ai
-let activeThreadRef = null;    // ref tin nhắn riêng đang lắng nghe (chỉ dùng khi activeTarget != null)
-let activeReadRef = null;      // ref "đã đọc" của cuộc trò chuyện riêng đang mở
+let activeTarget = null;
+let activeThreadRef = null;
+let activeReadRef = null;
 
-let publicMessages = [];       // luôn lắng nghe song song để tính badge kể cả khi đang xem 1 cuộc riêng
+let publicMessages = [];
 let publicLastRead = 0;
 let publicReadRef = null;
 
-let onlinePresenceData = {};   // {uid: {name, photoURL, lastSeen}}
+let onlinePresenceData = {};
 let privateThreadsRef = null;
-let privateThreadsData = {};   // {otherUid: {name, photoURL, lastMessage, lastTimestamp, lastSenderUid}}
+let privateThreadsData = {};
 let privateReadsAllRef = null;
-let privateReadsData = {};     // {otherUid: lastReadTimestamp}
+let privateReadsData = {};
 
-let groupMediaFiles = [];      // File[] — nhiều file được chọn cùng lúc, gửi song song
-let uploadProgressMap = {};    // {index: percent} — % tải lên của từng file trong lượt gửi hiện tại
-let uploadTasksMap = {};       // {index: firebase UploadTask} — cho phép huỷ tải lên từng file đang gửi
-let uploadErrorMap = {};       // {index: message} — lỗi tải lên riêng cho từng file (nếu có), cho phép thử lại
+let groupMediaFiles = [];
+let uploadProgressMap = {};
+let uploadTasksMap = {};
+let uploadErrorMap = {};
 
-let userProfile = null;        // {name, photoURL} — hồ sơ hiển thị đang dùng trong nhóm (tùy chỉnh hoặc mặc định Gmail)
-let userProfileRef = null;     // ref groupChat/userProfiles/{uid}
-let profileAvatarFile = null;  // ảnh đại diện mới chọn trong popup hồ sơ (chưa lưu, đã nén nếu là ảnh)
-let profileAvatarUploadTask = null; // UploadTask đang chạy khi lưu hồ sơ (cho phép huỷ)
+let userProfile = null;
+let userProfileRef = null;
+let profileAvatarFile = null;
+let profileAvatarUploadTask = null;
 
-/* ---------- Popup đăng nhập Google nhỏ gọn ---------- */
 function openLoginModal(){
   loginModalError.style.display = 'none';
   loginModalOverlay.classList.add('show');
@@ -2496,7 +2305,6 @@ btnGoogleLogin.addEventListener('click', openLoginModal);
 btnCloseLoginModal.addEventListener('click', closeLoginModal);
 loginModalOverlay.addEventListener('click', e=>{ if(e.target === loginModalOverlay) closeLoginModal(); });
 
-/* ---------- Popup hồ sơ nhóm: mở/đóng, chọn ảnh, lưu hoặc dùng mặc định ---------- */
 function getDefaultProfile(user){
   return { name: user.displayName || user.email || 'Ẩn danh', photoURL: user.photoURL || '' };
 }
@@ -2534,12 +2342,11 @@ profileModalOverlay.addEventListener('click', e=>{ if(e.target === profileModalO
 profileAvatarDropzone.addEventListener('click', ()=> profileAvatarInput.click());
 profileAvatarInput.addEventListener('change', async ()=>{
   const file = profileAvatarInput.files && profileAvatarInput.files[0];
-  profileAvatarInput.value = ''; // cho phép chọn lại đúng file đó lần sau
+  profileAvatarInput.value = '';
   if(!file) return;
-  profileSelectedPresetUrl = null; // chọn ảnh thật thì bỏ icon ngộ nghĩnh (nếu trước đó có chọn)
+  profileSelectedPresetUrl = null;
   renderPresetAvatarGrid();
   profileAvatarDropzoneLabel.textContent = 'Đang xử lý ảnh...';
-  // Nén ảnh trước để tránh tải lên thất bại vì file quá nặng (ảnh chụp điện thoại)
   const compressed = await compressImageFile(file, 800, 0.85);
   profileAvatarFile = compressed;
   profileAvatarDropzoneLabel.textContent = 'Đã chọn: ' + compressed.name;
@@ -2574,7 +2381,6 @@ btnSaveProfile.addEventListener('click', async ()=>{
   try{
     let photoURL = (userProfile && userProfile.photoURL) || currentUser.photoURL || '';
     if(profileSelectedPresetUrl){
-      // Đã chọn 1 icon ngộ nghĩnh có sẵn -> dùng thẳng data URL, không cần tải lên Storage
       photoURL = profileSelectedPresetUrl;
     }else if(profileAvatarFile){
       const safeName = profileAvatarFile.name.replace(/[^\w.\-]+/g, '_');
@@ -2616,27 +2422,12 @@ btnSaveProfile.addEventListener('click', async ()=>{
   }
 });
 
-/* ---------- CHIA SẺ VỊ TRÍ ----------
-   Quy tắc hỏi quyền vị trí: MỖI LẦN ĐĂNG NHẬP chỉ hỏi 1 lần.
-   - Nếu người dùng CHƯA TỪNG đồng ý (kể cả trước đó đã bấm "Không,
-     cảm ơn" ở lần đăng nhập trước), sẽ hiện lại popup hỏi vào lần
-     đăng nhập tiếp theo (không ghi nhớ việc từ chối).
-   - Nếu người dùng ĐÃ TỪNG đồng ý và lấy vị trí thành công ít nhất
-     1 lần, từ đó về sau sẽ KHÔNG hỏi lại nữa — tự động chia sẻ vị
-     trí ngầm mỗi khi đăng nhập.
-   Sau khi đồng ý: dùng navigator.geolocation.watchPosition để liên
-   tục cập nhật VỊ TRÍ HIỆN TẠI lên groupChat/userLocations/{uid}
-   (giữ lại vĩnh viễn làm "vị trí lần cuối" cho tab Quản trị xem khi
-   offline), đồng thời ghi thêm từng mốc vào
-   groupChat/userLocationHistory/{uid} (có throttle theo thời gian
-   để tránh ghi quá dày) để tab Quản trị có thể xem lại lịch sử di
-   chuyển của từng tài khoản. */
 const locationModalOverlay = document.getElementById('locationModalOverlay');
 const locationModalError   = document.getElementById('locationModalError');
 const btnLocationAllow     = document.getElementById('btnLocationAllow');
 const btnLocationDeny      = document.getElementById('btnLocationDeny');
 const LS_KEY_LOCATION_GRANTED = 'contentTool_locationGranted';
-const HISTORY_PUSH_INTERVAL_MS = 5 * 60 * 1000; // ghi thêm 1 mốc lịch sử tối đa mỗi 5 phút
+const HISTORY_PUSH_INTERVAL_MS = 5 * 60 * 1000;
 let locationWatchId = null;
 let lastHistoryPushTime = 0;
 
@@ -2647,20 +2438,17 @@ function openLocationModal(){
 function closeLocationModal(){ locationModalOverlay.classList.remove('show'); }
 function maybeAskLocationPermission(){
   if(!navigator.geolocation) return;
-  if(locationWatchId != null) return; // đã đang chia sẻ rồi thì không hỏi lại
+  if(locationWatchId != null) return;
   let granted = false;
   try{ granted = localStorage.getItem(LS_KEY_LOCATION_GRANTED) === '1'; }catch(e){}
   if(granted){
-    // Đã từng đồng ý ở lần đăng nhập trước -> tự động chia sẻ lại, không hỏi nữa
     startSharingLocation();
     return;
   }
-  // Chưa từng đồng ý (hoặc lần đăng nhập trước đã từ chối) -> hỏi lại đúng 1 lần cho lần đăng nhập này
   openLocationModal();
 }
 btnLocationDeny.addEventListener('click', ()=>{
   closeLocationModal();
-  // Không lưu lại việc từ chối -> lần đăng nhập kế tiếp sẽ hỏi lại
 });
 btnLocationAllow.addEventListener('click', ()=>{
   closeLocationModal();
@@ -2670,19 +2458,17 @@ btnLocationAllow.addEventListener('click', ()=>{
 });
 function startSharingLocation(onError){
   if(!currentUser || !navigator.geolocation) return;
-  if(locationWatchId != null) return; // đã đang theo dõi rồi
+  if(locationWatchId != null) return;
   let firstSuccessHandled = false;
   locationWatchId = navigator.geolocation.watchPosition(
     pos=>{
       if(!currentUser) return;
       if(!firstSuccessHandled){
         firstSuccessHandled = true;
-        // Lấy vị trí thành công lần đầu -> ghi nhớ đã đồng ý, từ nay không hỏi lại nữa
         try{ localStorage.setItem(LS_KEY_LOCATION_GRANTED, '1'); }catch(e){}
       }
       const p = userProfile || getDefaultProfile(currentUser);
       const uid = currentUser.uid;
-      // Cập nhật vị trí hiện tại (luôn ghi đè, dùng làm "vị trí lần cuối")
       gDb.ref('groupChat/userLocations/' + uid).set({
         lat: pos.coords.latitude,
         lng: pos.coords.longitude,
@@ -2691,7 +2477,6 @@ function startSharingLocation(onError){
         photoURL: p.photoURL || '',
         timestamp: firebase.database.ServerValue.TIMESTAMP
       }).catch(err=> console.error('Không cập nhật được vị trí:', err));
-      // Ghi thêm 1 mốc vào lịch sử vị trí, có throttle để không ghi quá dày
       const now = Date.now();
       if(now - lastHistoryPushTime > HISTORY_PUSH_INTERVAL_MS){
         lastHistoryPushTime = now;
@@ -2718,17 +2503,6 @@ function stopSharingLocation(){
   }
 }
 
-/* ---------- Đăng nhập Google: chống lỗi "đăng nhập xong nhưng
-   không vào được chat" trên trình duyệt di động ----------
-   Nguyên nhân phổ biến nhất là trình duyệt di động (đặc biệt Safari
-   trên iOS, hoặc WebView trong app) chặn IndexedDB/localStorage của
-   khung popup vì lý do chống theo dõi, khiến Firebase không lưu lại
-   được phiên đăng nhập dù popup Google đã thành công. Cách khắc phục:
-   1) Luôn set persistence tường minh trước khi đăng nhập, có phương
-      án dự phòng (LOCAL -> SESSION -> NONE) nếu bước trước bị chặn.
-   2) Nếu signInWithPopup lỗi kiểu bị chặn/không hỗ trợ trên di động,
-      tự động chuyển sang signInWithRedirect và xử lý kết quả bằng
-      getRedirectResult() ngay khi trang tải lại. */
 const persistenceReady = (async ()=>{
   try{ await gAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }
   catch(e1){
@@ -2764,7 +2538,7 @@ async function doGoogleSignIn(){
     if(isMobileUA() && fallbackCodes.includes(code)){
       try{
         await gAuth.signInWithRedirect(provider);
-        return; // trang sẽ chuyển hướng sang Google rồi quay lại — xử lý ở getRedirectResult() bên dưới
+        return;
       }catch(err2){
         console.error('Lỗi đăng nhập (redirect):', err2);
         loginModalError.textContent = 'Đăng nhập thất bại: ' + (err2 && err2.message ? err2.message : 'vui lòng thử lại');
@@ -2779,7 +2553,6 @@ async function doGoogleSignIn(){
   }
 }
 btnGoogleLoginModal.addEventListener('click', doGoogleSignIn);
-// Xử lý kết quả khi quay lại từ luồng redirect (trường hợp dự phòng ở trên)
 gAuth.getRedirectResult().catch(err=>{
   console.error('Lỗi xử lý kết quả đăng nhập redirect:', err);
   if(err && err.code){
@@ -2821,8 +2594,6 @@ gAuth.onAuthStateChanged(user=>{
     renderTargetRow();
     renderGroupMediaGrid();
 
-    // Đọc hồ sơ đã tùy chỉnh trước đó (nếu có); nếu chưa từng đặt, dùng mặc định
-    // Gmail và mời người dùng tùy chỉnh tên/ảnh ngay sau khi đăng nhập lần đầu.
     userProfileRef = gDb.ref('groupChat/userProfiles/' + user.uid);
     userProfileRef.once('value').then(snap=>{
       const saved = snap.val();
@@ -2899,7 +2670,6 @@ function renderOnlineUsers(data){
   renderTargetRow();
 }
 
-/* ---------- Chọn đối tượng nhắn tin: Cả nhóm / Nhắn riêng 1-1 ---------- */
 function pairKey(a, b){ return [a, b].sort().join('_'); }
 
 function renderTargetRow(){
@@ -2960,8 +2730,7 @@ function selectTarget(target){
   subscribeActiveThread();
 }
 
-/* ---------- Lắng nghe nhóm chung (luôn bật, phục vụ cả hiển thị lẫn tính badge) ---------- */
-let publicMessagesLoaded = false; // đánh dấu đã tải xong lượt đầu (lịch sử cũ), để không rung/thông báo nhầm khi mới đăng nhập
+let publicMessagesLoaded = false;
 let publicKnownIds = new Set();
 function setupPublicListeners(){
   publicMessagesLoaded = false;
@@ -2993,12 +2762,8 @@ function setupPublicListeners(){
     updateUnreadDisplay();
   });
 }
-/* ---------- Danh sách các cuộc nhắn riêng đã từng có (kể cả khi người kia offline) ----------
-   Node này luôn được lắng nghe (không chỉ khi đang mở đúng cuộc trò chuyện đó), nên tiện dùng
-   để phát hiện tin nhắn riêng MỚI gửi đến (dù đang xem nhóm chung hay cuộc trò chuyện khác) và
-   rung/thông báo tương ứng — so sánh lastTimestamp mới nhất với lần lưu trước đó cho từng người. */
 let privateThreadsLoaded = false;
-let prevPrivateThreadTimestamps = {}; // {otherUid: lastTimestamp đã biết trước đó}
+let prevPrivateThreadTimestamps = {};
 function setupPrivateThreadsListener(uid){
   privateThreadsLoaded = false;
   prevPrivateThreadTimestamps = {};
@@ -3038,16 +2803,9 @@ function setupPrivateReadsAllListener(uid){
     updateUnreadDisplay();
   });
 }
-/* ---------- Chuyển đổi cuộc trò chuyện đang xem: Cả nhóm <-> 1 người cụ thể ----------
-   Tin nhắn riêng (1-1) vẫn được lưu chung 1 node cho cả 2 người (để cả 2 đều nhận được
-   tin nhắn mới), nhưng việc "xóa tin nhắn" trong 1 cuộc trò chuyện riêng KHÔNG xóa dữ
-   liệu gốc đó — chỉ ghi lại 1 mốc thời gian "đã xóa phía tôi" riêng cho từng người ở
-   groupChat/privateClearedAt/{uid}/{otherUid}. Khi hiển thị, chỉ những tin nhắn có
-   thời gian SAU mốc đó của CHÍNH MÌNH mới được hiện ra — nên xóa xong chỉ mất trên máy
-   của người bấm xóa, người còn lại vẫn thấy đầy đủ lịch sử như cũ. */
-let activeThreadRawMessages = []; // tin nhắn gốc (chưa lọc theo mốc xóa riêng) của cuộc trò chuyện riêng đang mở
-let activeClearedAt = 0;          // mốc "đã xóa phía tôi" của CHÍNH MÌNH cho cuộc trò chuyện riêng đang mở
-let activeClearedRef = null;      // ref lắng nghe mốc xóa riêng ở trên
+let activeThreadRawMessages = [];
+let activeClearedAt = 0;
+let activeClearedRef = null;
 
 function renderActiveThreadMessages(){
   if(activeTarget){
@@ -3099,11 +2857,6 @@ function markAsRead(){
   }
 }
 
-/* ---------- Ghép ảnh/video đính kèm + nút tải về máy cho mọi người trong nhóm ----------
-   Nút tải về dùng downloadFileFromUrl() (fetch -> blob -> link cùng domain) thay vì chỉ
-   dựa vào thuộc tính "download" trên thẻ <a> (không hoạt động với URL Firebase Storage
-   khác domain trên nhiều trình duyệt/điện thoại), để đảm bảo file thực sự được lưu vào
-   máy / thư viện ảnh thay vì chỉ mở xem online. */
 function buildAttachmentsHtml(m, msgId){
   const atts = [];
   if(Array.isArray(m.attachments)) atts.push(...m.attachments);
@@ -3144,8 +2897,6 @@ function renderMessages(){
   }).join('');
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
 }
-// Bấm nút tải về trên ảnh/video trong khung chat — tải thật sự về máy (blob),
-// có báo trạng thái đang tải để người dùng biết đang chờ.
 chatMessagesEl.addEventListener('click', async (e)=>{
   const btn = e.target.closest('[data-dl-url]');
   if(!btn) return;
@@ -3175,8 +2926,6 @@ function updateUnreadDisplay(){
     chatSeenStatusEl.textContent = '';
   }
 
-  // Tổng số chưa đọc hiển thị trên badge của tab Group = tin chưa đọc ở nhóm chung
-  // (nếu không đang mở đúng nhóm chung) + số cuộc nhắn riêng đang có tin chưa đọc
   let total = 0;
   const viewingPublic = onGroupTab && !activeTarget;
   if(!viewingPublic){
@@ -3199,12 +2948,6 @@ function updateUnreadDisplay(){
   }
 }
 
-/* ---------- Xóa toàn bộ tin nhắn của cuộc trò chuyện đang mở (có xác nhận) ----------
-   - Cuộc trò chuyện RIÊNG (1-1): chỉ ẩn tin nhắn cũ TRÊN MÁY CỦA NGƯỜI BẤM XÓA (ghi mốc
-     thời gian ở groupChat/privateClearedAt/{uid}/{otherUid}) — dữ liệu tin nhắn gốc và
-     bản xem của người còn lại HOÀN TOÀN không bị ảnh hưởng.
-   - NHÓM CHUNG: vẫn xóa toàn bộ cho mọi thành viên như trước (đây là kênh công khai
-     dùng chung, không có khái niệm "xóa phía tôi"). */
 btnDeleteAllMsgs.addEventListener('click', async ()=>{
   if(!currentUser) return;
   if(activeTarget){
@@ -3218,7 +2961,7 @@ btnDeleteAllMsgs.addEventListener('click', async ()=>{
       await gDb.ref('groupChat/privateClearedAt/' + currentUser.uid + '/' + activeTarget.uid)
         .set(firebase.database.ServerValue.TIMESTAMP);
       showToast('Đã xóa tin nhắn phía bạn');
-      selectTarget(null); // cuộc trò chuyện riêng giờ trống phía mình -> đóng lại, quay về nhóm chung
+      selectTarget(null);
     }catch(err){
       console.error(err);
       showToast('Xóa thất bại: ' + describeStorageError(err));
@@ -3240,14 +2983,11 @@ btnDeleteAllMsgs.addEventListener('click', async ()=>{
   }
 });
 
-/* ---------- Đính kèm & gửi nhiều file song song, kèm % tiến trình + huỷ từng file ---------- */
 btnGroupAttach.addEventListener('click', ()=> groupMediaInput.click());
 groupMediaInput.addEventListener('change', async ()=>{
   const files = Array.from(groupMediaInput.files || []);
-  groupMediaInput.value = ''; // cho phép chọn lại đúng file đó ở lần sau nếu cần
+  groupMediaInput.value = '';
   if(files.length === 0) return;
-  // Nén ảnh trước khi thêm vào danh sách để giảm khả năng tải lên thất bại
-  // (video giữ nguyên vì nén video phía trình duyệt không khả thi/quá nặng)
   const processed = await Promise.all(files.map(f => compressImageFile(f, 1600, 0.85)));
   groupMediaFiles = groupMediaFiles.concat(processed);
   renderGroupMediaGrid();
@@ -3298,7 +3038,7 @@ function renderGroupMediaGrid(){
     btn.addEventListener('click', ()=>{
       const i = Number(btn.dataset.retry);
       delete uploadErrorMap[i];
-      sendGroupMessage(); // gửi lại — chỉ những file còn lỗi/chưa gửi sẽ được xử lý lại
+      sendGroupMessage();
     });
   });
 }
@@ -3306,8 +3046,6 @@ function cancelAllPendingUploads(){
   Object.values(uploadTasksMap).forEach(task=>{ try{ task.cancel(); }catch(e){} });
   uploadTasksMap = {};
 }
-// Tải 1 file lên Storage, báo % tiến trình theo thời gian thực qua state_changed,
-// lưu lại UploadTask để có thể huỷ giữa chừng qua nút ✕ trên từng file.
 function uploadOneFile(file, uid, index){
   const isVideo = file.type.startsWith('video/');
   const safeName = file.name.replace(/[^\w.\-]+/g, '_');
@@ -3360,12 +3098,6 @@ async function sendGroupMessage(){
   files.forEach((f,i)=>{ uploadProgressMap[i] = 0; });
   renderGroupMediaGrid();
   try{
-    // Tải TẤT CẢ file lên Firebase Storage song song cùng lúc (không chờ tuần tự),
-    // mỗi file tự cập nhật % riêng và có thể bị huỷ riêng lẻ; file lỗi/huỷ không
-    // chặn các file còn lại — dùng allSettled thay vì all để tránh 1 file lỗi làm
-    // mất hết những file đã tải lên thành công. URL tải về của mỗi file (từ
-    // Firebase Storage) sẽ được lưu kèm tin nhắn trên Realtime Database, nên
-    // TOÀN BỘ thành viên trong nhóm đều thấy được ảnh/video ngay khi tin nhắn tới.
     const results = await Promise.allSettled(files.map((f, i) => uploadOneFile(f, currentUser.uid, i)));
     const attachments = [];
     const remainingFiles = [];
@@ -3437,30 +3169,33 @@ async function sendGroupMessage(){
 }
 
 /* =========================================================
+   TAB QUẢN TRỊ (ADMIN) — XÁC THỰC BẰNG EMAIL GOOGLE
+   Chỉ tài khoản Google có email trùng ADMIN_EMAIL mới được mở bản đồ.
+   Dùng chung phiên đăng nhập Google với tab Group (gAuth) nên khi vào
+   được bản đồ, mọi truy vấn Firebase đều đã có auth != null hợp lệ,
+   không còn bị Firebase Rules chặn đọc âm thầm như cách cũ (so khớp
+   username/password thuần client-side, không đăng nhập Firebase Auth).
 ========================================================= */
-const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
-const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
+const ADMIN_EMAIL = 'vuquochoai2017@gmail.com'; // email Google duy nhất được cấp quyền quản trị
 
-const adminLoginCard   = document.getElementById('adminLoginCard');
-const adminMapCard     = document.getElementById('adminMapCard');
-const adminUserInput   = document.getElementById('adminUserInput');
-const adminPassInput   = document.getElementById('adminPassInput');
-const adminLoginError  = document.getElementById('adminLoginError');
-const btnAdminLogin    = document.getElementById('btnAdminLogin');
-const btnAdminLogout   = document.getElementById('btnAdminLogout');
-const adminUserListEl  = document.getElementById('adminUserList');
+const adminLoginCard    = document.getElementById('adminLoginCard');
+const adminMapCard      = document.getElementById('adminMapCard');
+const adminLoginError   = document.getElementById('adminLoginError');
+const btnAdminGoogleLogin = document.getElementById('btnAdminGoogleLogin');
+const btnAdminLogout    = document.getElementById('btnAdminLogout');
+const adminUserListEl   = document.getElementById('adminUserList');
 const adminHistoryListEl  = document.getElementById('adminHistoryList');
 const adminHistoryLabelEl = document.getElementById('adminHistoryLabel');
 
 let adminMap = null;
-let adminMarkers = {};          // {uid: L.marker}
-let adminLocationsData = {};    // groupChat/userLocations
-let adminPresenceData = {};     // groupChat/presence
+let adminMarkers = {};
+let adminLocationsData = {};
+let adminPresenceData = {};
 let adminLocationsRef = null;
 let adminPresenceRefForMap = null;
-let adminHistoryRef = null;     // ref lịch sử vị trí của thành viên đang được chọn xem
-let adminSelectedUid = null;    // uid thành viên đang được chọn để xem lịch sử vị trí
-let adminHistoryMarker = null;  // marker tạm dùng để đánh dấu 1 điểm lịch sử khi bấm vào danh sách
+let adminHistoryRef = null;
+let adminSelectedUid = null;
+let adminHistoryMarker = null;
 
 function showAdminMapView(){
   adminLoginCard.style.display = 'none';
@@ -3468,78 +3203,74 @@ function showAdminMapView(){
   initAdminMap();
   subscribeAdminData();
 }
-function showAdminLoginView(){
+function showAdminLoginView(msg){
   adminLoginCard.style.display = 'block';
   adminMapCard.style.display = 'none';
   unsubscribeAdminData();
-}
-btnAdminLogin.addEventListener('click', async ()=>{
-  const u = adminUserInput.value.trim();
-  const p = adminPassInput.value;
-  if(!u || !p){
-    adminLoginError.textContent = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.';
+  if(msg){
+    adminLoginError.textContent = msg;
     adminLoginError.style.display = 'block';
+  }else{
+    adminLoginError.style.display = 'none';
+  }
+}
+
+// Nút đăng nhập ở tab Quản trị dùng chung popup Google với tab Group.
+btnAdminGoogleLogin.addEventListener('click', ()=>{
+  if(gAuth.currentUser){
+    checkAdminAccess();
     return;
   }
-  btnAdminLogin.disabled = true;
-  adminLoginError.style.display = 'none';
-  try{
-    const snap = await gDb.ref(ADMIN_CONFIG_PATH).once('value');
-    const cfg = snap.val();
-    if(!cfg || !cfg.username || !cfg.password){
-      adminLoginError.textContent = 'Chưa cấu hình tài khoản quản trị trên Firebase. Vào Firebase Console → Realtime Database → tạo node "' + ADMIN_CONFIG_PATH + '" gồm 2 trường "username" và "password" rồi thử lại.';
-      adminLoginError.style.display = 'block';
-      return;
-    }
-    if(u === String(cfg.username) && p === String(cfg.password)){
-      try{ sessionStorage.setItem(LS_KEY_ADMIN_SESSION, '1'); }catch(e){}
-      showAdminMapView();
-    }else{
-      adminLoginError.textContent = 'Sai tên đăng nhập hoặc mật khẩu.';
-      adminLoginError.style.display = 'block';
-    }
-  }catch(err){
-    console.error(err);
-    adminLoginError.textContent = 'Không đọc được cấu hình quản trị từ Firebase: ' + describeStorageError(err);
-    adminLoginError.style.display = 'block';
-  }finally{
-    btnAdminLogin.disabled = false;
+  openLoginModal();
+});
+btnAdminLogout.addEventListener('click', ()=> gAuth.signOut());
+
+// Kiểm tra quyền admin dựa trên email của tài khoản Google đang đăng nhập.
+// Vì cả app dùng chung 1 phiên Firebase Auth, hàm này tự chạy lại mỗi khi
+// trạng thái đăng nhập thay đổi ở BẤT KỲ tab nào (Group hay Quản trị).
+function checkAdminAccess(){
+  const user = gAuth.currentUser;
+  if(!user){
+    showAdminLoginView();
+    return;
   }
-});
-adminPassInput.addEventListener('keydown', e=>{
-  if(e.key === 'Enter') btnAdminLogin.click();
-});
-btnAdminLogout.addEventListener('click', ()=>{
-  try{ sessionStorage.removeItem(LS_KEY_ADMIN_SESSION); }catch(e){}
-  adminUserInput.value = '';
-  adminPassInput.value = '';
-  showAdminLoginView();
-});
-(function initAdminAutoLogin(){
-  try{
-    if(sessionStorage.getItem(LS_KEY_ADMIN_SESSION) === '1') showAdminMapView();
-  }catch(e){}
-})();
+  const email = (user.email || '').toLowerCase();
+  if(email === ADMIN_EMAIL.toLowerCase()){
+    showAdminMapView();
+  }else{
+    showAdminLoginView(`Tài khoản "${user.email}" không có quyền quản trị. Vui lòng đăng xuất (nút ở tab Group) rồi đăng nhập đúng tài khoản được cấp quyền.`);
+  }
+}
+gAuth.onAuthStateChanged(()=> checkAdminAccess());
 
 function initAdminMap(){
   if(adminMap){ setTimeout(()=> adminMap.invalidateSize(), 60); return; }
-  adminMap = L.map('adminMap').setView([16.0471, 108.2062], 5); // mặc định trung tâm Việt Nam
+  adminMap = L.map('adminMap').setView([16.0471, 108.2062], 5);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(adminMap);
   setTimeout(()=> adminMap.invalidateSize(), 100);
+  if(typeof ResizeObserver !== 'undefined'){
+    const ro = new ResizeObserver(()=>{ if(adminMap) adminMap.invalidateSize(); });
+    ro.observe(document.getElementById('adminMap'));
+  }
 }
 function subscribeAdminData(){
   adminLocationsRef = gDb.ref('groupChat/userLocations');
   adminLocationsRef.on('value', snap=>{
     adminLocationsData = snap.val() || {};
     renderAdminMarkers();
+  }, err=>{
+    console.error('Không đọc được vị trí thành viên:', err);
+    showToast('Không lấy được dữ liệu vị trí: ' + describeStorageError(err));
   });
   adminPresenceRefForMap = gDb.ref('groupChat/presence');
   adminPresenceRefForMap.on('value', snap=>{
     adminPresenceData = snap.val() || {};
     renderAdminMarkers();
+  }, err=>{
+    console.error('Không đọc được danh sách online:', err);
   });
 }
 function unsubscribeAdminData(){
@@ -3554,7 +3285,6 @@ function fmtAdminTime(ts){
 function renderAdminMarkers(){
   if(!adminMap) return;
   const uids = Object.keys(adminLocationsData);
-  // Xóa marker của những user không còn dữ liệu vị trí
   Object.keys(adminMarkers).forEach(uid=>{
     if(!adminLocationsData[uid]){ adminMap.removeLayer(adminMarkers[uid]); delete adminMarkers[uid]; }
   });
@@ -3593,7 +3323,6 @@ function renderAdminUserList(){
     adminUserListEl.innerHTML = '<div class="listbox-item">Chưa có thành viên nào chia sẻ vị trí</div>';
     return;
   }
-  // Online lên trước, mới nhất lên trước
   const sorted = uids.slice().sort((a,b)=>{
     const onlineA = !!adminPresenceData[a], onlineB = !!adminPresenceData[b];
     if(onlineA !== onlineB) return onlineA ? -1 : 1;
@@ -3621,19 +3350,61 @@ function renderAdminUserList(){
     });
   });
 }
+function unsubscribeAdminHistory(){
+  if(adminHistoryRef){ adminHistoryRef.off('value'); adminHistoryRef = null; }
+  adminSelectedUid = null;
+  if(adminHistoryMarker && adminMap){ adminMap.removeLayer(adminHistoryMarker); adminHistoryMarker = null; }
+}
+function loadAdminHistory(uid, name){
+  if(adminHistoryRef){ adminHistoryRef.off('value'); adminHistoryRef = null; }
+  adminSelectedUid = uid;
+  renderAdminUserList();
+  adminHistoryLabelEl.textContent = 'Lịch sử vị trí của ' + (name || 'Ẩn danh');
+  adminHistoryListEl.innerHTML = '<div class="listbox-item">Đang tải lịch sử vị trí...</div>';
+  adminHistoryRef = gDb.ref('groupChat/userLocationHistory/' + uid).limitToLast(100);
+  adminHistoryRef.on('value', snap=>{
+    const val = snap.val() || {};
+    const list = Object.keys(val)
+      .map(k => ({ id:k, ...val[k] }))
+      .filter(h => typeof h.lat === 'number' && typeof h.lng === 'number')
+      .sort((a,b)=> (b.timestamp||0) - (a.timestamp||0));
+    renderAdminHistoryList(list, name);
+  }, err=>{
+    console.error('Không đọc được lịch sử vị trí:', err);
+    adminHistoryListEl.innerHTML = `<div class="listbox-item">Không lấy được lịch sử: ${escapeHtml(describeStorageError(err))}</div>`;
+  });
+}
+function renderAdminHistoryList(list, name){
+  if(list.length === 0){
+    adminHistoryListEl.innerHTML = `<div class="listbox-item">Chưa có lịch sử vị trí nào cho ${escapeHtml(name || 'Ẩn danh')}</div>`;
+    return;
+  }
+  adminHistoryListEl.innerHTML = list.map(h => `
+    <div class="listbox-item" data-hist-lat="${h.lat}" data-hist-lng="${h.lng}" data-hist-time="${h.timestamp || ''}" style="cursor:pointer">
+      <span class="item-title">${fmtAdminTime(h.timestamp)}</span>
+      <span class="item-link">${h.lat.toFixed(5)}, ${h.lng.toFixed(5)}</span>
+    </div>
+  `).join('');
+  adminHistoryListEl.querySelectorAll('[data-hist-lat]').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const lat = parseFloat(row.dataset.histLat);
+      const lng = parseFloat(row.dataset.histLng);
+      const ts = row.dataset.histTime ? Number(row.dataset.histTime) : null;
+      if(!adminMap) return;
+      adminMap.setView([lat, lng], 16);
+      if(adminHistoryMarker){ adminMap.removeLayer(adminHistoryMarker); }
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;border-radius:50%;background:#f59e0b;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)"></div>`,
+        iconSize: [14,14], iconAnchor: [7,7]
+      });
+      adminHistoryMarker = L.marker([lat, lng], { icon }).addTo(adminMap)
+        .bindPopup(`<b>${escapeHtml(name || 'Ẩn danh')}</b><br>Vị trí lúc: ${fmtAdminTime(ts)}`)
+        .openPopup();
+    });
+  });
+}
 
-/* =========================================================
-   TAB TẢI VIDEO (FACEBOOK / TIKTOK / REDNOTE)
-   - Facebook & TikTok: dán link -> gọi thử 1 dịch vụ công khai để lấy link
-     video xem trực tiếp + tiêu đề. Đây là các dịch vụ của bên thứ ba nên có
-     thể không phải lúc nào cũng hoạt động (đổi API, chặn theo khu vực, video
-     riêng tư...). Nếu lấy thất bại vì bất kỳ lý do gì, tự động hiện đường
-     dẫn sang công cụ tải video thay thế (x2download.com cho Facebook,
-     tikdownload.to cho TikTok) để người dùng tự thao tác tiếp.
-   - RedNote (Xiaohongshu): người dùng thường copy nguyên khối text chia sẻ
-     từ app (chữ Trung + link rút gọn dạng http://xhslink.cn/...), nên chỉ
-     cần tách đúng URL trong đoạn text đó rồi mở sang tab mới.
-========================================================= */
 function extractFirstUrl(text){
   const m = (text || '').match(/https?:\/\/[^\s"'<>]+/i);
   return m ? m[0] : null;
@@ -3645,7 +3416,6 @@ function renderDownloaderFallback(wrapEl, fallbackUrl, message){
   `;
 }
 
-/* ---------- Facebook ---------- */
 const fbLinkInput = document.getElementById('fbLinkInput');
 const btnFbFetch  = document.getElementById('btnFbFetch');
 const fbVideoWrap = document.getElementById('fbVideoWrap');
@@ -3658,10 +3428,6 @@ btnFbFetch.addEventListener('click', async ()=>{
   btnFbFetch.disabled = true;
   fbTitleWrap.style.display = 'none';
   fbTitleText.value = '';
-  // Dùng Video Plugin công khai của Facebook để nhúng trực tiếp (KHÔNG cần app token như
-  // oEmbed JSON — vốn hầu như luôn lỗi vì Facebook yêu cầu access_token từ năm 2018). Với
-  // link rút gọn dạng .../share/r/xxxx/ (Reels chia sẻ), Facebook tự phân giải ở phía máy
-  // chủ của họ bên trong khung nhúng nên vẫn hoạt động bình thường.
   const embedSrc = 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(link) + '&show_text=false';
   fbVideoWrap.innerHTML = `
     <div style="width:100%;aspect-ratio:9/16;max-height:75vh;border-radius:var(--radius-md);overflow:hidden;background:#000">
@@ -3671,8 +3437,6 @@ btnFbFetch.addEventListener('click', async ()=>{
     <p class="hint" style="margin:10px 0 0">Nếu khung phía trên không hiện được video (bài viết ở chế độ riêng tư, đã bị gỡ, hoặc Facebook chặn nhúng), dùng công cụ tải video thay thế bên dưới:</p>
     <a class="btn btn-ghost btn-full" style="margin-top:8px" href="https://x2download.com/en/home" target="_blank" rel="noopener noreferrer">Mở công cụ tải video thay thế</a>
   `;
-  // Cố lấy thêm tiêu đề bài viết qua oEmbed — không bắt buộc, nếu Facebook chặn/yêu cầu
-  // token thì bỏ qua lặng lẽ, không ảnh hưởng đến khung video nhúng ở trên.
   try{
     const resp = await fetch('https://www.facebook.com/plugins/video/oembed.json/?url=' + encodeURIComponent(link));
     if(resp.ok){
@@ -3689,7 +3453,6 @@ btnFbFetch.addEventListener('click', async ()=>{
   }
 });
 
-/* ---------- TikTok ---------- */
 const tkLinkInput = document.getElementById('tkLinkInput');
 const btnTkFetch  = document.getElementById('btnTkFetch');
 const tkVideoWrap = document.getElementById('tkVideoWrap');
@@ -3702,7 +3465,6 @@ btnTkFetch.addEventListener('click', async ()=>{
   tkTitleWrap.style.display = 'none';
   tkVideoWrap.innerHTML = '<div class="hint" style="margin:0">Đang lấy video, vui lòng chờ...</div>';
   try{
-    // Dịch vụ công khai thường dùng để lấy link video TikTok không watermark + tiêu đề
     const resp = await fetch('https://www.tikwm.com/api/?url=' + encodeURIComponent(link));
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
@@ -3726,7 +3488,6 @@ btnTkFetch.addEventListener('click', async ()=>{
   }
 });
 
-/* ---------- RedNote (Xiaohongshu) ---------- */
 const rnShareInput = document.getElementById('rnShareInput');
 const btnRnOpen    = document.getElementById('btnRnOpen');
 btnRnOpen.addEventListener('click', ()=>{
@@ -3737,19 +3498,6 @@ btnRnOpen.addEventListener('click', ()=>{
   window.open(url, '_blank', 'noopener');
 });
 
-/* =========================================================
-   TAB VIDEO YOUTUBE
-   - Dán link video HOẶC link playlist YouTube -> phát ngay bằng YouTube IFrame
-     Player API chính thức (không cần API key). Nếu là playlist, tự dựng danh
-     sách các video trong đó (lấy tiêu đề + ảnh thumbnail qua oEmbed công khai
-     của YouTube — không cần key), bấm vào video nào sẽ phát video đó.
-   - Tích hợp Media Session API để có nút phát/dừng/chuyển bài trên thanh
-     thông báo hệ thống — đây là cách để trình duyệt Android nhận diện đây là
-     một "phiên phát media" và ưu tiên giữ ÂM THANH chạy tiếp khi tab bị đưa
-     xuống nền. Trên iOS Safari, hệ điều hành vẫn có thể tự tạm dừng khi khoá
-     máy/rời trình duyệt — đây là giới hạn nền tảng, không khắc phục được chỉ
-     bằng JavaScript của 1 trang web thường (không phải app cài đặt riêng).
-========================================================= */
 const ytLinkInput    = document.getElementById('ytLinkInput');
 const btnYtLoad      = document.getElementById('btnYtLoad');
 const ytNowTitleWrap = document.getElementById('ytNowTitleWrap');
@@ -3775,7 +3523,7 @@ const btnYtLockPrev    = document.getElementById('btnYtLockPrev');
 const btnYtLockNext    = document.getElementById('btnYtLockNext');
 let ytPlayer = null;
 let ytApiReadyPromise = null;
-let ytLastResumedVideoId = null; // videoId đã được thử tua tới vị trí lưu trong phiên hiện tại (tránh tua lặp lại)
+let ytLastResumedVideoId = null;
 
 function ensureYoutubeApiReady(){
   if(window.YT && window.YT.Player) return Promise.resolve();
@@ -3786,7 +3534,7 @@ function ensureYoutubeApiReady(){
     const timeoutId = setTimeout(()=>{
       if(settled) return;
       settled = true;
-      ytApiReadyPromise = null; // cho phép thử lại ở lần bấm "Tải" tiếp theo thay vì kẹt mãi
+      ytApiReadyPromise = null;
       reject(new Error('Hết thời gian chờ tải trình phát YouTube (mạng quá chậm hoặc bị chặn)'));
     }, 15000);
     window.onYouTubeIframeAPIReady = ()=>{
@@ -3822,7 +3570,7 @@ function parseYoutubeLink(rawLink){
       else if(path.startsWith('/watch')) videoId = u.searchParams.get('v');
     }
     playlistId = u.searchParams.get('list');
-  }catch(e){ /* link không hợp lệ -> trả về null cho cả 2 */ }
+  }catch(e){ }
   return { videoId, playlistId };
 }
 btnYtLoad.addEventListener('click', async ()=>{
@@ -3859,7 +3607,7 @@ btnYtLoad.addEventListener('click', async ()=>{
 });
 function onYtPlayerReady(){
   setupYtMediaSessionHandlers();
-  buildYtPlaylistUiIfAny(); // tự thử lại nhiều lần bên trong nếu player chưa kịp nạp xong metadata playlist
+  buildYtPlaylistUiIfAny();
 }
 function onYtPlayerStateChange(e){
   updateYtNowPlaying();
@@ -3869,8 +3617,6 @@ function onYtPlayerStateChange(e){
     if('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     startYtSaveTimer();
     updateYtPlayPauseIcons('playing');
-    // Video này lần đầu chuyển sang PLAYING trong phiên hiện tại -> nếu có lưu vị trí xem
-    // dở từ trước (và chưa gần hết video) thì tự tua tới đó, kiểu "xem tiếp".
     if(videoId && videoId !== ytLastResumedVideoId){
       ytLastResumedVideoId = videoId;
       const h = ytHistoryData[videoId];
@@ -3887,9 +3633,6 @@ function onYtPlayerStateChange(e){
     stopYtSaveTimer();
     updateYtPlayPauseIcons('paused');
   }else if(e.data === YT.PlayerState.BUFFERING){
-    // Đang tải bộ đệm (thường do mạng yếu/chập chờn) — chỉ đổi biểu tượng để người dùng biết
-    // ứng dụng KHÔNG bị treo, chỉ đang chờ dữ liệu; không can thiệp gì thêm, để trình phát tự
-    // xử lý lại khi mạng ổn định trở lại (đây là cơ chế có sẵn của YouTube player).
     updateYtPlayPauseIcons('buffering');
   }else if(e.data === YT.PlayerState.ENDED){
     if(videoId) upsertYtHistoryEntry(videoId, { position: 0 });
@@ -3902,9 +3645,6 @@ function onYtPlayerStateChange(e){
   highlightCurrentYtPlaylistItem();
   if(ytLockOverlay.classList.contains('show')) updateYtLockScreenInfo();
 }
-// Lỗi phát video (video bị gỡ/riêng tư, chủ video chặn nhúng, lỗi mạng khiến trình phát HTML5
-// không tải được...) — hiện thông báo rõ ràng cho người dùng thay vì để ứng dụng như bị "treo"
-// tại video đó, và tự động bỏ qua sang video kế tiếp nếu đang phát playlist.
 function onYtPlayerError(e){
   const codeMessages = {
     2: 'Đường link video không hợp lệ.',
@@ -3923,8 +3663,6 @@ function onYtPlayerError(e){
     setTimeout(()=>{ try{ ytPlayer.nextVideo(); }catch(err){ console.error(err); } }, 1200);
   }
 }
-// Mất/có mạng trở lại trong lúc đang xem — chỉ báo cho người dùng biết lý do video có thể
-// bị gián đoạn, KHÔNG tự ý dừng/tải lại trình phát (để tránh làm gián đoạn thêm).
 window.addEventListener('offline', ()=>{
   showToast('Mất kết nối mạng — video YouTube có thể bị gián đoạn cho tới khi có mạng trở lại');
 });
@@ -3967,14 +3705,13 @@ async function buildYtPlaylistUiIfAny(retriesLeft){
   const list = ytPlayer.getPlaylist();
   if((!list || list.length === 0)){
     if(retriesLeft > 0){
-      // Player chưa kịp nạp xong metadata playlist -> thử lại sau 1 nhịp thay vì bỏ cuộc luôn
       setTimeout(()=> buildYtPlaylistUiIfAny(retriesLeft - 1), 400);
     }else{
       ytPlaylistWrap.style.display = 'none';
     }
     return;
   }
-  const limited = list.slice(0, 50); // giới hạn để tránh gọi oEmbed quá nhiều với playlist rất dài
+  const limited = list.slice(0, 50);
   ytPlaylistWrap.style.display = 'block';
   ytPlaylistWrap.innerHTML = '<div class="hint" style="margin:0 0 8px">Đang tải danh sách video...</div>';
   const items = await Promise.all(limited.map(async (vid, i)=>{
@@ -4020,16 +3757,12 @@ function highlightCurrentYtPlaylistItem(){
   });
 }
 
-/* ---------- Lịch sử phát & nhớ vị trí phát (lưu trên máy này, theo từng video) ----------
-   Mỗi vài giây trong lúc phát, và mỗi khi tạm dừng, vị trí hiện tại được lưu vào localStorage
-   theo videoId. Lần sau mở lại đúng video đó (dán link hoặc bấm vào lịch sử), trang tự tua
-   tới vị trí đã lưu (trừ khi đã xem gần hết). Video xem xong (kết thúc) sẽ reset về đầu. */
 const LS_KEY_YT_HISTORY = 'contentTool_ytHistory';
-const YT_HISTORY_LIMIT = 30;      // chỉ giữ lại 30 video gần nhất (cả khi lưu máy lẫn lưu tài khoản)
-const YT_SAVE_INTERVAL_MS = 5000; // lưu vị trí mỗi 5 giây trong lúc đang phát
-let ytHistoryData = {};  // { videoId: { title, author, thumb, position, duration, updatedAt } }
+const YT_HISTORY_LIMIT = 30;
+const YT_SAVE_INTERVAL_MS = 5000;
+let ytHistoryData = {};
 let ytSaveTimer = null;
-let ytHistoryCloudUid = null; // uid tài khoản Google đang đăng nhập -> lịch sử đồng bộ theo tài khoản này thay vì theo máy
+let ytHistoryCloudUid = null;
 
 function loadYtHistory(){
   try{ ytHistoryData = JSON.parse(localStorage.getItem(LS_KEY_YT_HISTORY) || '{}') || {}; }
@@ -4054,7 +3787,6 @@ function upsertYtHistoryEntry(videoId, patch){
   const toRemove = ids.length > YT_HISTORY_LIMIT ? ids.slice(YT_HISTORY_LIMIT) : [];
   toRemove.forEach(id=> delete ytHistoryData[id]);
   if(ytHistoryCloudUid){
-    // Đã đăng nhập Google -> lưu lịch sử theo tài khoản (đồng bộ được trên nhiều thiết bị)
     const updates = {};
     updates[videoId] = entry;
     toRemove.forEach(id=>{ updates[id] = null; });
@@ -4069,12 +3801,8 @@ function upsertYtHistoryEntry(videoId, patch){
     saveYtHistoryToStorage();
   }
 }
-/* Đồng bộ lịch sử theo tài khoản Google đã đăng nhập ở tab Group (dùng chung 1 lượt đăng nhập
-   cho cả app). Khi đăng nhập: đọc lịch sử đã lưu trên tài khoản, gộp thêm lịch sử đang có sẵn
-   trên máy (nếu mới hơn) rồi chuyển hẳn sang lắng nghe/lưu theo tài khoản. Khi đăng xuất: quay
-   lại đọc/lưu theo máy (localStorage) như trước. */
 let ytHistoryCloudRef = null;
-let ytHistorySyncStatus = 'idle'; // 'idle' | 'syncing' | 'synced' | 'error'
+let ytHistorySyncStatus = 'idle';
 let ytHistorySyncErrorMsg = '';
 gAuth.onAuthStateChanged(async (user)=>{
   if(ytHistoryCloudRef){ ytHistoryCloudRef.off('value'); ytHistoryCloudRef = null; }
@@ -4096,9 +3824,6 @@ gAuth.onAuthStateChanged(async (user)=>{
       }
       ytHistoryCloudRef = gDb.ref('groupChat/ytHistory/' + user.uid);
       ytHistoryCloudRef.on('value', snap2=>{
-        // Luôn hiển thị ĐÚNG dữ liệu mới nhất trên tài khoản — thay toàn bộ ytHistoryData bằng
-        // đúng nội dung Firebase trả về (không giữ lại phần cũ), đảm bảo danh sách hiện đủ và
-        // khớp 100% với tài khoản Google đang đăng nhập trên mọi thiết bị.
         ytHistoryData = snap2.val() || {};
         ytHistorySyncStatus = 'synced';
         renderYtHistory();
@@ -4113,7 +3838,6 @@ gAuth.onAuthStateChanged(async (user)=>{
       console.error('Không gộp/đọc được lịch sử theo tài khoản Google:', err);
       ytHistorySyncStatus = 'error';
       ytHistorySyncErrorMsg = describeYtHistorySyncError(err);
-      // Vẫn hiển thị lịch sử trên máy tạm thời để không mất trắng danh sách trong lúc lỗi
       loadYtHistory();
       renderYtHistory();
     }
@@ -4127,12 +3851,6 @@ gAuth.onAuthStateChanged(async (user)=>{
 });
 function describeYtHistorySyncError(err){
   if(err && err.code === 'PERMISSION_DENIED'){
-    // Cần cấu hình Firebase Realtime Database Rules cho phép user đã đăng nhập đọc/ghi đúng
-    // nhánh lịch sử của chính họ, ví dụ:
-    //   "groupChat": { "ytHistory": { "$uid": {
-    //     ".read": "auth != null && auth.uid === $uid",
-    //     ".write": "auth != null && auth.uid === $uid"
-    //   } } }
     return 'Chưa được cấp quyền lưu lịch sử lên tài khoản Google (cần cấu hình Firebase Rules cho đường dẫn groupChat/ytHistory).';
   }
   return (err && err.message) || 'Lỗi không xác định khi đồng bộ lịch sử.';
@@ -4175,8 +3893,6 @@ function saveCurrentYtPosition(){
   });
   renderYtHistory();
 }
-// Lưu lại ngay vị trí đang xem khi rời tab / khoá màn hình — đáng tin cậy hơn trên di động
-// so với sự kiện beforeunload (thường không kịp chạy trên trình duyệt di động).
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) saveCurrentYtPosition(); });
 window.addEventListener('pagehide', saveCurrentYtPosition);
 function renderYtHistory(){
@@ -4213,7 +3929,7 @@ async function playYtVideoFromHistory(videoId){
   try{
     await ensureYoutubeApiReady();
     if(ytPlayer){
-      ytPlayer.loadVideoById(videoId); // vị trí đã lưu sẽ tự tua tới trong onYtPlayerStateChange khi bắt đầu PLAYING
+      ytPlayer.loadVideoById(videoId);
     }else{
       ytPlayer = new YT.Player('ytPlayerEl', {
         width: '100%', height: '100%',
@@ -4252,11 +3968,6 @@ loadYtHistory();
 renderYtHistory();
 updateYtHistorySyncHint();
 
-/* ---------- Chỉ phát âm thanh (ẩn khung video) — giảm phần cần vẽ lại trên màn hình -----------
-   YouTube không cho lấy luồng "chỉ âm thanh" riêng qua trình nhúng công khai (không có API/khoá
-   truy cập cho việc đó), nên cách khả thi để giảm tải hiển thị + tiết kiệm pin ngay trên trình
-   duyệt là: thu nhỏ khung video xuống gần như 0 (ẩn đi bằng CSS, không dùng display:none để
-   video không bị dừng phát) và thay bằng 1 thanh "đang phát" gọn, tối giản để vẽ. */
 const LS_KEY_YT_AUDIO_ONLY = 'contentTool_ytAudioOnly';
 let ytAudioOnlyMode = false;
 function loadYtAudioOnlyPref(){
@@ -4290,11 +4001,6 @@ if(btnYtCompactPlayPause){
 }
 loadYtAudioOnlyPref();
 
-/* ---------- Khoá màn hình tối (tiết kiệm pin) ----------
-   Phủ 1 lớp gần như toàn màu đen lên hết trang, chỉ còn ảnh nhỏ + tiêu đề + nút điều khiển —
-   giảm mạnh diện tích sáng/diện tích cần vẽ lại trên màn hình (đặc biệt tiết kiệm pin thật sự
-   với màn OLED vì điểm ảnh đen gần như không tiêu thụ điện). Video/âm thanh YouTube vẫn tiếp
-   tục phát bình thường phía sau lớp phủ này, chỉ là không hiển thị khung hình động nữa. */
 function openYtLockScreen(){
   if(!ytPlayer){ showToast('Chưa có video nào đang phát để khoá màn hình'); return; }
   updateYtLockScreenInfo();
