@@ -967,6 +967,10 @@
       </div>
       <div class="section-label">Danh sách thành viên (bấm để xem lịch sử vị trí)</div>
       <div id="adminUserList" class="listbox"></div>
+	  <div class="chat-header-row" style="margin-top:0">
+        <div class="section-label" id="adminHistoryLabel" style="margin:0">Lịch sử vị trí</div>
+        <button id="btnAdminDeleteHistory" class="btn btn-danger" style="flex:none;padding:6px 10px;font-size:11.5px;min-height:auto;display:none" title="Xóa toàn bộ lịch sử vị trí của thành viên này">🗑 Xóa lịch sử</button>
+      </div>
       <div class="section-label" id="adminHistoryLabel">Lịch sử vị trí</div>
       <div id="adminHistoryList" class="listbox">
         <div class="listbox-item">Chọn 1 thành viên ở danh sách trên để xem lịch sử vị trí</div>
@@ -4154,7 +4158,6 @@ async function sendFloatingMessage(state){
 ========================================================= */
 const ADMIN_CONFIG_PATH = 'groupChat/userProfiles'; // node Firebase chứa {username, password}
 const LS_KEY_ADMIN_SESSION = 'contentTool_adminLoggedIn';
-
 const adminLoginCard   = document.getElementById('adminLoginCard');
 const adminMapCard     = document.getElementById('adminMapCard');
 const adminUserInput   = document.getElementById('adminUserInput');
@@ -4165,6 +4168,7 @@ const btnAdminLogout   = document.getElementById('btnAdminLogout');
 const adminUserListEl  = document.getElementById('adminUserList');
 const adminHistoryListEl  = document.getElementById('adminHistoryList');
 const adminHistoryLabelEl = document.getElementById('adminHistoryLabel');
+const btnAdminDeleteHistory = document.getElementById('btnAdminDeleteHistory');
 
 let adminMap = null;
 let adminMarkers = {};          // {uid: L.marker}
@@ -4333,26 +4337,49 @@ function renderAdminUserList(){
     });
   });
 }
+// Xóa thủ công toàn bộ lịch sử vị trí của thành viên đang được chọn xem.
+btnAdminDeleteHistory.addEventListener('click', async ()=>{
+  if(!adminSelectedUid) return;
+  const ok = await showConfirmDialog(
+    'Xóa lịch sử vị trí?',
+    'Toàn bộ lịch sử vị trí đã lưu của thành viên này trên Firebase sẽ bị xóa vĩnh viễn. Vị trí hiện tại (điểm mới nhất trên bản đồ) không bị ảnh hưởng.',
+    'Xóa lịch sử'
+  );
+  if(!ok) return;
+  try{
+    await gDb.ref('groupChat/userLocationHistory/' + adminSelectedUid).remove();
+    showToast('Đã xóa lịch sử vị trí');
+  }catch(err){
+    console.error(err);
+    showToast('Xóa thất bại: ' + describeStorageError(err));
+  }
+});
 /* ---------- Lịch sử vị trí của 1 thành viên (chọn từ danh sách bên trên) ---------- */
 function unsubscribeAdminHistory(){
   if(adminHistoryRef){ adminHistoryRef.off('value'); adminHistoryRef = null; }
   adminSelectedUid = null;
   if(adminHistoryMarker && adminMap){ adminMap.removeLayer(adminHistoryMarker); adminHistoryMarker = null; }
+  if(adminHistoryPolyline && adminMap){ adminMap.removeLayer(adminHistoryPolyline); adminHistoryPolyline = null; }
+  btnAdminDeleteHistory.style.display = 'none';
 }
 function loadAdminHistory(uid, name){
   if(adminHistoryRef){ adminHistoryRef.off('value'); adminHistoryRef = null; }
+  if(adminHistoryPolyline && adminMap){ adminMap.removeLayer(adminHistoryPolyline); adminHistoryPolyline = null; }
   adminSelectedUid = uid;
-  renderAdminUserList(); // để tô sáng dòng đang được chọn
+  renderAdminUserList();
   adminHistoryLabelEl.textContent = 'Lịch sử vị trí của ' + (name || 'Ẩn danh');
   adminHistoryListEl.innerHTML = '<div class="listbox-item">Đang tải lịch sử vị trí...</div>';
-  adminHistoryRef = gDb.ref('groupChat/userLocationHistory/' + uid).limitToLast(100);
+  btnAdminDeleteHistory.style.display = 'inline-flex';
+  // Không giới hạn số lượng (bỏ limitToLast) để đồng bộ và hiển thị TOÀN BỘ lịch sử
+  // đã ghi trên Firebase cho tài khoản này, không bị cắt bớt.
+  adminHistoryRef = gDb.ref('groupChat/userLocationHistory/' + uid);
   adminHistoryRef.on('value', snap=>{
     const val = snap.val() || {};
-    const list = Object.keys(val)
+    const listAsc = Object.keys(val)
       .map(k => ({ id:k, ...val[k] }))
       .filter(h => typeof h.lat === 'number' && typeof h.lng === 'number')
-      .sort((a,b)=> (b.timestamp||0) - (a.timestamp||0));
-    renderAdminHistoryList(list, name);
+      .sort((a,b)=> (a.timestamp||0) - (b.timestamp||0)); // tăng dần theo thời gian, dùng để vẽ đường đi
+    renderAdminHistoryList(listAsc, name);
   });
 }
 function renderAdminHistoryList(list, name){
