@@ -207,6 +207,14 @@
     display:flex; align-items:center; justify-content:center;
     font-size:10px; line-height:1; border:none; cursor:pointer;
   }
+  /* Nút "Thêm bộ" nằm cuối lưới hastag */
+  .hashtag-btn.hashtag-add{
+    border:1.5px dashed var(--primary);
+    background:var(--primary-light);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .hashtag-btn.hashtag-add .num{ font-size:24px; }
+  .hashtag-btn.hashtag-add .label{ color:var(--primary-text); }
   .dropzone{
     display:flex; align-items:center; justify-content:center; gap:8px;
     border:1.5px dashed var(--border); border-radius:var(--radius-md);
@@ -683,7 +691,7 @@
         <textarea id="contentInput" class="editor-common editor-textarea"
           placeholder="Nhập nội dung bài viết..." spellcheck="false"></textarea>
       </div>
-      <div class="section-label">Chọn bộ 5 hastag &amp; copy nội dung</div>
+      <div class="section-label">Chọn bộ 5 hastag &amp; copy nội dung (bấm ✎ để sửa/xóa, bấm ＋ để thêm bộ mới)</div>
       <div id="hashtagGrid" class="hashtag-grid"></div>
       <div class="btnrow">
         <button class="btn btn-ghost btn-full" id="btnClearContent">Xóa nội dung</button>
@@ -981,7 +989,11 @@
       <p class="hint">Danh sách các lần chỉnh sửa mã nguồn của công cụ, mới nhất lên trên.</p>
       <div class="listbox">
         <div class="listbox-item">
-          <span class="item-title">v1.5 <span style="font-weight:400;color:var(--muted)">— mới nhất</span></span>
+          <span class="item-title">v1.6 <span style="font-weight:400;color:var(--muted)">— mới nhất</span></span>
+          <span class="item-link">Bộ hastag: thêm nút "＋ Thêm bộ" để tạo bộ hastag mới, thêm nút "Xóa bộ này" trong popup sửa để xóa bộ không dùng nữa (có xác nhận); số thứ tự tự đánh lại theo danh sách.</span>
+        </div>
+        <div class="listbox-item">
+          <span class="item-title">v1.5</span>
           <span class="item-link">Thêm nhóm "Auto Comment" ở tab Shoppe (hàng đợi nhắc bình luận Shopee lên Facebook — công cụ tự copy nội dung & mở bài viết đúng giờ, người dùng tự bấm Đăng, không tự động hoá tài khoản); thêm mục Nhật ký cập nhật phiên bản này.</span>
         </div>
         <div class="listbox-item">
@@ -1099,13 +1111,13 @@
     </div>
   </div>
 
-  <!-- ============ POPUP SỬA BỘ HASTAG (tên nhãn + 5 hastag) ============ -->
+  <!-- ============ POPUP THÊM / SỬA / XÓA BỘ HASTAG (tên nhãn + 5 hastag) ============ -->
   <div id="hashtagModalOverlay" class="modal-overlay">
     <div class="modal-card">
       <button type="button" id="btnCloseHashtagModal" class="modal-close">✕</button>
       <div class="modal-icon">#</div>
-      <h3 class="modal-title">Sửa bộ hastag <span id="hashtagModalNum"></span></h3>
-      <p class="modal-desc">Đặt tên gợi nhớ cho bộ này và chỉnh sửa 5 hastag đi kèm — có thể cách nhau bằng dấu cách hoặc xuống dòng.</p>
+      <h3 class="modal-title" id="hashtagModalTitle">Sửa bộ hastag</h3>
+      <p class="modal-desc" id="hashtagModalDesc">Đặt tên gợi nhớ cho bộ này và chỉnh sửa 5 hastag đi kèm — có thể cách nhau bằng dấu cách hoặc xuống dòng.</p>
       <div class="field" style="margin-top:0">
         <label>Tên nhãn hiển thị</label>
         <input type="text" id="hashtagModalLabelInput" maxlength="40" placeholder="Vd: Tin tức mxh">
@@ -1116,7 +1128,8 @@
       </div>
       <div id="hashtagModalError" class="hint" style="color:var(--red);display:none;margin-top:8px"></div>
       <div class="btnrow">
-        <button type="button" class="btn btn-primary btn-full" id="btnSaveHashtagModal">Lưu bộ hastag</button>
+        <button type="button" class="btn btn-primary" id="btnSaveHashtagModal">Lưu bộ hastag</button>
+        <button type="button" class="btn btn-danger" id="btnDeleteHashtagModal" style="display:none">Xóa bộ này</button>
       </div>
     </div>
   </div>
@@ -1462,87 +1475,111 @@ contentHistoryList.addEventListener('click', (e)=>{
 loadContentHistory();
 renderContentHistory();
 /* =========================================================
-   LƯỚI NÚT HASTAG ĐÁNH SỐ (1..9) — có thể sửa cả TÊN NHÃN và 5 HASTAG
-   qua popup riêng (thay vì prompt() cũ chỉ sửa được hastag).
+   LƯỚI NÚT HASTAG — DANH SÁCH ĐỘNG: THÊM / SỬA / XÓA BỘ HASTAG
+   -------------------------------------------------------------
+   Mỗi bộ gồm { id, label, tags[] }. Số thứ tự hiển thị trên nút là
+   vị trí trong danh sách (1, 2, 3...) nên tự đánh lại khi thêm/xóa.
+   - Bấm ＋ ở cuối lưới để mở popup tạo bộ mới.
+   - Bấm ✎ trên 1 nút để mở popup sửa tên nhãn + 5 hastag; trong popup
+     đó có nút "Xóa bộ này" (có hỏi xác nhận).
+   - Dữ liệu lưu ở localStorage khóa 'contentTool_hashtagSets'. Nếu máy
+     này còn dữ liệu kiểu cũ (2 khóa hashtagPresets / hashtagLabels theo
+     số 1..9), sẽ tự chuyển sang kiểu mới ở lần mở đầu tiên.
 ========================================================= */
-const HASHTAG_NUMBERS = [1,2,3,4,5,6,7,8,9];
-const hashtagLabels = {
-  1:  'Tin tức mxh',
-  2:  'Tin Tức Mạng Xã Hội',
-  3:  'Tin Mới',
-  4:  'Tin Ngắn Mỗi Ngày',
-  5:  'Cảm Xúc Con Người',
-  6:  'ToDay News',
-  7:  'Tin Đường Phố',
-  8:  'TTMXH',
-  9:  'Tin Mới 24h'
-};
-const hashtagPresets = {
-  1:  ['#tintucmxh','#mxh24h','#hotnews','#xuhuongmoi','#capnhatnhanh'],
-  2:  ['#tintucmangxahoi','#mangxahoi','#newsdaily','#tinnong24h','#videohot'],
-  3:  ['#tinmoi','#tinnhanh','#capnhat24h','#newsupdate','#hottrendvn'],
-  4:  ['#tinnganmoingay','#banthinhanh','#tinthoisu','#moingaymottin','#thongtin24h'],
-  5:  ['#camxucconnguoi','#cauchuyencuocsong','#yeuthuong','#songtichcuc','#truyencamhung'],
-  6:  ['#todaynews','#breakingnews','#worldnews','#dailyupdate','#latestnews'],
-  7:  ['#tinduongpho','#duongpho24h','#thucte','#hientruong','#cuocsongquanhta'],
-  8:  ['#ttmxh','#tinxuhuong','#newsviral','#capnhatmoi','#tinhomnay'],
-  9:  ['#tinmoi24h','#24hnews','#news24','#tintuc24h','#tintucnong']
-};
+const DEFAULT_HASHTAG_SETS = [
+  { id:'hs_1', label:'Tin tức mxh',          tags:['#tintucmxh','#mxh24h','#hotnews','#xuhuongmoi','#capnhatnhanh'] },
+  { id:'hs_2', label:'Tin Tức Mạng Xã Hội',  tags:['#tintucmangxahoi','#mangxahoi','#newsdaily','#tinnong24h','#videohot'] },
+  { id:'hs_3', label:'Tin Mới',              tags:['#tinmoi','#tinnhanh','#capnhat24h','#newsupdate','#hottrendvn'] },
+  { id:'hs_4', label:'Tin Ngắn Mỗi Ngày',    tags:['#tinnganmoingay','#banthinhanh','#tinthoisu','#moingaymottin','#thongtin24h'] },
+  { id:'hs_5', label:'Cảm Xúc Con Người',    tags:['#camxucconnguoi','#cauchuyencuocsong','#yeuthuong','#songtichcuc','#truyencamhung'] },
+  { id:'hs_6', label:'ToDay News',           tags:['#todaynews','#breakingnews','#worldnews','#dailyupdate','#latestnews'] },
+  { id:'hs_7', label:'Tin Đường Phố',        tags:['#tinduongpho','#duongpho24h','#thucte','#hientruong','#cuocsongquanhta'] },
+  { id:'hs_8', label:'TTMXH',                tags:['#ttmxh','#tinxuhuong','#newsviral','#capnhatmoi','#tinhomnay'] },
+  { id:'hs_9', label:'Tin Mới 24h',          tags:['#tinmoi24h','#24hnews','#news24','#tintuc24h','#tintucnong'] }
+];
 const hashtagGrid = document.getElementById('hashtagGrid');
-const LS_KEY_HASHTAGS = 'contentTool_hashtagPresets';
+const LS_KEY_HASHTAG_SETS   = 'contentTool_hashtagSets';
+// Hai khóa cũ — chỉ còn dùng để chuyển dữ liệu cũ sang kiểu mới
+const LS_KEY_HASHTAGS       = 'contentTool_hashtagPresets';
 const LS_KEY_HASHTAG_LABELS = 'contentTool_hashtagLabels';
-(function loadHashtagPresets(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(LS_KEY_HASHTAGS) || 'null');
-    if(saved && typeof saved === 'object'){
-      HASHTAG_NUMBERS.forEach(n=>{
-        if(Array.isArray(saved[n]) && saved[n].length) hashtagPresets[n] = saved[n];
-      });
-    }
-  }catch(e){}
-})();
-(function loadHashtagLabels(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(LS_KEY_HASHTAG_LABELS) || 'null');
-    if(saved && typeof saved === 'object'){
-      HASHTAG_NUMBERS.forEach(n=>{
-        if(typeof saved[n] === 'string' && saved[n].trim()) hashtagLabels[n] = saved[n];
-      });
-    }
-  }catch(e){}
-})();
-function saveHashtagPresets(){
-  try{ localStorage.setItem(LS_KEY_HASHTAGS, JSON.stringify(hashtagPresets)); }catch(e){}
+let hashtagSets = [];
+function newHashtagId(){
+  return 'hs_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 }
-function saveHashtagLabels(){
-  try{ localStorage.setItem(LS_KEY_HASHTAG_LABELS, JSON.stringify(hashtagLabels)); }catch(e){}
+function isValidHashtagSet(s){
+  return s && typeof s.id === 'string' && typeof s.label === 'string' && Array.isArray(s.tags);
+}
+function loadHashtagSets(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(LS_KEY_HASHTAG_SETS) || 'null');
+    if(Array.isArray(saved)){
+      hashtagSets = saved.filter(isValidHashtagSet);
+      return;
+    }
+  }catch(e){}
+  // Chưa có dữ liệu kiểu mới -> dựng từ bộ mặc định, ghi đè bằng dữ liệu kiểu cũ nếu có
+  let oldTags = {}, oldLabels = {};
+  try{ oldTags = JSON.parse(localStorage.getItem(LS_KEY_HASHTAGS) || '{}') || {}; }catch(e){}
+  try{ oldLabels = JSON.parse(localStorage.getItem(LS_KEY_HASHTAG_LABELS) || '{}') || {}; }catch(e){}
+  hashtagSets = DEFAULT_HASHTAG_SETS.map((d, i)=>{
+    const n = i + 1;
+    const tags = (Array.isArray(oldTags[n]) && oldTags[n].length) ? oldTags[n].slice() : d.tags.slice();
+    const label = (typeof oldLabels[n] === 'string' && oldLabels[n].trim()) ? oldLabels[n] : d.label;
+    return { id: d.id, label, tags };
+  });
+}
+function saveHashtagSets(){
+  try{ localStorage.setItem(LS_KEY_HASHTAG_SETS, JSON.stringify(hashtagSets)); }catch(e){}
 }
 function joinHashtags(arr){ return arr.join(' '); }
 function renderHashtagGrid(){
-  hashtagGrid.innerHTML = HASHTAG_NUMBERS.map(n => `
-    <div class="hashtag-btn" data-n="${n}" title="Bấm để copy kèm 5 hastag của nút ${n}">
-      <button class="edit-pin" data-edit="${n}" title="Sửa tên nhãn &amp; 5 hastag">✎</button>
-      <span class="num">${n}</span>
-      <span class="label">${escapeHtml(hashtagLabels[n] || '')}</span>
+  const itemsHtml = hashtagSets.map((s, i) => `
+    <div class="hashtag-btn" data-id="${escapeHtml(s.id)}" title="Bấm để copy kèm 5 hastag của nút ${i+1}">
+      <button class="edit-pin" data-edit="${escapeHtml(s.id)}" title="Sửa / xóa bộ hastag này">✎</button>
+      <span class="num">${i+1}</span>
+      <span class="label">${escapeHtml(s.label || '')}</span>
     </div>
   `).join('');
+  const addHtml = `
+    <div class="hashtag-btn hashtag-add" data-add="1" title="Thêm bộ hastag mới">
+      <span class="num">＋</span>
+      <span class="label">Thêm bộ</span>
+    </div>
+  `;
+  hashtagGrid.innerHTML = itemsHtml + addHtml;
 }
+loadHashtagSets();
 renderHashtagGrid();
-/* ---------- Popup sửa bộ hastag (tên nhãn + 5 hastag cùng lúc) ---------- */
+/* ---------- Popup thêm / sửa / xóa bộ hastag ---------- */
 const hashtagModalOverlay      = document.getElementById('hashtagModalOverlay');
 const btnCloseHashtagModal     = document.getElementById('btnCloseHashtagModal');
-const hashtagModalNum          = document.getElementById('hashtagModalNum');
+const hashtagModalTitle        = document.getElementById('hashtagModalTitle');
 const hashtagModalLabelInput   = document.getElementById('hashtagModalLabelInput');
 const hashtagModalTagsInput    = document.getElementById('hashtagModalTagsInput');
 const hashtagModalError        = document.getElementById('hashtagModalError');
 const btnSaveHashtagModal      = document.getElementById('btnSaveHashtagModal');
-let hashtagEditingN = null;
-function openHashtagModal(n){
-  hashtagEditingN = n;
-  hashtagModalNum.textContent = '#' + n;
+const btnDeleteHashtagModal    = document.getElementById('btnDeleteHashtagModal');
+let hashtagEditingId = null; // null = đang thêm bộ mới; chuỗi = id bộ đang sửa
+function openHashtagModal(id){
   hashtagModalError.style.display = 'none';
-  hashtagModalLabelInput.value = hashtagLabels[n] || '';
-  hashtagModalTagsInput.value = joinHashtags(hashtagPresets[n] || []);
+  if(id == null){
+    hashtagEditingId = null;
+    hashtagModalTitle.textContent = 'Thêm bộ hastag mới';
+    hashtagModalLabelInput.value = '';
+    hashtagModalTagsInput.value = '';
+    btnDeleteHashtagModal.style.display = 'none';
+    btnSaveHashtagModal.textContent = 'Thêm bộ hastag';
+  }else{
+    const idx = hashtagSets.findIndex(s => s.id === id);
+    if(idx === -1) return;
+    const s = hashtagSets[idx];
+    hashtagEditingId = id;
+    hashtagModalTitle.textContent = 'Sửa bộ hastag #' + (idx + 1);
+    hashtagModalLabelInput.value = s.label || '';
+    hashtagModalTagsInput.value = joinHashtags(s.tags || []);
+    btnDeleteHashtagModal.style.display = 'block';
+    btnSaveHashtagModal.textContent = 'Lưu bộ hastag';
+  }
   hashtagModalOverlay.classList.add('show');
   setTimeout(()=> hashtagModalLabelInput.focus(), 60);
 }
@@ -1550,8 +1587,6 @@ function closeHashtagModal(){ hashtagModalOverlay.classList.remove('show'); }
 btnCloseHashtagModal.addEventListener('click', closeHashtagModal);
 hashtagModalOverlay.addEventListener('click', e=>{ if(e.target === hashtagModalOverlay) closeHashtagModal(); });
 btnSaveHashtagModal.addEventListener('click', ()=>{
-  const n = hashtagEditingN;
-  if(n == null) return;
   const label = hashtagModalLabelInput.value.trim();
   if(!label){
     hashtagModalError.textContent = 'Vui lòng nhập tên nhãn hiển thị.';
@@ -1565,32 +1600,63 @@ btnSaveHashtagModal.addEventListener('click', ()=>{
     return;
   }
   while(list.length < 5) list.push('#hashtag');
-  hashtagLabels[n] = label;
-  hashtagPresets[n] = list;
+  if(hashtagEditingId == null){
+    hashtagSets.push({ id: newHashtagId(), label, tags: list });
+    saveHashtagSets();
+    renderHashtagGrid();
+    closeHashtagModal();
+    showToast(`Đã thêm bộ hastag ${hashtagSets.length}: ${label}`);
+  }else{
+    const idx = hashtagSets.findIndex(s => s.id === hashtagEditingId);
+    if(idx === -1){ closeHashtagModal(); return; }
+    hashtagSets[idx].label = label;
+    hashtagSets[idx].tags = list;
+    saveHashtagSets();
+    renderHashtagGrid();
+    closeHashtagModal();
+    showToast(`Đã lưu bộ hastag ${idx + 1}: ${label}`);
+  }
+});
+btnDeleteHashtagModal.addEventListener('click', async ()=>{
+  if(hashtagEditingId == null) return;
+  const idx = hashtagSets.findIndex(s => s.id === hashtagEditingId);
+  if(idx === -1) return;
+  const name = hashtagSets[idx].label || ('bộ ' + (idx + 1));
+  const ok = await showConfirmDialog(
+    'Xóa bộ hastag này?',
+    `Bạn có chắc chắn muốn xóa bộ hastag "${name}"? Các bộ phía sau sẽ được đánh số lại. Hành động này không thể hoàn tác.`,
+    'Xóa'
+  );
+  if(!ok) return;
+  hashtagSets.splice(idx, 1);
+  saveHashtagSets();
   renderHashtagGrid();
-  saveHashtagPresets();
-  saveHashtagLabels();
   closeHashtagModal();
-  showToast(`Đã lưu bộ hastag ${n}: ${label}`);
+  showToast(`Đã xóa bộ hastag "${name}"`);
 });
 hashtagGrid.addEventListener('click', async (e)=>{
+  if(e.target.closest('[data-add]')){
+    openHashtagModal(null);
+    return;
+  }
   const editBtn = e.target.closest('[data-edit]');
   if(editBtn){
     openHashtagModal(editBtn.dataset.edit);
     return;
   }
   const card = e.target.closest('.hashtag-btn');
-  if(!card) return;
+  if(!card || !card.dataset.id) return;
+  const set = hashtagSets.find(s => s.id === card.dataset.id);
+  if(!set) return;
   const content = contentInput.value.trim();
   if(!content){ showToast('Chưa có nội dung để copy'); return; }
   addContentToHistory(content);
-  const n = card.dataset.n;
   const now = new Date();
   const dd = String(now.getDate()).padStart(2,'0');
   const mm = String(now.getMonth()+1).padStart(2,'0');
   const yyyy = now.getFullYear();
   const dateStr = `${dd}/${mm}/${yyyy}`;
-  const hashtagLine = joinHashtags(hashtagPresets[n]);
+  const hashtagLine = joinHashtags(set.tags);
   const formatted =
 `${content}
 Ngày đăng: ${dateStr}
@@ -4179,6 +4245,7 @@ let adminPresenceRefForMap = null;
 let adminHistoryRef = null;     // ref lịch sử vị trí của thành viên đang được chọn xem
 let adminSelectedUid = null;    // uid thành viên đang được chọn để xem lịch sử vị trí
 let adminHistoryMarker = null;  // marker tạm dùng để đánh dấu 1 điểm lịch sử khi bấm vào danh sách
+let adminHistoryPolyline = null; // đường nối các điểm lịch sử (khai báo thêm: trước đây biến này bị thiếu khai báo gây lỗi ReferenceError)
 
 function showAdminMapView(){
   adminLoginCard.style.display = 'none';
